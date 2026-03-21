@@ -283,24 +283,17 @@ h3 {
 }
 
 
-
-
-
 /* Headers */
-
 .header h1 {
-
-    position: absolute;
-    top: 200px;
-    left: 280px;
+    position: relative; /* Changed from absolute */
+    margin-top: 100px;  /* Adjusts distance from top nav */
+    margin-left: 280px;
     font-family: Blender Pro;
     color: #FCEE09;
     font-size: 70px;
     font-weight: 200;
     text-transform: uppercase;
-
 }
-
 .underline img {
 
     position: absolute;
@@ -405,54 +398,34 @@ h3 {
   }
 
 
+/* Bio Text */
+.intro, .intro2 {
+    position: relative; /* Changed from absolute */
+    left: 282px;
+    margin-top: 20px;   /* Creates space between lines */
+}
 
-
-
-/* Intro */
-
-.intro h2 {
-
+.intro h2, .intro2 h2 {
     color: #ffffff;
     font-weight: 100;
     font-size: 22px;
-}
-
-.intro {
-
-    position: absolute;
-    top: 375px;
-    left: 282px;
+    max-width: 800px; /* Prevents text from stretching too wide */
 }
 
 
-.intro2 h2 {
-
-    color: #ffffff;
-    font-weight: 100;
-    font-size: 22px;
-
-}
-
-.intro2 {
-
-    position: absolute;
-    left: 282px;
-    top: 412px;
-}
 /* --- Professional Certifications Section --- */
 
 .entire_container {
     position: relative;
-    top: 70px;
-    padding-bottom: 200px; /* Space for the footer */
+    /* Remove the 'top' property entirely */
 }
 
 /* Category Headers */
 .languages, .software {
-    position: relative; /* Changed from absolute for better flow */
+    position: relative; /* Changed from absolute */
     left: 282px;
-    margin-top: 50px;
-    margin-bottom: 20px;
+    margin-top: 60px;   /* Pushes the category title down away from the bio */
+    margin-bottom: 30px;
 }
 
 .languages h2, .software h2 {
@@ -464,19 +437,17 @@ h3 {
 
 /* The Grid System */
 .cert-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 30px;
-    max-width: 1000px;
+    display: flex;      /* Use flex for a simple row */
+    flex-wrap: wrap;    /* Allows them to wrap if you add many */
+    gap: 40px;
     margin-left: 282px;
-    padding-top: 20px;
+    margin-top: 20px;
 }
 
 .cert-card img {
-    width: 180px; /* Matching the original card size */
+    width: 160px;       /* Set a consistent width */
+    height: auto;
     transition: 0.5s;
-    cursor: pointer;
-    filter: drop-shadow(0px 0px 2px rgba(0, 240, 255, 0.2));
 }
 
 .cert-card img:hover {
