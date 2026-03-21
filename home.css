@@ -40,7 +40,7 @@ body {
   margin: 0;
   height: 100%;
   overflow-x: hidden;
-  background-image: url("Home Page/loop.gif");
+  background-image: url("Home_Page/loop.gif");
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center center;
@@ -496,15 +496,21 @@ font-weight: 200;
 /*Social Media Icons */
 
 .social_box {
-
   position: absolute;
   left: 88px;
   top: 780px;
   padding-bottom: 150px;
+  z-index: 10; /* Ensure it stays above the background */
+}
+
+/* We target all images in the social container for a universal fix */
+.social_container img {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
 }
 
 .github img {
-
   position: absolute;
   top: 800px;
   left: 125px;
@@ -512,9 +518,7 @@ font-weight: 200;
   cursor: pointer;
 }
 
-
 .youtube img {
-
   position: absolute;
   top: 845px;
   left: 125px;
@@ -522,9 +526,7 @@ font-weight: 200;
   cursor: pointer;
 }
 
-
 .instagram img {
-
   position: absolute;
   top: 890px;
   left: 125px;
@@ -532,27 +534,22 @@ font-weight: 200;
   cursor: pointer;
 }
 
-
 .linkedin img {
-
   position: absolute;
   top: 935px;
   left: 125px;
   transition: .5s;
   cursor: pointer;
-
 }
 
-
 .icons_container {
-
   position: absolute;
   top: 16px;
   left: 2px;
+  z-index: 11;
 }
 
 .social_container {
-
   position: absolute;
   top: -90px;
   left: -20px;
