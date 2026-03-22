@@ -416,16 +416,20 @@ h3 {
 /* --- Professional Certifications Section --- */
 
 .entire_container {
-    position: relative;
-    /* Remove the 'top' property entirely */
+position: relative;
+    top: 50px; /* Reduced from 70px to pull it closer to the bio */
+    margin-left: 282px; /* Keeping your left alignment */
+    margin-right: 150px; /* THIS IS THE FIX: Creates a gap for the progress bar */
+    max-width: calc(100% - 450px); /* Ensures it doesn't expand too far right */
+    padding-bottom: 200px;
 }
 
 /* Category Headers */
+/* Reset individual category margins since the container now handles them */
 .languages, .software {
-    position: relative; /* Changed from absolute */
-    left: 282px;
-    margin-top: 60px;   /* Pushes the category title down away from the bio */
-    margin-bottom: 30px;
+    position: relative;
+    left: 0 !important; /* Resetting this because the parent container is already offset */
+    margin-top: 40px;
 }
 
 .languages h2, .software h2 {
@@ -437,11 +441,10 @@ h3 {
 
 /* The Grid System */
 .cert-grid {
-    display: flex;      /* Use flex for a simple row */
-    flex-wrap: wrap;    /* Allows them to wrap if you add many */
-    gap: 40px;
-    margin-left: 282px;
-    margin-top: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 25px;
+    justify-content: flex-start; /* Keeps badges left-aligned within the safe zone */
 }
 
 .cert-card img {
