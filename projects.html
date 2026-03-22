@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/1.11.4/TweenMax.min.js"></script>
     <title>DevaDarshan | Projects</title>
     <link rel="stylesheet" href="projects.css">
     <link rel="shortcut icon" type="image/png" href="favicon.png">
@@ -12,62 +13,64 @@
 
 <body style="background-color: #020106;" id="top">
 
-    <nav>
-          <input type="checkbox" id="nav" class="hidden">
-          <label for="nav" class="nav-btn"><i></i><i></i><i></i></label>
-          <div class="nav-wrapper">
-                <ul>
-                      <li><a href="index.html">Home</a></li>
-                      <li><a href="about.html">About</a></li>
-                      <li><a href="projects.html">Projects</a></li>
-                      <li><a href="DevaDarshan-R-K-resume.pdf" target="_blank">Resume</a></li>
-                </ul>
-          </div>
-    </nav>
+    <div class="container" id="home">
+        <nav>
+              <input type="checkbox" id="nav" class="hidden">
+              <label for="nav" class="nav-btn">
+                    <i></i>
+                    <i></i>
+                    <i></i>
+              </label>
+              <div class="nav-wrapper">
+                    <ul>
+                          <li><a href="index.html">Home</a></li>
+                          <li><a href="about.html">About</a></li>
+                          <li><a href="projects.html">Projects</a></li>
+                          <li><a href="DevaDarshan-R-K-resume.pdf" target="_blank">Resume</a></li>
+                    </ul>
+              </div>
+        </nav>
+    </div>
 
-    <div class="header_main_container">
-        <div class="header-with-underline">
+    <div class="header_container">
+        <div class="header" id="projects">
             <h1>Projects</h1>
-            <img src="About Page/underline.png" class="header-underline" draggable="false">
+        </div>
+        <div class="underline">
+            <img src="About_Page/underline.png" draggable="false">
         </div>
     </div>
 
-    <div class="social_sidebar">
-        <div class="social_box_wrapper">
-            <img src="About Page/socialbox_yellow.svg" class="social_bg" draggable="false">
-            <div class="icons_overlay">
-                <img src="About Page/github_black.svg" alt="GitHub" onclick="window.open('https://github.com/devadarshan5', '_blank');">
-                <img src="About Page/youtube_black.svg" alt="YouTube" onclick="window.open('https://www.youtube.com/channel/UCSCz36H43q4BJS_78Bghbew', '_blank');">
-                <img src="About Page/instagram_black.svg" alt="Instagram" onclick="window.open('https://www.instagram.com/devadarshan5', '_blank');">
-                <img src="About Page/linkedin_black.svg" alt="LinkedIn" onclick="window.open('https://www.linkedin.com/in/deva-darshan-r-k-07b3b8298', '_blank');">
+    <div class="social_container">
+        <div class="social_box">
+            <img src="About_Page/socialbox_yellow.svg" draggable="false">
+        </div>
+
+        <div class="icons_container">
+            <div class="github">
+                <img src="About_Page/github_black.svg" alt="github" draggable="false" onclick="window.open('https://github.com/devadarshan5', '_blank');" />
+            </div>
+
+            <div class="youtube">
+                <img src="About_Page/youtube_black.svg" alt="Youtube" draggable="false" onclick="window.open('https://www.youtube.com/channel/UCSCz36H43q4BJS_78Bghbew', '_blank');" />
+            </div>
+
+            <div class="instagram">
+                <img src="About_Page/instagram_black.svg" alt="Instagram" draggable="false" onclick="window.open('https://www.instagram.com/devadarshan5', '_blank');" />
+            </div>
+
+            <div class="linkedin">
+                <img src="About_Page/linkedin_black.svg" alt="Linkedin" draggable="false" onclick="window.open('https://www.linkedin.com/in/deva-darshan-r-k-07b3b8298', '_blank');" />
             </div>
         </div>
     </div>
 
-    <div class="entire_container">
-        <div class="project-grid">
-            
-            <div class="project-card">
-                <div class="project-placeholder">
-                    <p>PROJECT 1 IMAGE LATER</p>
-                </div>
-                <div class="project-info">
-                    <h3>UE5 Level Design</h3>
-                    <p>Description of your work goes here.</p>
-                </div>
-            </div>
+    <div class="project1">
+        <img class="responsive" src="Projects Page/ue5_project.png" draggable="false">
+    </div>
 
-            <div class="project-card">
-                <div class="project-placeholder">
-                    <p>PROJECT 2 IMAGE LATER</p>
-                </div>
-                <div class="project-info">
-                    <h3>Networking Lab</h3>
-                    <p>Description of your work goes here.</p>
-                </div>
-            </div>
-
-        </div>
+    <div class="project2">
+        <img class="responsive" src="Projects Page/network_lab.png" draggable="false">
     </div>
 
     <div class="footer">
@@ -80,16 +83,27 @@
     </div>
 
     <script>
+        var counter = document.querySelector(".percent");
+
         function progress() {
             var windowScrollTop = $(window).scrollTop();
             var docHeight = $(document).height();
             var windowHeight = $(window).height();
             var progress = (windowScrollTop / (docHeight - windowHeight)) * 100;
-            $("h3").text(Math.round(progress) + "%");
-            $(".fill").height(progress + "%");
+
+            var $bgColor = "#fff";
+            var $textColor = progress > 99 ? "#fff" : "#333";
+
+            $("h3")
+                .text(Math.round(progress) + "%")
+                .css({ color: $textColor });
+
+            $(".fill")
+                .height(progress + "%")
+                .css({ backgroundColor: $bgColor });
         }
-        $(document).on("scroll", progress);
         progress();
+        $(document).on("scroll", progress);
     </script>
 </body>
 </html>
