@@ -464,7 +464,6 @@ position: relative;
     filter: invert(1) grayscale(1) brightness(2);
     mix-blend-mode: screen;
 }
-}
 .cert-card img:hover {
     filter: drop-shadow(0px 0px 15px #00F0FF);
     transform: translateY(-5px);
