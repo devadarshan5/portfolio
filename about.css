@@ -449,12 +449,10 @@ h3 {
     height: auto;
     transition: 0.5s;
 }
-/* This removes white backgrounds from non-transparent badges */
-.remove-bg img {
-    mix-blend-mode: multiply;
-    filter: brightness(1.2); /* Boosts the colors since 'multiply' can darken them */
-    background-color: white; /* Required for the blend mode to calculate correctly */
-    border-radius: 5px;      /* Optional: softens the edges */
+.ghost-badge img {
+    filter: invert(1) grayscale(1) brightness(2);
+    mix-blend-mode: screen;
+}
 }
 .cert-card img:hover {
     filter: drop-shadow(0px 0px 15px #00F0FF);
