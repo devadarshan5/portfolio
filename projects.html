@@ -4,8 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/1.11.4/TweenMax.min.js"></script>
-    <title>Pathum Danthanarayana | Projects</title>
+    <title>Devadarshan R K | Projects</title>
     <link rel="stylesheet" href="projects.css">
     <link rel="shortcut icon" type="image/png" href="favicon.png">
     <script type="text/javascript" src="main.js"></script>
@@ -13,152 +12,87 @@
 
 <body style="background-color: #020106;" id="top">
 
-    <!--Navigation-->
-
     <div class="container" id="home">
         <nav>
               <input type="checkbox" id="nav" class="hidden">
-              <label for="nav" class="nav-btn">
-                    <i></i>
-                    <i></i>
-                    <i></i>
-              </label>
+              <label for="nav" class="nav-btn"><i></i><i></i><i></i></label>
               <div class="nav-wrapper">
                     <ul>
                           <li><a href="index.html">Home</a></li>
                           <li><a href="about.html">About</a></li>
                           <li><a href="projects.html">Projects</a></li>
-                          <li><a href="Pathum_D_2021_resume.pdf" target="_blank">Resume</a></li>
+                          <li><a href="DevaDarshan-R-K-resume.pdf" target="_blank">Resume</a></li>
                     </ul>
               </div>
         </nav>
     </div>
 
-
-<!--Headers-->
-
-<div class="header_container">
-
-    <div class="header" id="projects">
-        <h1>Projects</h1>
+    <div class="header_main_container">
+        <div class="header-with-underline">
+            <h1>Projects</h1>
+            <img src="About_Page/underline.png" class="header-underline" draggable="false">
+        </div>
     </div>
 
-    <div class="underline">
-        <img src="About Page/underline.png" draggable="false">
+    <div class="social_sidebar">
+        <div class="social_box_wrapper">
+            <img src="About_Page/socialbox_yellow.svg" class="social_bg" draggable="false">
+            <div class="icons_overlay">
+                <img src="About_Page/github_black.svg" alt="github" onclick="window.open('https://github.com/devadarshan5/', '_blank');">
+                <img src="About_Page/youtube_black.svg" alt="Youtube" onclick="window.open('https://www.youtube.com/channel/UCSCz36H43q4BJS_78Bghbew/', '_blank');">
+                <img src="About_Page/instagram_black.svg" alt="Instagram" onclick="window.open('https://www.instagram.com/devadarshan5/', '_blank');">
+                <img src="About_Page/linkedin_black.svg" alt="Linkedin" onclick="window.open('https://www.linkedin.com/in/deva-darshan-r-k-07b3b8298/', '_blank');">
+            </div>
+        </div>
     </div>
 
+    <div class="entire_container">
+        <div class="project-grid">
+            
+            <div class="project-card">
+                <div class="project-image">
+                    <img src="Projects_Page/ue5_project.jpg" alt="UE5 Level Design">
+                </div>
+                <div class="project-info">
+                    <h3>UE5 Level Design</h3>
+                    <p>High-fidelity environment design utilizing Lumen and Nanite.</p>
+                    <div class="tech-tags"><span>#UE5</span> <span>#LevelDesign</span></div>
+                </div>
+            </div>
+
+            <div class="project-card">
+                <div class="project-image">
+                    <img src="Projects_Page/network_lab.jpg" alt="Networking Lab">
+                </div>
+                <div class="project-info">
+                    <h3>Networking Lab</h3>
+                    <p>Secure network infrastructure and VLAN configuration.</p>
+                    <div class="tech-tags"><span>#Cybersecurity</span> <span>#Cisco</span></div>
+                </div>
+            </div>
+
+        </div>
     </div>
 
-
-<!--Social Media Icons-->
-<div class="social_container">
-
-    <div class="social_box">
-
-        <img src="About Page/socialbox_yellow.svg" draggable="false">
+    <div class="footer">
+        <h2>PCE_05 2026 | <a href="https://github.com/devadarshan5/portfolio" target="_blank">View Project Source</a></h2>
     </div>
 
-    <div class="icons_container">
-    <div class="github">
-        <img src="About Page/github_black.svg" alt="github" draggable="false" onclick="window.open('https://github.com/pathumd', '_blank');" />
+    <div class="percent">
+        <div class="fill"></div>
+        <div class="counter"><h3></h3></div>
     </div>
 
-    <div class="youtube">
-        <img src="About Page/youtube_black.svg" alt="Youtube" draggable="false" onclick="window.open('https://www.youtube.com/channel/UCwBEcY77KvSDHY8fWgY8gqg', '_blank');" />
-    </div>
-
-    <div class="instagram">
-        <img src="About Page/instagram_black.svg" alt="Instagram" draggable="false" onclick="window.open('https://www.instagram.com/pathum.danthanarayana/', '_blank');" />
-    </div>
-
-    <div class="linkedin">
-        <img src="About Page/linkedin_black.svg" alt="Linkedin" draggable="false" onclick="window.open('https://www.linkedin.com/in/pathum-danthanarayana/', '_blank');" />
-    </div>
-
-    </div>
-    </div>
-
-
-
-<!--Projects-->
-<div class="project1">
-    <img class="responsive" src="Projects Page/personalwebsite.png" draggable="false">
-</div>
-
-<div class="project2">
-    <img class="responsive" src="Projects Page/cyberpunk2077webconcept.png" draggable="false">
-</div>
-
-<div class="project3">
-    <img class="responsive" src="Projects Page/fluxuidesign.png" draggable="false">
-</div>
-
-<div class="project4">
-    <img class="responsive" src="Projects Page/casemod.png" draggable="false">
-</div>
-
-<div class="project5">
-    <img class="responsive" src="Projects Page/hyperlazer.png" draggable="false">
-</div>
-
-<div class="project6">
-    <img class="responsive" src="Projects Page/project_previse.png" draggable="false">
-</div>
-
-<div class="project7">
-    <img class="responsive" src="Projects Page/remakes.png" draggable="false">
-</div>
-
-<div class="project8">
-    <img class="responsive" src="Projects Page/photography.png" draggable="false">
-</div>
-
-<div class="project9">
-    <a href="cyberpunkart.html">
-    <img class="responsive" src="Projects Page/cyberpunk2077_screenshots.png" draggable="false">
-    </a>
-</div>
-
-
-
-<!--Footer-->
-
-<div class="footer">
-    <h2>Pathum Danthanarayana 2021 | <a href="https://github.com/pathumd/2021_personal_site" target="_blank">View this project</a></h2>
-</div>
-
-<!--Progress Counter-->
-<div class="percent">
-    <div class="fill"></div>
-    <div class="counter"><h3></h3></div>
-</div>
-
-<script>
-
-    var counter = document.querySelector(".percent");
-
-    function progress() {
-        var windowScrollTop = $(window).scrollTop();
-        var docHeight = $(document).height();
-        var windowHeight = $(window).height();
-        var progress = (windowScrollTop / (docHeight - windowHeight)) * 100;
-
-        var $bgColor = progress > 99 ? "#fff" : "#fff";
-        var $textColor = progress > 99 ? "#fff" : "#333";
-
-        $("h3")
-            .text(Math.round(progress) + "%")
-            .css({ color: $textColor });
-
-        $(".fill")
-            .height(progress + "%")
-            .css({ backgroundColor: $bgColor });
-    }
-    progress();
-    $(document).on("scroll", progress);
-</script>
-
-
+    <script>
+        function progress() {
+            var windowScrollTop = $(window).scrollTop();
+            var docHeight = $(document).height();
+            var windowHeight = $(window).height();
+            var progress = (windowScrollTop / (docHeight - windowHeight)) * 100;
+            $("h3").text(Math.round(progress) + "%");
+            $(".fill").height(progress + "%");
+        }
+        $(document).on("scroll", progress);
+    </script>
 </body>
-
 </html>
