@@ -99,7 +99,7 @@
   /* ===== Wanted poster triggers ===== */
 .poster-trigger{
   position:relative;
-  width:78px;
+  width:130px;
   cursor:pointer;
   text-decoration:none;
   display:block;
@@ -112,7 +112,7 @@
 }
 .poster-trigger img{ display:block; width:100%; height:auto; border-radius:1px; }
 .poster-trigger:hover{
-  transform: scale(1.35) rotate(calc(var(--rot,0deg) * 0.3));
+  transform: scale(1.75) rotate(calc(var(--rot,0deg) * 0.3));
   box-shadow:0 8px 20px rgba(244,196,48,.5);
   z-index:5;
 }
@@ -124,17 +124,19 @@
 .poster-trigger:hover .poster-label{ opacity:1; }
 
 .crew-reveal{
-  position:absolute; left:50%; bottom:78px;
-  transform:translateX(-50%) translateY(30px);
-  display:flex; gap:12px; padding:14px 18px;
-  background:rgba(4,6,12,.55);
+  position:absolute; left:50%; top:50%;
+  transform:translate(-50%,-50%) scale(.85);
+  display:flex; flex-wrap:wrap; justify-content:center;
+  gap:20px; padding:26px 32px;
+  background:rgba(4,6,12,.7);
   border:1px solid rgba(244,196,48,.35);
-  border-radius:10px;
+  border-radius:14px;
   opacity:0; pointer-events:none; z-index:25;
   transition: opacity .6s ease, transform .6s ease;
-  max-width:90vw; overflow-x:auto;
+  max-width:min(1100px, 94vw);
+  max-height:88vh;
 }
-.crew-reveal.is-open{ opacity:1; transform:translateX(-50%) translateY(0); pointer-events:auto; }
+.crew-reveal.is-open{ opacity:1; transform:translate(-50%,-50%) scale(1); pointer-events:auto; }
 
 /* ===== generic ink-wipe transition (exit to most pages) ===== */
 .page-transition{ position:fixed; inset:0; z-index:9997; pointer-events:none; }
@@ -148,27 +150,27 @@
 .pt-blot3{ width:120vmax; height:120vmax; opacity:.85; }
 
 /* ===== Nami's special loading screen ===== */
-.nami-loading{
+.char-loading{
   position:fixed; inset:0; z-index:9999;
   background:#000; opacity:0; pointer-events:none;
   transition:opacity .5s ease; overflow:hidden;
 }
-.nami-loading.is-active{ opacity:1; pointer-events:auto; }
-.nami-loading img.nl-bg{
+.char-loading.is-active{ opacity:1; pointer-events:auto; }
+.char-loading img.nl-bg{
   position:absolute; inset:0; width:100%; height:100%; object-fit:cover;
   opacity:0; transition:opacity .6s ease, transform 6s ease; transform:scale(1.06);
 }
-.nami-loading img.nl-bg.is-shown{ opacity:1; transform:scale(1); }
+.char-loading img.nl-bg.is-shown{ opacity:1; transform:scale(1); }
 .rain-layer{ position:absolute; inset:0; overflow:hidden; }
 .rain-icon{ position:absolute; top:-60px; cursor:pointer; will-change:transform; filter:drop-shadow(0 2px 4px rgba(0,0,0,.5)); }
-.rain-icon img{ display:block; width:100%; height:auto; }
+.rain-icon img{ display:block; width:100%; height:100%; object-fit:contain; }
 .nl-caption{
   position:absolute; bottom:40px; left:50%; transform:translateX(-50%);
   font-family:'Bebas Neue',sans-serif; letter-spacing:.3em; color:#F4C430;
   font-size:14px; opacity:0; transition:opacity .5s ease .3s;
   text-shadow:0 0 10px rgba(0,0,0,.8);
 }
-.nami-loading.is-active .nl-caption{ opacity:1; }
+.char-loading.is-active .nl-caption{ opacity:1; }
 
 .sparkle{
   position:fixed; font-family:'Luckiest Guy',cursive; color:#F4C430;
@@ -194,7 +196,7 @@
       <span class="eyebrow">Straw Hat Pirates</span>
       <h1 class="title">MONKEY D.<br>LUFFY</h1>
       <p class="desc">The boy who would be King of the Pirates. Rubber fists, an iron will, and a grin that never quits &mdash; chasing the world's greatest treasure.</p>
-      <button class="btn" id="setSailBtn">Set Sail</button>
+      <button class="btn" id="setSailBtn">Meet the Crew</button>
     </div>
     <div class="right">
       <span class="eyebrow">Joy Boy Awakened</span>
@@ -207,8 +209,8 @@
 
   <div class="crew-reveal" id="crewReveal">
     <a class="poster-trigger" href="Zoro.html" style="--rot:-6deg;"><img src="Wanted_Posters/zoro_wanted_poster.jpg" alt="Zoro"><span class="poster-label">Zoro</span></a>
-    <a class="poster-trigger" href="Nami.html" data-nami="true" style="--rot:5deg;"><img src="Wanted_Posters/nami_wanted_poster.jpg" alt="Nami"><span class="poster-label">Nami</span></a>
-    <a class="poster-trigger" href="Sanji.html" style="--rot:-4deg;"><img src="Wanted_Posters/sanji_wanted_poster.jpg" alt="Sanji"><span class="poster-label">Sanji</span></a>
+    <a class="poster-trigger" href="Nami.html" data-loading="nami" style="--rot:5deg;"><img src="Wanted_Posters/nami_wanted_poster.jpg" alt="Nami"><span class="poster-label">Nami</span></a>
+    <a class="poster-trigger" href="Sanji.html" data-loading="sanji" style="--rot:-4deg;"><img src="Wanted_Posters/sanji_wanted_poster.jpg" alt="Sanji"><span class="poster-label">Sanji</span></a>
     <a class="poster-trigger" href="Chopper.html" style="--rot:7deg;"><img src="Wanted_Posters/chopper_wanted_poster.jpg" alt="Chopper"><span class="poster-label">Chopper</span></a>
     <a class="poster-trigger" href="Robin.html" style="--rot:-5deg;"><img src="Wanted_Posters/robin_wanted_poster.jpg" alt="Robin"><span class="poster-label">Robin</span></a>
     <a class="poster-trigger" href="Franky.html" style="--rot:6deg;"><img src="Wanted_Posters/franky_wanted_poster.jpg" alt="Franky"><span class="poster-label">Franky</span></a>
@@ -224,10 +226,10 @@
   <div class="pt-blot pt-blot3"></div>
 </div>
 
-<div class="nami-loading" id="namiLoading">
-  <img class="nl-bg" id="namiLoadingImg" src="" alt="">
+<div class="char-loading" id="charLoading">
+  <img class="nl-bg" id="charLoadingImg" src="" alt="">
   <div class="rain-layer" id="rainLayer"></div>
-  <div class="nl-caption">Charting a course to Nami's Route&hellip;</div>
+  <div class="nl-caption" id="charLoadingCaption"></div>
 </div>
 
 <script>
@@ -436,11 +438,23 @@ function playExitTransition(x,y,href){
   animateScale(blots, 0, 1, reduceMotion?150:850, ()=>{ window.location.href=href; });
 }
 
-/* ---- Nami's special loading screen ---- */
-const NAMI_IMAGES = ['Nami_Page/loading1.png','Nami_Page/loading2.jpg','Nami_Page/loading3.jpeg'];
-const RAIN_ICONS  = ['Icons/berry.png','Icons/tangerine.png'];
+/* ---- character loading screens (config-driven, one per crew member) ---- */
+const LOADING_SCREENS = {
+  nami: {
+    images: ['Nami_Page/loading1.png','Nami_Page/loading2.jpg','Nami_Page/loading3.jpeg'],
+    icons:  ['Icons/berry.png','Icons/tangerine.png'],
+    caption: "Charting a course to Nami's Route\u2026",
+    href: 'Nami.html'
+  },
+  sanji: {
+    images: ['Sanji_Page/loading1.jpg','Sanji_Page/loading2.jpg','Sanji_Page/loading3.jpg','Sanji_Page/loading4.jpg','Sanji_Page/loading5.jpg'],
+    icons:  ['Icons/meat.png','Icons/rum.png','Icons/pizza.png','Icons/mooncake.png'],
+    caption: "Heading to the galley\u2026",
+    href: 'Sanji.html'
+  }
+};
 
-function spawnRainIcon(container){
+function spawnRainIcon(container, icons){
   const el=document.createElement('div');
   el.className='rain-icon';
   const size = 26+Math.random()*30;
@@ -448,10 +462,11 @@ function spawnRainIcon(container){
   const duration = 2.4+Math.random()*1.8;
   const rot = (Math.random()*80-40);
   el.style.width=size+'px';
+  el.style.height=size+'px';
   el.style.left=startX+'vw';
   el.style.transition=`transform ${duration}s linear, opacity .3s ease`;
   const img=document.createElement('img');
-  img.src = RAIN_ICONS[Math.floor(Math.random()*RAIN_ICONS.length)];
+  img.src = icons[Math.floor(Math.random()*icons.length)];
   el.appendChild(img);
   container.appendChild(el);
 
@@ -460,6 +475,7 @@ function spawnRainIcon(container){
   });
 
   el.addEventListener('click', (e)=>{
+    console.log('RAIN ICON CLICKED', el);
     e.stopPropagation();
     burstSparkle(e.clientX, e.clientY);
     el.style.opacity='0';
@@ -469,31 +485,29 @@ function spawnRainIcon(container){
   setTimeout(()=>{ if (el.parentNode) el.remove(); }, duration*1000+200);
 }
 
-function playNamiLoadingScreen(){
-  const overlay = document.getElementById('namiLoading');
-  const img = document.getElementById('namiLoadingImg');
-  const rainLayer = document.getElementById('rainLayer');
+function playCharLoadingScreen(key){
+  const config = LOADING_SCREENS[key];
+  if (!config) return;
 
-  const pick = NAMI_IMAGES[Math.floor(Math.random()*NAMI_IMAGES.length)];
+  const overlay   = document.getElementById('charLoading');
+  const img       = document.getElementById('charLoadingImg');
+  const rainLayer = document.getElementById('rainLayer');
+  const caption   = document.getElementById('charLoadingCaption');
+
+  const pick = config.images[Math.floor(Math.random()*config.images.length)];
   img.src = pick;
   img.classList.remove('is-shown');
+  caption.textContent = config.caption;
   overlay.classList.add('is-active');
   requestAnimationFrame(()=> img.classList.add('is-shown'));
 
-  const rainDuration = reduceMotion ? 900 : 2600;
-  let rainInterval = null;
-  if (!reduceMotion){
-    rainInterval = setInterval(()=> spawnRainIcon(rainLayer), 180);
-  }
+  const rainDuration = 2600;
+  const rainInterval = setInterval(()=> spawnRainIcon(rainLayer, config.icons), 180);
 
   setTimeout(()=>{
-    if (rainInterval) clearInterval(rainInterval);
-    overlay.classList.remove('is-active');
-    setTimeout(()=>{
-      rainLayer.innerHTML='';
-      window.location.href='Nami.html';
-    }, 550);
-  }, rainDuration);
+   clearInterval(rainInterval);
+   window.location.href = config.href;
+}, rainDuration);
 }
 
 /* ---- wire up every poster ---- */
@@ -504,8 +518,8 @@ document.querySelectorAll('.poster-trigger').forEach(a=>{
     const cx=rect.left+rect.width/2, cy=rect.top+rect.height/2;
     SoundEngine.playTick();
 
-    if (this.dataset.nami){
-      playNamiLoadingScreen();
+    if (this.dataset.loading){
+      playCharLoadingScreen(this.dataset.loading);
     } else {
       playExitTransition(cx, cy, this.getAttribute('href'));
     }
