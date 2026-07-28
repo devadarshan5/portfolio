@@ -180,6 +180,21 @@
   0%{ opacity:1; transform: translate(0,0) scale(.6); }
   100%{ opacity:0; transform: translate(var(--sx), var(--sy)) scale(1.3); }
 }
+
+.sakura-wipe{
+  position:fixed; inset:0; z-index:9996; pointer-events:none;
+  opacity:0; overflow:hidden;
+  background: radial-gradient(circle at 50% 50%, #ffd6ef, #ff9ad5);
+  transition: opacity .35s ease;
+}
+.sakura-wipe.is-active{ opacity:1; }
+.wipe-petal{
+  position:absolute; opacity:0;
+  transform: scale(.2) rotate(0deg);
+  transition: opacity .5s ease, transform .5s cubic-bezier(.2,1.4,.4,1);
+}
+.wipe-petal.is-in{ opacity:.95; }
+
 </style>
 </head>
 <body>
@@ -211,8 +226,8 @@
     <a class="poster-trigger" href="Zoro.html" style="--rot:-6deg;"><img src="Wanted_Posters/zoro_wanted_poster.jpg" alt="Zoro"><span class="poster-label">Zoro</span></a>
     <a class="poster-trigger" href="Nami.html" data-loading="nami" style="--rot:5deg;"><img src="Wanted_Posters/nami_wanted_poster.jpg" alt="Nami"><span class="poster-label">Nami</span></a>
     <a class="poster-trigger" href="Sanji.html" data-loading="sanji" style="--rot:-4deg;"><img src="Wanted_Posters/sanji_wanted_poster.jpg" alt="Sanji"><span class="poster-label">Sanji</span></a>
-    <a class="poster-trigger" href="Chopper.html" style="--rot:7deg;"><img src="Wanted_Posters/chopper_wanted_poster.jpg" alt="Chopper"><span class="poster-label">Chopper</span></a>
-    <a class="poster-trigger" href="Robin.html" style="--rot:-5deg;"><img src="Wanted_Posters/robin_wanted_poster.jpg" alt="Robin"><span class="poster-label">Robin</span></a>
+    <a class="poster-trigger" href="Chopper.html" data-loading="chopper" style="--rot:7deg;"><img src="Wanted_Posters/chopper_wanted_poster.jpg" alt="Chopper"><span class="poster-label">Chopper</span></a>
+    <a class="poster-trigger" href="Robin.html" data-loading="robin" style="--rot:-5deg;"><img src="Wanted_Posters/robin_wanted_poster.jpg" alt="Robin"><span class="poster-label">Robin</span></a>
     <a class="poster-trigger" href="Franky.html" style="--rot:6deg;"><img src="Wanted_Posters/franky_wanted_poster.jpg" alt="Franky"><span class="poster-label">Franky</span></a>
     <a class="poster-trigger" href="Brook.html" style="--rot:-7deg;"><img src="Wanted_Posters/brook_wanted_poster.jpg" alt="Brook"><span class="poster-label">Brook</span></a>
     <a class="poster-trigger" href="Usopp.html" style="--rot:4deg;"><img src="Wanted_Posters/usopp_wanted_poster.jpg" alt="Usopp"><span class="poster-label">Usopp</span></a>
@@ -225,6 +240,8 @@
   <div class="pt-blot pt-blot2"></div>
   <div class="pt-blot pt-blot3"></div>
 </div>
+
+<div class="sakura-wipe" id="sakuraWipe"></div>
 
 <div class="char-loading" id="charLoading">
   <img class="nl-bg" id="charLoadingImg" src="" alt="">
@@ -344,6 +361,28 @@
 "use strict";
 const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+function playSakuraWipe(done){
+  const wipe = document.getElementById('sakuraWipe');
+  wipe.innerHTML = '';
+  wipe.classList.add('is-active');
+  const count = reduceMotion ? 0 : 46;
+  for (let i=0;i<count;i++){
+    const p = document.createElement('span');
+    p.className = 'wipe-petal';
+    p.textContent = '\u{1F338}';
+    p.style.left = (Math.random()*100) + 'vw';
+    p.style.top  = (Math.random()*100) + 'vh';
+    p.style.fontSize = (22 + Math.random()*30) + 'px';
+    const rot = Math.random()*360;
+    wipe.appendChild(p);
+    setTimeout(()=>{
+      p.classList.add('is-in');
+      p.style.transform = `scale(1.15) rotate(${rot}deg)`;
+    }, Math.random() * (reduceMotion ? 0 : 260));
+  }
+  setTimeout(()=>{ if (done) done(); }, reduceMotion ? 80 : 650);
+}
+
 (function(){
   const overlay = document.getElementById('pageTransition');
   const blots = overlay.querySelectorAll('.pt-blot');
@@ -451,6 +490,20 @@ const LOADING_SCREENS = {
     icons:  ['Icons/meat.png','Icons/rum.png','Icons/pizza.png','Icons/mooncake.png'],
     caption: "Heading to the galley\u2026",
     href: 'Sanji.html'
+  },
+  robin: {
+    images: ['Robin_Page/loading1.jpg','Robin_Page/loading2.jpg','Robin_Page/loading3.jpg','Robin_Page/loading4.png','Robin_Page/loading5.jpg'],
+    icons:  ['Icons/berry.png','Icons/tangerine.png'],
+    caption: "Uncovering the record\u2026",
+    href: 'Robin.html',
+    transition: 'sakura'
+  },
+  chopper: {
+    images: ['Chopper_Page/loading1.jpg','Chopper_Page/loading2.jpg','Chopper_Page/loading3.jpg'],
+    icons:  ['Icons/berry.png','Icons/tangerine.png'],
+    caption: "Following the sakura trail\u2026",
+    href: 'Chopper.html',
+    transition: 'sakura'
   }
 };
 
@@ -489,25 +542,32 @@ function playCharLoadingScreen(key){
   const config = LOADING_SCREENS[key];
   if (!config) return;
 
-  const overlay   = document.getElementById('charLoading');
-  const img       = document.getElementById('charLoadingImg');
-  const rainLayer = document.getElementById('rainLayer');
-  const caption   = document.getElementById('charLoadingCaption');
+  function reveal(){
+    const overlay   = document.getElementById('charLoading');
+    const img       = document.getElementById('charLoadingImg');
+    const rainLayer = document.getElementById('rainLayer');
+    const caption   = document.getElementById('charLoadingCaption');
+    img.src = config.images[Math.floor(Math.random()*config.images.length)];
+    img.classList.remove('is-shown');
+    caption.textContent = config.caption;
+    overlay.classList.add('is-active');
+    requestAnimationFrame(()=> img.classList.add('is-shown'));
+    const rainInterval = setInterval(()=> spawnRainIcon(rainLayer, config.icons), 180);
+    setTimeout(()=>{
+      const wipe = document.getElementById('sakuraWipe');
+      if (wipe) wipe.classList.remove('is-active');
+    }, 400);
+    setTimeout(()=>{
+      clearInterval(rainInterval);
+      window.location.href = config.href;
+    }, 2600);
+  }
 
-  const pick = config.images[Math.floor(Math.random()*config.images.length)];
-  img.src = pick;
-  img.classList.remove('is-shown');
-  caption.textContent = config.caption;
-  overlay.classList.add('is-active');
-  requestAnimationFrame(()=> img.classList.add('is-shown'));
-
-  const rainDuration = 2600;
-  const rainInterval = setInterval(()=> spawnRainIcon(rainLayer, config.icons), 180);
-
-  setTimeout(()=>{
-   clearInterval(rainInterval);
-   window.location.href = config.href;
-}, rainDuration);
+  if (config.transition === 'sakura'){
+    playSakuraWipe(reveal);
+  } else {
+    reveal();
+  }
 }
 
 /* ---- wire up every poster ---- */

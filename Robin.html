@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Robin — The Dig Site | Devadarshan R K</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=EB+Garamond:ital,wght@0,400;0,600;1,400&family=Kalam:wght@400;700&display=swap" rel="stylesheet">
+
+<style>
+
+/* =======================================================================
+   LOADING SCREENS
+   ======================================================================= */
+
+.sakura-wipe{
+  position:fixed; inset:0; z-index:9996; pointer-events:none;
+  opacity:0; overflow:hidden;
+  background: radial-gradient(circle at 50% 50%, #ffd6ef, #ff9ad5);
+  transition: opacity .35s ease;
+}
+.sakura-wipe.is-active{ opacity:1; }
+.wipe-petal{
+  position:absolute; opacity:0;
+  transform: scale(.2) rotate(0deg);
+  transition: opacity .5s ease, transform .5s cubic-bezier(.2,1.4,.4,1);
+}
+.wipe-petal.is-in{ opacity:.95; }
+
+/* generic ink-wipe transition */
+.page-transition{ position:fixed; inset:0; z-index:9997; pointer-events:none; }
+.pt-blot{ position:absolute; left:50%; top:50%; width:160vmax; height:160vmax; background: var(--stone-dark); border-radius:50%; transform:translate(-50%,-50%) scale(1); }
+.pt-blot2{ width:140vmax; height:140vmax; opacity:.92; }
+.pt-blot3{ width:120vmax; height:120vmax; opacity:.85; }
+
+/* character-specific loading screen */
+.char-loading{ position:fixed; inset:0; z-index:9999; background:#000; opacity:0; pointer-events:none; transition:opacity .5s ease; overflow:hidden; }
+.char-loading.is-active{ opacity:1; pointer-events:auto; }
+.char-loading img.nl-bg{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; opacity:0; transition:opacity .6s ease, transform 6s ease; transform:scale(1.06); }
+.char-loading img.nl-bg.is-shown{ opacity:1; transform:scale(1); }
+.rain-layer{ position:absolute; inset:0; overflow:hidden; }
+.rain-icon{ position:absolute; top:-60px; cursor:pointer; will-change:transform; filter:drop-shadow(0 2px 4px rgba(0,0,0,.5)); }
+.rain-icon img{ display:block; width:100%; height:100%; object-fit:contain; }
+.nl-caption{ position:absolute; bottom:40px; left:50%; transform:translateX(-50%); font-family: var(--font-display); letter-spacing:.2em; color: var(--amber-bright); font-size:13px; opacity:0; transition:opacity .5s ease .3s; text-shadow:0 0 10px rgba(0,0,0,.8); }
+.char-loading.is-active .nl-caption{ opacity:1; }
+
+.sparkle{ position:fixed; font-family: var(--font-display); color: var(--amber-bright); pointer-events:none; z-index:10000; animation: sparkle-pop .9s ease-out forwards; }
+@keyframes sparkle-pop{ 0%{ opacity:1; transform: translate(0,0) scale(.6); } 100%{ opacity:0; transform: translate(var(--sx), var(--sy)) scale(1.3); } }
+
+/* =======================================================================
+   DESIGN TOKENS
+   ======================================================================= */
+:root{
+  --stone-dark:  #2e2a24;
+  --stone-mid:   #4a4238;
+  --sandstone:   #b89768;
+  --parchment:   #ead9b8;
+  --moss:        #5f7350;
+  --amber:       #d4a24c;
+  --amber-bright:#f0c878;
+  --ink:         #241f18;
+  --shadow:      rgba(20,16,10,.6);
+
+  --font-display: 'Cinzel', serif;
+  --font-body:    'EB Garamond', serif;
+  --font-hand:    'Kalam', cursive;
+}
+
+*{ margin:0; padding:0; box-sizing:border-box; }
+html{ scroll-behavior:smooth; }
+body{
+  font-family: var(--font-body);
+  background: linear-gradient(180deg, #1c1914 0%, #14110d 100%);
+  color: var(--parchment);
+  overflow-x:hidden;
+  position:relative;
+}
+
+@media (prefers-reduced-motion: reduce){
+  *{ animation-duration:.001ms !important; animation-iteration-count:1 !important; transition-duration:.15s !important; }
+}
+
+::-webkit-scrollbar{ width:11px; }
+::-webkit-scrollbar-track{ background: #1c1914; }
+::-webkit-scrollbar-thumb{ background: var(--sandstone); border-radius:8px; border:2px solid #1c1914; }
+html{ scrollbar-color: var(--sandstone) #1c1914; scrollbar-width: thin; }
+
+/* =======================================================================
+   AMBIENT RUINS BACKDROP
+   ======================================================================= */
+.ruins-bg{ position:fixed; inset:0; z-index:0; pointer-events:none; overflow:hidden; }
+.ruins-bg::before{
+  content:'';
+  position:absolute; inset:0;
+  background: radial-gradient(ellipse 70% 45% at 50% 8%, rgba(212,162,76,.10) 0%, transparent 60%);
+}
+.column{
+  position:absolute; top:0; width:64px; height:38%;
+  background: linear-gradient(90deg, #2a251e 0%, var(--stone-mid) 45%, #2a251e 100%);
+  opacity:.55;
+}
+.column::before{ content:''; position:absolute; inset:0; background-image: repeating-linear-gradient(180deg, rgba(0,0,0,.15) 0 10px, transparent 10px 26px); }
+.col1{ left:4%; height:44%; }
+.col2{ left:22%; height:30%; opacity:.4; }
+.col3{ right:20%; height:36%; opacity:.45; }
+.col4{ right:5%; height:48%; }
+
+.vine{ position:absolute; width:5px; background: linear-gradient(180deg, var(--moss), #3a4630); opacity:.5; border-radius:3px; }
+
+#dustCanvas{ position:fixed; inset:0; z-index:1; pointer-events:none; }
+
+/* =======================================================================
+   HEADER
+   ======================================================================= */
+.wrap{ position:relative; z-index:2; max-width:1000px; margin:0 auto; padding: 90px 6vw 60px; }
+
+.intro{ text-align:center; min-height:70vh; display:flex; flex-direction:column; justify-content:center; align-items:center; gap:16px; }
+.eyebrow{ font-family: var(--font-display); font-size:12px; letter-spacing:.35em; text-transform:uppercase; color: var(--amber); }
+.title{ font-family: var(--font-display); font-weight:700; font-size: clamp(38px, 6.5vw, 74px); color: var(--parchment); text-shadow: 0 6px 30px rgba(0,0,0,.6); }
+.sub{ font-style:italic; color: rgba(234,217,184,.7); max-width:520px; font-size:17px; line-height:1.7; }
+.scroll-hint{ margin-top:20px; font-family: var(--font-display); font-size:11px; letter-spacing:.25em; color: var(--sandstone); animation: hint-bob 2.6s ease-in-out infinite; }
+@keyframes hint-bob{ 0%,100%{ transform:translateY(0);} 50%{ transform:translateY(8px);} }
+
+/* =======================================================================
+   PONEGLYPH TABLETS
+   ======================================================================= */
+.dig-row{ position:relative; min-height:74vh; display:flex; align-items:center; padding: 6vh 0; }
+.dig-row.left  { justify-content:flex-start; }
+.dig-row.right { justify-content:flex-end; }
+
+.tablet{
+  position:relative;
+  width:min(480px, 88vw);
+  border-radius: 10px;
+  background: linear-gradient(160deg, #59503f 0%, #3c352a 100%);
+  border: 3px solid #24201a;
+  box-shadow: 0 20px 40px var(--shadow), inset 0 0 0 6px rgba(0,0,0,.15);
+  padding: 4px;
+  opacity:0; transform: translateY(26px) scale(.97);
+  transition: opacity .7s ease, transform .7s ease;
+  cursor: pointer;
+}
+.tablet.is-shown{ opacity:1; transform:translateY(0) scale(1); }
+
+.tablet-face{
+  position:relative; overflow:hidden; border-radius:7px;
+  aspect-ratio: 1 / 1;
+}
+
+.runes{
+  position:absolute; inset:0;
+  opacity:1;
+  transition: opacity .9s ease;
+}
+.runes img{ width:100%; height:100%; object-fit:cover; display:block; }
+
+.tablet.is-deciphered .runes{ opacity:0; }
+.tablet:hover .runes{ opacity:.9; transition-duration:.3s; }
+
+.decipher-sweep{
+  position:absolute; left:-40%; top:0; bottom:0; width:40%;
+  background: linear-gradient(90deg, transparent, rgba(240,200,120,.35), transparent);
+  pointer-events:none;
+  transition: left 1.1s ease;
+}
+.tablet.is-deciphered .decipher-sweep{ left:120%; }
+
+.translation{
+  position:absolute; inset:0; z-index:2;
+  padding: 30px 26px;
+  overflow-y:auto;
+  opacity:0;
+  transition: opacity .8s ease .15s;
+}
+.tablet.is-deciphered .translation{ opacity:1; }
+.tablet:hover .translation{ opacity:.12; transition-duration:.3s; }
+
+.tab-index{ font-family: var(--font-display); font-size:11px; letter-spacing:.25em; color: var(--amber); text-transform:uppercase; }
+.tab-title{ font-family: var(--font-display); font-weight:700; font-size:24px; color: var(--parchment); margin: 6px 0 4px; }
+.tab-date{ font-size:13px; color: var(--sandstone); font-style:italic; display:block; margin-bottom:12px; }
+.tab-body{ font-size:16px; line-height:1.65; color: rgba(234,217,184,.9); }
+.tab-body a{ color: var(--amber-bright); }
+
+.hover-cue{ position:absolute; bottom:10px; right:16px; font-family: var(--font-hand); font-size:13px; color: rgba(212,162,76,.6); z-index:2; }
+
+/* Robin's research-journal margin note */
+.margin-note{
+  position:absolute; width:170px;
+  background: #efe3c8; color: var(--ink);
+  border: 1px solid rgba(36,32,26,.3);
+  border-radius:3px; padding:12px 14px;
+  font-family: var(--font-hand); font-size:15px; line-height:1.4;
+  box-shadow: 3px 5px 10px rgba(0,0,0,.35);
+  opacity:0; transform: rotate(var(--nrot,-3deg)) translateY(10px);
+  transition: opacity .6s ease .3s, transform .6s ease .3s;
+}
+.tablet.is-shown ~ .margin-note.is-shown,
+.margin-note.is-shown{ opacity:1; transform: rotate(var(--nrot,-3deg)) translateY(0); }
+.margin-note::before{ content:'\1F58B\FE0F'; margin-right:4px; }
+.dig-row.left .margin-note{ right: 4%; top: 14%; }
+.dig-row.right .margin-note{ left: 4%; top: 14%; }
+@media (max-width: 900px){
+  .margin-note{ display:none; }
+}
+
+/* =======================================================================
+   FINALE
+   ======================================================================= */
+.finale{ text-align:center; min-height:60vh; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:16px; }
+.finale-buttons{ display:flex; gap:16px; flex-wrap:wrap; justify-content:center; margin-top:12px; }
+.dig-btn{
+  font-family: var(--font-display); font-size:12px; letter-spacing:.15em;
+  padding:14px 24px; background: var(--stone-mid); color: var(--parchment);
+  border: 1px solid var(--sandstone); border-radius:3px; text-decoration:none;
+  transition: transform .25s ease, background .25s ease;
+}
+.dig-btn:hover{ transform: translateY(-2px); background: var(--amber); color: var(--ink); }
+
+/* =======================================================================
+   CREW DRAWER TRIGGER (magnifying glass badge)
+   ======================================================================= */
+.dig-trigger{
+  position:fixed; top:20px; left:20px; z-index:60;
+  width:54px; height:54px; border-radius:50%;
+  background: var(--stone-mid); border: 2px solid var(--amber);
+  display:flex; align-items:center; justify-content:center;
+  font-size:22px; cursor:pointer;
+  box-shadow: 0 4px 0 var(--shadow);
+  transition: transform .25s ease;
+}
+.dig-trigger:hover{ transform: scale(1.08) rotate(-6deg); }
+
+.crew-drawer{ position:fixed; inset:0; z-index:70; background: rgba(20,16,10,.65); display:flex; align-items:center; justify-content:center; opacity:0; pointer-events:none; transition: opacity .35s ease; padding: 5vh 4vw; }
+.crew-drawer.is-open{ opacity:1; pointer-events:auto; }
+.crew-panel{
+  background: var(--stone-dark); border: 3px solid var(--amber); border-radius:12px;
+  padding: 28px 28px 22px; max-width:560px; width:100%; max-height:84vh; overflow-y:auto;
+  box-shadow: 0 20px 50px var(--shadow);
+  transform: scale(.92) translateY(10px); transition: transform .35s cubic-bezier(.3,1.4,.4,1);
+  scrollbar-color: var(--amber) transparent; scrollbar-width: thin;
+}
+.crew-panel::-webkit-scrollbar{ width:6px; }
+.crew-panel::-webkit-scrollbar-track{ background: transparent; }
+.crew-panel::-webkit-scrollbar-thumb{ background: var(--amber); border-radius:6px; }
+.crew-drawer.is-open .crew-panel{ transform: scale(1) translateY(0); }
+.crew-panel-head{ display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; }
+.crew-panel-head h3{ font-family: var(--font-display); font-size:16px; letter-spacing:.1em; color: var(--amber-bright); }
+.crew-close{ width:30px; height:30px; border-radius:50%; border:1px solid var(--amber); background:transparent; color: var(--parchment); font-size:16px; cursor:pointer; }
+.crew-grid{ display:grid; grid-template-columns: repeat(3, 1fr); gap:12px; }
+.crew-link{ display:block; border:2px solid var(--ink); border-radius:5px; overflow:hidden; text-decoration:none; transition: transform .25s cubic-bezier(.34,1.5,.4,1); }
+.crew-link:hover{ transform: scale(1.06) rotate(-1deg); }
+.crew-link img{ display:block; width:100%; height:auto; }
+.crew-link .cl-name{ display:block; text-align:center; font-family: var(--font-display); font-size:10px; letter-spacing:.08em; padding:5px 0; background: var(--amber); color: var(--ink); }
+</style>
+</head>
+<body>
+
+<div class="ruins-bg" id="ruinsBg">
+  <div class="column col1"></div>
+  <div class="column col2"></div>
+  <div class="column col3"></div>
+  <div class="column col4"></div>
+  <div class="vine" style="left:6%; top:0; height:22%;"></div>
+  <div class="vine" style="right:24%; top:0; height:16%;"></div>
+  <div class="vine" style="right:7%; top:0; height:26%;"></div>
+</div>
+<canvas id="dustCanvas"></canvas>
+
+<div class="sakura-wipe" id="sakuraWipe"></div>
+
+<div class="page-transition" id="pageTransition">
+  <div class="pt-blot pt-blot1"></div>
+  <div class="pt-blot pt-blot2"></div>
+  <div class="pt-blot pt-blot3"></div>
+</div>
+
+<div class="char-loading" id="charLoading">
+  <img class="nl-bg" id="charLoadingImg" src="" alt="">
+  <div class="rain-layer" id="rainLayer"></div>
+  <div class="nl-caption" id="charLoadingCaption"></div>
+</div>
+
+<!-- ==================== CREW TRIGGER ==================== -->
+<div class="dig-trigger" id="digTrigger">&#128269;</div>
+<div class="crew-drawer" id="crewDrawer">
+  <div class="crew-panel">
+    <div class="crew-panel-head">
+      <h3>OTHER RECORDS ON FILE</h3>
+      <button class="crew-close" id="crewClose">&times;</button>
+    </div>
+    <div class="crew-grid">
+      <a class="crew-link" href="Luffy.html"><img src="Wanted_Posters/luffy_wanted_poster.jpg" alt="Luffy"><span class="cl-name">Luffy</span></a>
+      <a class="crew-link" href="Zoro.html"><img src="Wanted_Posters/zoro_wanted_poster.jpg" alt="Zoro"><span class="cl-name">Zoro</span></a>
+      <a class="crew-link" href="Nami.html" data-loading="nami"><img src="Wanted_Posters/nami_wanted_poster.jpg" alt="Nami"><span class="cl-name">Nami</span></a>
+      <a class="crew-link" href="Sanji.html" data-loading="sanji"><img src="Wanted_Posters/sanji_wanted_poster.jpg" alt="Sanji"><span class="cl-name">Sanji</span></a>
+      <a class="crew-link" href="Chopper.html" data-loading="chopper"><img src="Wanted_Posters/chopper_wanted_poster.jpg" alt="Chopper"><span class="cl-name">Chopper</span></a>
+      <a class="crew-link" href="Franky.html"><img src="Wanted_Posters/franky_wanted_poster.jpg" alt="Franky"><span class="cl-name">Franky</span></a>
+      <a class="crew-link" href="Brook.html"><img src="Wanted_Posters/brook_wanted_poster.jpg" alt="Brook"><span class="cl-name">Brook</span></a>
+      <a class="crew-link" href="Usopp.html"><img src="Wanted_Posters/usopp_wanted_poster.jpg" alt="Usopp"><span class="cl-name">Usopp</span></a>
+      <a class="crew-link" href="Jinbe.html"><img src="Wanted_Posters/jinbe_wanted_poster.jpg" alt="Jinbe"><span class="cl-name">Jinbe</span></a>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <!-- ==================== INTRO ==================== -->
+  <section class="intro">
+    <span class="eyebrow">An Excavation In Progress</span>
+    <h1 class="title">The Dig Site</h1>
+    <p class="sub">Six tablets, half-buried. Scroll closer and the stone starts to speak — hover to see the marks before the meaning.</p>
+    <span class="scroll-hint">&#9662; descend &#9662;</span>
+  </section>
+
+  <!-- ================= PONEGLYPH I ================= -->
+  <div class="dig-row left">
+    <div class="tablet" data-tablet>
+      <div class="tablet-face">
+        <div class="runes"><img src="Robin_Page/poneglyph1.png" alt="Poneglyph I, undeciphered"></div>
+        <div class="decipher-sweep"></div>
+        <div class="translation">
+          <span class="tab-index">Poneglyph I</span>
+          <h2 class="tab-title">First Contact</h2>
+          <span class="tab-date">2013</span>
+          <p class="tab-body">Long before any of this had a name, there was a cousin's PC in the countryside and whatever game happened to be installed. Didn't know it yet, but that was the beginning.</p>
+        </div>
+        <span class="hover-cue">hover to see the original marks</span>
+      </div>
+    </div>
+  <div class="margin-note" data-note style="--nrot:-4deg;">Every archive has an origin point. This is yours.</div>
+  </div>
+  
+
+  <!-- ================= PONEGLYPH II ================= -->
+  <div class="dig-row right">
+    <div class="tablet" data-tablet>
+      <div class="tablet-face">
+        <div class="runes"><img src="Robin_Page/poneglyph2.png" alt="Poneglyph II, undeciphered"></div>
+        <div class="decipher-sweep"></div>
+        <div class="translation">
+          <span class="tab-index">Poneglyph II</span>
+          <h2 class="tab-title">The Broken Arm</h2>
+          <span class="tab-date">2015</span>
+          <p class="tab-body">A lesson on how hard drives work turned into an unsupervised teardown of the family computer. The read/write arm didn't survive. Neither did the drive — but the habit of taking things apart stuck.</p>
+        </div>
+        <span class="hover-cue">hover to see the original marks</span>
+      </div>
+    </div>
+  <div class="margin-note" data-note style="--nrot:3deg;">Curiosity rarely arrives without a small casualty.</div>
+  </div>
+  
+
+  <!-- ================= PONEGLYPH III ================= -->
+  <div class="dig-row left">
+    <div class="tablet" data-tablet>
+      <div class="tablet-face">
+        <div class="runes"><img src="Robin_Page/poneglyph3.png" alt="Poneglyph III, undeciphered"></div>
+        <div class="decipher-sweep"></div>
+        <div class="translation">
+          <span class="tab-index">Poneglyph III</span>
+          <h2 class="tab-title">Down the Rabbit Hole</h2>
+          <span class="tab-date">2019</span>
+          <p class="tab-body">A2D Channel led to PCMR. PCMR led to Linus Tech Tips. Linus Tech Tips led to five more channels after that. What started as curiosity turned into a genuine knowledge goldmine.</p>
+        </div>
+        <span class="hover-cue">hover to see the original marks</span>
+      </div>
+    </div>
+  <div class="margin-note" data-note style="--nrot:-3deg;">Ah — the moment research becomes obsession. I know it well.</div>
+  </div>
+  
+
+  <!-- ================= PONEGLYPH IV ================= -->
+  <div class="dig-row right">
+    <div class="tablet" data-tablet>
+      <div class="tablet-face">
+        <div class="runes"><img src="Robin_Page/poneglyph4.png" alt="Poneglyph IV, undeciphered"></div>
+        <div class="decipher-sweep"></div>
+        <div class="translation">
+          <span class="tab-index">Poneglyph IV</span>
+          <h2 class="tab-title">The Hardware Oath</h2>
+          <span class="tab-date">2021 &ndash; 2026</span>
+          <p class="tab-body">Set out for CompTIA A+ in the first year of college, learning from Mike Myers and Steve Nicholson without realizing there were two full exams hiding inside one certification. Core 1 fell on June 12, 2025. Core 2 followed on September 17. After returning to Insightz Technology as a Security Analyst, Network+ was completed on March 8, 2026 &mdash; this time because the job actually needed it.</p>
+        </div>
+        <span class="hover-cue">hover to see the original marks</span>
+      </div>
+    </div>
+  <div class="margin-note" data-note style="--nrot:4deg;">Two exams disguised as one. Cruel, and strangely familiar.</div>
+  </div>
+  
+
+  <!-- ================= PONEGLYPH V ================= -->
+  <div class="dig-row left">
+    <div class="tablet" data-tablet>
+      <div class="tablet-face">
+        <div class="runes"><img src="Robin_Page/poneglyph5.png" alt="Poneglyph V, undeciphered"></div>
+        <div class="decipher-sweep"></div>
+        <div class="translation">
+          <span class="tab-index">Poneglyph V</span>
+          <h2 class="tab-title">Switching Shores</h2>
+          <span class="tab-date">2026</span>
+          <p class="tab-body">Kali and Ubuntu came and went, both broken more than once, neither built for gaming. Then came the year Linux got serious about it — and Bazzite ran Forza Horizon 6 better than Windows ever did. rEFInd got a One Piece theme and secure boot to match. The switch stuck.</p>
+        </div>
+        <span class="hover-cue">hover to see the original marks</span>
+      </div>
+    </div>
+  <div class="margin-note" data-note style="--nrot:-3deg;">Some ruins are worth returning to, once rebuilt properly.</div>
+  </div>
+  
+
+  <!-- ================= PONEGLYPH VI ================= -->
+  <div class="dig-row right">
+    <div class="tablet" data-tablet>
+      <div class="tablet-face">
+        <div class="runes"><img src="Robin_Page/poneglyph6.png" alt="Poneglyph VI, undeciphered"></div>
+        <div class="decipher-sweep"></div>
+        <div class="translation">
+          <span class="tab-index">Poneglyph VI</span>
+          <h2 class="tab-title">The Blank Page</h2>
+          <span class="tab-date">July 10, 2026</span>
+          <p class="tab-body">A doomscroll, a reel from <a href="https://www.instagram.com/codegirl.megha" target="_blank" rel="noopener">@codegirl.megha</a>, and a single HTML file holding Luffy's Gear 5 awakening — images and all, base64-encoded, freely shared on GitHub. That was the spark. Everything since has been built from there.</p>
+        </div>
+        <span class="hover-cue">hover to see the original marks</span>
+      </div>
+    </div>
+  <div class="margin-note" data-note style="--nrot:3deg;">History rarely announces itself. It just quietly begins.</div>
+  </div>
+  
+
+  <!-- ==================== FINALE ==================== -->
+  <section class="finale">
+    <span class="eyebrow">The Record Ends Here, For Now</span>
+    <h1 class="title" style="font-size:clamp(30px,5vw,52px);">More Will Be Buried Later</h1>
+    <p class="sub">Six tablets recovered. The rest of the site is still being excavated.</p>
+    <div class="finale-buttons">
+      <a class="dig-btn" href="Luffy.html">Return to the Ship</a>
+      <a class="dig-btn" href="Nami.html">See the Chart</a>
+      <a class="dig-btn" href="Zoro.html">See the Voyages</a>
+    </div>
+  </section>
+
+</div>
+
+<script>
+(function(){
+"use strict";
+const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+function playSakuraWipe(done){
+  const wipe = document.getElementById('sakuraWipe');
+  wipe.innerHTML = '';
+  wipe.classList.add('is-active');
+  const count = reduceMotion ? 0 : 46;
+  for (let i=0;i<count;i++){
+    const p = document.createElement('span');
+    p.className = 'wipe-petal';
+    p.textContent = '\u{1F338}';
+    p.style.left = (Math.random()*100) + 'vw';
+    p.style.top  = (Math.random()*100) + 'vh';
+    p.style.fontSize = (22 + Math.random()*30) + 'px';
+    const rot = Math.random()*360;
+    wipe.appendChild(p);
+    setTimeout(()=>{
+      p.classList.add('is-in');
+      p.style.transform = `scale(1.15) rotate(${rot}deg)`;
+    }, Math.random() * (reduceMotion ? 0 : 260));
+  }
+  setTimeout(()=>{ if (done) done(); }, reduceMotion ? 80 : 650);
+}
+
+/* ---- lightweight sound engine ---- */
+const SoundEngine = (function(){
+  let ctx=null, masterGain=null;
+  function ensureCtx(){
+    if (ctx) return;
+    ctx = new (window.AudioContext||window.webkitAudioContext)();
+    masterGain = ctx.createGain();
+    masterGain.gain.value = 0.35;
+    masterGain.connect(ctx.destination);
+  }
+  function playTick(){
+    ensureCtx();
+    if (ctx.state==='suspended') ctx.resume();
+    const o=ctx.createOscillator(), g=ctx.createGain();
+    o.type='triangle'; o.frequency.value=440;
+    g.gain.value=0.0001;
+    o.connect(g); g.connect(masterGain);
+    const t=ctx.currentTime;
+    g.gain.exponentialRampToValueAtTime(0.3,t+0.01);
+    g.gain.exponentialRampToValueAtTime(0.0001,t+0.2);
+    o.start(t); o.stop(t+0.22);
+  }
+  function playSparkle(){
+    ensureCtx();
+    if (ctx.state==='suspended') ctx.resume();
+    [880,1180,1560].forEach((f,i)=>{
+      const o=ctx.createOscillator(), g=ctx.createGain();
+      o.type='sine'; o.frequency.value=f;
+      g.gain.value=0.0001;
+      o.connect(g); g.connect(masterGain);
+      const t=ctx.currentTime+i*0.07;
+      g.gain.exponentialRampToValueAtTime(0.22,t+0.01);
+      g.gain.exponentialRampToValueAtTime(0.0001,t+0.3);
+      o.start(t); o.stop(t+0.32);
+    });
+  }
+  return { playTick, playSparkle };
+})();
+
+function burstSparkleAt(x, y){
+  const glyphs = ['&#10022;','&#10023;','&#10039;'];
+  for (let i=0;i<10;i++){
+    const s = document.createElement('span');
+    s.className = 'sparkle';
+    s.innerHTML = glyphs[Math.floor(Math.random()*glyphs.length)];
+    const angle = Math.random()*Math.PI*2, dist = 40+Math.random()*60;
+    s.style.setProperty('--sx', Math.cos(angle)*dist+'px');
+    s.style.setProperty('--sy', Math.sin(angle)*dist+'px');
+    s.style.left = x+'px'; s.style.top = y+'px';
+    s.style.fontSize = (14+Math.random()*10)+'px';
+    document.body.appendChild(s);
+    setTimeout(()=> s.remove(), 950);
+  }
+  SoundEngine.playSparkle();
+}
+
+/* ---- entrance (page load) + generic exit transition ---- */
+function playEntranceTransition(){
+  const blots = document.querySelectorAll('.pt-blot');
+  gsapFreeScale(blots, 1, 0, reduceMotion ? 150 : 700, ()=>{ document.getElementById('pageTransition').style.pointerEvents='none'; });
+}
+function playExitTransition(x, y, href){
+  const overlay = document.getElementById('pageTransition');
+  const blots = overlay.querySelectorAll('.pt-blot');
+  blots.forEach(b=>{ b.style.left = x+'px'; b.style.top = y+'px'; });
+  overlay.style.pointerEvents = 'auto';
+  gsapFreeScale(blots, 0, 1, reduceMotion ? 150 : 850, ()=>{ window.location.href = href; });
+}
+function gsapFreeScale(elements, from, to, duration, done){
+  const start = performance.now();
+  elements.forEach(el=> el.style.transform = `translate(-50%,-50%) scale(${from})`);
+  function step(now){
+    const p = Math.min(1, (now-start)/duration);
+    const eased = 1 - Math.pow(1-p, 3);
+    const val = from + (to-from)*eased;
+    elements.forEach(el=> el.style.transform = `translate(-50%,-50%) scale(${val})`);
+    if (p<1) requestAnimationFrame(step); else if (done) done();
+  }
+  requestAnimationFrame(step);
+}
+playEntranceTransition();
+
+/* ---- character loading screens ---- */
+const LOADING_SCREENS = {
+  nami: {
+    images: ['Nami_Page/loading1.png','Nami_Page/loading2.jpg','Nami_Page/loading3.jpeg'],
+    icons:  ['Icons/berry.png','Icons/tangerine.png'],
+    caption: "Charting a course to Nami's Route\u2026",
+    href: 'Nami.html'
+  },
+  sanji: {
+    images: ['Sanji_Page/loading1.jpg','Sanji_Page/loading2.jpg','Sanji_Page/loading3.jpg','Sanji_Page/loading4.jpg','Sanji_Page/loading5.jpg'],
+    icons:  ['Icons/meat.png','Icons/rum.png','Icons/pizza.png','Icons/mooncake.png'],
+    caption: "Heading to the galley\u2026",
+    href: 'Sanji.html'
+  },
+  chopper: {
+  images: ['Chopper_Page/loading1.jpg','Chopper_Page/loading2.jpg','Chopper_Page/loading3.jpg'],
+  icons:  ['Icons/berry.png','Icons/tangerine.png'],
+  caption: "Following the sakura trail\u2026",
+  href: 'Chopper.html',
+  transition: 'sakura'
+  }
+};
+
+function spawnRainIcon(container, icons){
+  const el=document.createElement('div');
+  el.className='rain-icon';
+  const size = 26+Math.random()*30;
+  el.style.width=size+'px'; el.style.height=size+'px';
+  el.style.left=(Math.random()*100)+'vw';
+  const duration = 2.4+Math.random()*1.8;
+  const rot = (Math.random()*80-40);
+  el.style.transition=`transform ${duration}s linear, opacity .3s ease`;
+  const img=document.createElement('img');
+  img.src = icons[Math.floor(Math.random()*icons.length)];
+  el.appendChild(img);
+  container.appendChild(el);
+  requestAnimationFrame(()=>{ el.style.transform = `translateY(115vh) rotate(${rot}deg)`; });
+  el.addEventListener('click', (e)=>{
+    e.stopPropagation();
+    burstSparkleAt(e.clientX, e.clientY);
+    el.style.opacity='0';
+    setTimeout(()=>el.remove(),300);
+  });
+  setTimeout(()=>{ if (el.parentNode) el.remove(); }, duration*1000+200);
+}
+
+function playCharLoadingScreen(key){
+  const config = LOADING_SCREENS[key];
+  if (!config) return;
+
+  function reveal(){
+    const overlay   = document.getElementById('charLoading');
+    const img       = document.getElementById('charLoadingImg');
+    const rainLayer = document.getElementById('rainLayer');
+    const caption   = document.getElementById('charLoadingCaption');
+    img.src = config.images[Math.floor(Math.random()*config.images.length)];
+    img.classList.remove('is-shown');
+    caption.textContent = config.caption;
+    overlay.classList.add('is-active');
+    requestAnimationFrame(()=> img.classList.add('is-shown'));
+    const rainInterval = setInterval(()=> spawnRainIcon(rainLayer, config.icons), 180);
+    setTimeout(()=>{
+      const wipe = document.getElementById('sakuraWipe');
+      if (wipe) wipe.classList.remove('is-active');
+    }, 400);
+    setTimeout(()=>{
+      clearInterval(rainInterval);
+      window.location.href = config.href;
+    }, 2600);
+  }
+
+  if (config.transition === 'sakura'){
+    playSakuraWipe(reveal);
+  } else {
+    reveal();
+  }
+}
+
+/* ---- wire up the crew links ---- */
+document.querySelectorAll('.crew-link').forEach(a=>{
+  a.addEventListener('click', function(e){
+    e.preventDefault();
+    const href = this.getAttribute('href');
+    const rect = this.getBoundingClientRect();
+    const cx = rect.left + rect.width/2;
+    const cy = rect.top + rect.height/2;
+    SoundEngine.playTick();
+    if (this.dataset.loading){
+      playCharLoadingScreen(this.dataset.loading);
+    } else {
+      playExitTransition(cx, cy, href);
+    }
+  });
+});
+
+/* ---- dust motes + light shaft ---- */
+const canvas = document.getElementById('dustCanvas');
+const ctx = canvas.getContext('2d');
+let w,h,motes=[];
+function resize(){ w=canvas.width=window.innerWidth; h=canvas.height=window.innerHeight; }
+resize(); window.addEventListener('resize', resize);
+const MOTE_COUNT = reduceMotion ? 0 : 40;
+for (let i=0;i<MOTE_COUNT;i++){
+  motes.push({ x:Math.random()*w, y:Math.random()*h, r:.6+Math.random()*1.3,
+    vx:(Math.random()-.5)*.08, vy:-.05-Math.random()*.08, a:.12+Math.random()*.2, drift:Math.random()*6 });
+}
+let running=true;
+function frame(){
+  if(!running) return;
+  ctx.clearRect(0,0,w,h);
+  motes.forEach(m=>{
+    m.drift+=.01; m.x+=m.vx+Math.sin(m.drift)*.05; m.y+=m.vy;
+    if(m.y<-4){ m.y=h+4; m.x=Math.random()*w; }
+    ctx.beginPath(); ctx.fillStyle=`rgba(240,200,120,${m.a})`; ctx.arc(m.x,m.y,m.r,0,Math.PI*2); ctx.fill();
+  });
+  requestAnimationFrame(frame);
+}
+if (MOTE_COUNT>0) frame();
+document.addEventListener('visibilitychange', ()=>{ running=!document.hidden; if(running && MOTE_COUNT>0) frame(); });
+
+/* ---- scroll reveal: tablets decipher, margin notes fade in ---- */
+const io = new IntersectionObserver((entries)=>{
+  entries.forEach(entry=>{
+    if (entry.isIntersecting){
+      entry.target.classList.add('is-shown');
+      if (entry.target.hasAttribute('data-tablet')){
+        setTimeout(()=> entry.target.classList.add('is-deciphered'), reduceMotion ? 50 : 500);
+      }
+      io.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.35 });
+
+document.querySelectorAll('[data-tablet], [data-note]').forEach(el=> io.observe(el));
+
+/* ---- crew drawer ---- */
+const digTrigger = document.getElementById('digTrigger');
+const crewDrawer = document.getElementById('crewDrawer');
+const crewClose  = document.getElementById('crewClose');
+digTrigger.addEventListener('click', ()=> crewDrawer.classList.add('is-open'));
+crewClose.addEventListener('click', ()=> crewDrawer.classList.remove('is-open'));
+crewDrawer.addEventListener('click', (e)=>{ if (e.target === crewDrawer) crewDrawer.classList.remove('is-open'); });
+})();
+</script>
+
+</body>
+</html>
