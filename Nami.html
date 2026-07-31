@@ -12,7 +12,7 @@
 <style>
 
 /* =======================================================================
-   SAKURA WIPE
+   1. SAKURA WIPE
    ======================================================================= */
 
 .sakura-wipe{
@@ -30,7 +30,7 @@
 .wipe-petal.is-in{ opacity:.95; }
 
 /* =======================================================================
-   1. RESET & DESIGN TOKENS
+   2. RESET & DESIGN TOKENS
    ======================================================================= */
 *{ margin:0; padding:0; box-sizing:border-box; }
 html{ scroll-behavior:smooth; }
@@ -70,7 +70,7 @@ a{ color: inherit; }
 }
 
 /* =======================================================================
-   2. FIXED CANVAS LAYERS (paper grain + ambient dust)
+   3. FIXED CANVAS LAYERS (paper grain + ambient dust)
    ======================================================================= */
 #paper-canvas, #ambient-canvas{
   position: fixed;
@@ -84,7 +84,7 @@ a{ color: inherit; }
 #ambient-canvas{ opacity:.55; }
 
 /* =======================================================================
-   3. CUSTOM CURSOR
+   4. CUSTOM CURSOR
    ======================================================================= */
 .cursor-dot{
   position: fixed;
@@ -108,7 +108,7 @@ a{ color: inherit; }
 @keyframes cursor-spin{ to{ transform: rotate(360deg); } }
 
 /* =======================================================================
-   4. TOP NAV — "CHARTS" DRAWER
+   5. TOP NAV — "CHARTS" DRAWER
    ======================================================================= */
 .visually-hidden{ position:absolute; opacity:0; pointer-events:none; }
 
@@ -159,7 +159,7 @@ a{ color: inherit; }
 #chart-nav-toggle:checked ~ .chart-nav{ max-height: 480px; }
 
 /* =======================================================================
-   5. SOUND TOGGLE
+   6. SOUND TOGGLE
    ======================================================================= */
 .sound-toggle{
   position: fixed;
@@ -180,7 +180,7 @@ a{ color: inherit; }
 .sound-toggle:hover{ background: var(--parchment-dark); }
 
 /* =======================================================================
-   6. LOG POSE COMPASS (fixed)
+   7. LOG POSE COMPASS (fixed)
    ======================================================================= */
 .log-pose{
   position: fixed;
@@ -218,7 +218,7 @@ a{ color: inherit; }
 .lp-caption.is-visible{ opacity: 1; transform: translateY(0); }
 
 /* =======================================================================
-   7. VOYAGE MAP CONTAINER + ROUTE SVG
+   8. VOYAGE MAP CONTAINER + ROUTE SVG
    ======================================================================= */
 .voyage{
   position: relative;
@@ -251,7 +251,7 @@ a{ color: inherit; }
 .wind-line{ stroke: var(--ink-soft); stroke-width:1; fill:none; opacity:.35; }
 
 /* =======================================================================
-   8. NARRATIVE "LOG ENTRY" BEATS
+   9. NARRATIVE "LOG ENTRY" BEATS
    ======================================================================= */
 .beat{
   position: relative;
@@ -275,7 +275,7 @@ a{ color: inherit; }
 .log-entry.gsap-in p{ opacity:1; transform:translateY(0); }
 
 /* =======================================================================
-   9. INTRO / FINALE HERO BEATS
+   10. INTRO / FINALE HERO BEATS
    ======================================================================= */
 .beat-intro, .beat-finale{
   min-height: 100vh;
@@ -355,7 +355,7 @@ a{ color: inherit; }
 }
 
 /* =======================================================================
-   10. ISLAND SECTIONS
+   11. ISLAND SECTIONS
    ======================================================================= */
 .island{
   position: relative;
@@ -456,6 +456,7 @@ a{ color: inherit; }
 .island-card.is-revealed .tech-chips li:nth-child(8){ animation-delay:.44s; }
 @keyframes chip-in{ to{ opacity:1; transform:translateY(0); } }
 
+/* sparkle burst (island reveals, finale, and clicked rain icons) */
 .sparkle{
   position:absolute;
   font-family: var(--font-display);
@@ -468,6 +469,7 @@ a{ color: inherit; }
   100%{ opacity:0; transform: translate(var(--sx), var(--sy)) scale(1.3); }
 }
 
+/* fullscreen character loading screen (image + falling rain icons) */
 .char-loading{
   position:fixed; inset:0; z-index:9999;
   background:#000; opacity:0; pointer-events:none;
@@ -491,7 +493,7 @@ a{ color: inherit; }
 .char-loading.is-active .nl-caption{ opacity:1; }
 
 /* =======================================================================
-   11. LANDMARK ICONS (per-island animated line art)
+   12. LANDMARK ICONS (per-island animated line art)
    ======================================================================= */
 .landmark svg{ width:100%; height:100%; overflow:visible; }
 .lm-line{ fill:none; stroke: var(--ink); stroke-width:3; stroke-linecap:round; stroke-linejoin:round; }
@@ -534,7 +536,7 @@ a{ color: inherit; }
 }
 
 /* =======================================================================
-   12. INK-WIPE REVEAL OVERLAY
+   13. INK-WIPE REVEAL OVERLAY
    ======================================================================= */
 .ink-overlay{
   position:absolute;
@@ -605,7 +607,7 @@ a{ color: inherit; }
 .pt-blot3{ width:120vmax; height:120vmax; opacity:.85; }
 
 /* =======================================================================
-   13. WOODGRAIN / OCEAN CURRENT DIVIDER + DUST
+   14. WOODGRAIN / OCEAN CURRENT DIVIDER + DUST
    ======================================================================= */
 .divider-note{
   position:relative;
@@ -618,7 +620,7 @@ a{ color: inherit; }
 }
 
 /* =======================================================================
-   14. RESPONSIVE
+   15. RESPONSIVE
    ======================================================================= */
 @media (max-width: 820px){
   .island{ justify-content:center !important; padding: 6vh 6vw; }
@@ -642,7 +644,7 @@ a{ color: inherit; }
 <canvas id="paper-canvas"></canvas>
 <canvas id="ambient-canvas"></canvas>
 
-<!-- ==================== CUSTOM CURSOR ==================== -->
+<!-- ==================== PAGE TRANSITIONS & LOADING SCREENS ==================== -->
 <div class="page-transition" id="pageTransition">
   <div class="pt-blot pt-blot1"></div>
   <div class="pt-blot pt-blot2"></div>
@@ -657,6 +659,7 @@ a{ color: inherit; }
   <div class="nl-caption" id="charLoadingCaption"></div>
 </div>
 
+<!-- ==================== CUSTOM CURSOR ==================== -->
 <div class="cursor-dot" id="cursorDot">
   <svg viewBox="0 0 40 40">
     <circle class="c-ring" cx="20" cy="20" r="16"/>
@@ -674,7 +677,7 @@ a{ color: inherit; }
     <a class="mobile-poster" href="projects.html"><img src="Wanted_Posters/zoro_wanted_poster.jpg" alt="Zoro"></a>
     <a class="mobile-poster" href="Chopper.html"><img src="Wanted_Posters/chopper_wanted_poster.jpg" alt="Chopper"></a>
     <a class="mobile-poster" href="Robin.html"><img src="Wanted_Posters/robin_wanted_poster.jpg" alt="Robin"></a>
-    <a class="mobile-poster" href="Franky.html"><img src="Wanted_Posters/franky_wanted_poster.jpg" alt="Franky"></a>
+    <a class="mobile-poster" href="Franky.html" data-loading="franky"><img src="Wanted_Posters/franky_wanted_poster.jpg" alt="Franky"></a>
     <a class="mobile-poster" href="Brook.html"><img src="Wanted_Posters/brook_wanted_poster.jpg" alt="Brook"></a>
     <a class="mobile-poster" href="Usopp.html"><img src="Wanted_Posters/usopp_wanted_poster.jpg" alt="Usopp"></a>
     <a class="mobile-poster" href="Jinbe.html"><img src="Wanted_Posters/jinbe_wanted_poster.jpg" alt="Jinbe"></a>
@@ -758,7 +761,7 @@ a{ color: inherit; }
 
   <!-- ================= NETWORKING ================= -->
   <section class="island island--left" data-caption="Approaching Networking Island">
-   <a class="poster-trigger" href="Luffy.html" style="right:7vw; top:12%; --rot:-6deg;">
+   <a class="poster-trigger" href="Luffy.html" data-loading="luffy" style="right:7vw; top:12%; --rot:-6deg;">
     <img src="Wanted_Posters/luffy_wanted_poster.jpg" alt="Luffy Wanted Poster">
     <span class="poster-label">Luffy</span>
    </a>
@@ -842,7 +845,7 @@ a{ color: inherit; }
     <img src="Wanted_Posters/robin_wanted_poster.jpg" alt="Robin Wanted Poster">
     <span class="poster-label">Robin</span>
    </a>
-   <a class="poster-trigger" href="Franky.html" style="right:6vw; top:60%; --rot:7deg;">
+   <a class="poster-trigger" href="Franky.html" data-loading="franky" style="right:6vw; top:60%; --rot:7deg;">
     <img src="Wanted_Posters/franky_wanted_poster.jpg" alt="Franky Wanted Poster">
     <span class="poster-label">Franky</span>
    </a>
@@ -1009,17 +1012,18 @@ const lerp  = (a,b,t) => a + (b-a)*t;
 if (window.gsap && window.ScrollTrigger){ gsap.registerPlugin(ScrollTrigger); }
 
 /* =======================================================================
-   SAKURA
+   2. SAKURA + COLA
    ======================================================================= */
-function playSakuraWipe(done){
+function playPetalWipe(emoji, colorA, colorB, done){
   const wipe = document.getElementById('sakuraWipe');
+  wipe.style.background = `radial-gradient(circle at 50% 50%, ${colorA}, ${colorB})`;
   wipe.innerHTML = '';
   wipe.classList.add('is-active');
   const count = reduceMotion ? 0 : 46;
   for (let i=0;i<count;i++){
     const p = document.createElement('span');
     p.className = 'wipe-petal';
-    p.textContent = '\u{1F338}';
+    p.textContent = emoji;
     p.style.left = (Math.random()*100) + 'vw';
     p.style.top  = (Math.random()*100) + 'vh';
     p.style.fontSize = (22 + Math.random()*30) + 'px';
@@ -1032,9 +1036,12 @@ function playSakuraWipe(done){
   }
   setTimeout(()=>{ if (done) done(); }, reduceMotion ? 80 : 650);
 }
+function playSakuraWipe(done){ playPetalWipe('\u{1F338}', '#ffd6ef', '#ff9ad5', done); }
+function playTangerineWipe(done){ playPetalWipe('\u{1F34A}', '#ffe0b0', '#ff9a3c', done); }
+function playColaWipe(done){ playPetalWipe('\u{1F964}', '#f5e6c8', '#5c3a1e', done); }
 
 /* =======================================================================
-   2. CUSTOM CURSOR
+   3. CUSTOM CURSOR
    ======================================================================= */
 (function initCursor(){
   const dot = document.getElementById('cursorDot');
@@ -1059,7 +1066,7 @@ function playSakuraWipe(done){
 })();
 
 /* =======================================================================
-   3. SOUND ENGINE (synthesized — no audio files needed)
+   4. SOUND ENGINE (synthesized — no audio files needed)
    ======================================================================= */
 const SoundEngine = (function(){
   let ctx=null, masterGain=null, ambientNodes=null, on=false;
@@ -1157,7 +1164,7 @@ document.getElementById('soundToggle').addEventListener('click', function(){
 });
 
 /* =======================================================================
-   4. PAPER GRAIN CANVAS (static-ish texture, redrawn on resize)
+   5. PAPER GRAIN CANVAS (static-ish texture, redrawn on resize)
    ======================================================================= */
 (function initPaperCanvas(){
   const cv = document.getElementById('paper-canvas');
@@ -1178,7 +1185,7 @@ document.getElementById('soundToggle').addEventListener('click', function(){
 })();
 
 /* =======================================================================
-   5. AMBIENT PARTICLES CANVAS (dust motes + distant birds)
+   6. AMBIENT PARTICLES CANVAS (dust motes + distant birds)
    ======================================================================= */
 (function initAmbientCanvas(){
   const cv = document.getElementById('ambient-canvas');
@@ -1228,7 +1235,7 @@ document.getElementById('soundToggle').addEventListener('click', function(){
 })();
 
 /* =======================================================================
-   6. ROUTE PATH DRAW + SHIP MARKER  (single scroll-driven source of truth)
+   7. ROUTE PATH DRAW + SHIP MARKER  (single scroll-driven source of truth)
    ======================================================================= */
 const islandProgressMarks = [
   { name:'Networking Island',    at: 1850/9800, caption:'Approaching Networking Island' },
@@ -1308,7 +1315,7 @@ const islandProgressMarks = [
 })();
 
 /* =======================================================================
-   7. NARRATIVE + ISLAND REVEAL SCROLLTRIGGERS (ink recede)
+   8. NARRATIVE + ISLAND REVEAL SCROLLTRIGGERS (ink recede)
    ======================================================================= */
 (function initIntroFigures(){
   const figs = document.querySelectorAll('.beat-intro .intro-figure');
@@ -1318,7 +1325,7 @@ const islandProgressMarks = [
 })();
 
 /* =======================================================================
-   PAGE TRANSITION (ink-wipe entrance on load, exit on poster click)
+   9. PAGE TRANSITION (ink-wipe entrance on load, exit on poster click)
    ======================================================================= */
 function playEntranceTransition(){
   const blots = document.querySelectorAll('.pt-blot');
@@ -1371,6 +1378,15 @@ document.querySelectorAll('.poster-trigger, .mobile-poster').forEach(a=>{
   });
 });
 
+/* ---- character loading screens ----
+   images: fullscreen art, one picked at random per visit
+   icons:  falling rain art
+   caption: shown while the loading screen is up
+   href:   final destination
+   transition: optional — 'sakura' | omit for a plain fade (this file never needs 'tangerine',
+              since that's only for pages that link *to* Nami, not this page itself)
+---- */
+
 const LOADING_SCREENS = {
   sanji: {
     images: ['Sanji_Page/loading1.jpg','Sanji_Page/loading2.jpg','Sanji_Page/loading3.jpg','Sanji_Page/loading4.jpg','Sanji_Page/loading5.jpg'],
@@ -1378,6 +1394,12 @@ const LOADING_SCREENS = {
     caption: "Heading to the galley\u2026",
     href: 'Sanji.html'
   },
+  luffy: {
+  images: ['Luffy_Page/loading1.jpg','Luffy_Page/loading2.png','Luffy_Page/loading3.jpg','Luffy_Page/loading4.png','Luffy_Page/loading5.png','Luffy_Page/loading6.jpeg','Luffy_Page/loading7.jpeg','Luffy_Page/loading8.jpg'],
+  icons:  ['Icons/meat.png','Icons/pizza.png'],
+  caption: "Setting course for the Captain\u2026",
+  href: 'Luffy.html'
+},
   robin: {
     images: ['Robin_Page/loading1.jpg','Robin_Page/loading2.jpg','Robin_Page/loading3.jpg','Robin_Page/loading4.png','Robin_Page/loading5.jpg'],
     icons:  ['Icons/berry.png','Icons/tangerine.png'],
@@ -1391,7 +1413,14 @@ const LOADING_SCREENS = {
     caption: "Following the sakura trail\u2026",
     href: 'Chopper.html',
     transition: 'sakura'
-  }
+  },
+  franky: {
+  images: ['Franky_Page/loading1.jpg','Franky_Page/loading2.jpg','Franky_Page/loading3.jpg','Franky_Page/loading4.jpg','Franky_Page/loading5.jpg'],
+  icons:  ['Icons/cola.png'],
+  caption: "Heading to the workshop\u2026",
+  href: 'Franky.html',
+  transition: 'cola'
+}
 };
 
 function spawnRainIcon(container, icons){
@@ -1418,6 +1447,8 @@ function spawnRainIcon(container, icons){
   setTimeout(()=>{ if (el.parentNode) el.remove(); }, duration*1000+200);
 }
 
+/* ---- sparkle burst at exact pixel coordinates (rain-icon clicks) —
+   NOT the same function as burstSparkle(anchorEl) below, which takes an element instead ---- */
 function burstSparkleAt(x, y){
   const glyphs = ['✦','✧','✶'];
   for (let i=0;i<10;i++){
@@ -1464,6 +1495,10 @@ function playCharLoadingScreen(key){
 
   if (config.transition === 'sakura'){
     playSakuraWipe(reveal);
+  } else if (config.transition === 'tangerine'){
+    playTangerineWipe(reveal);
+  } else if (config.transition === 'cola'){
+    playColaWipe(reveal);
   } else {
     reveal();
   }
@@ -1515,7 +1550,7 @@ function playCharLoadingScreen(key){
 })();
 
 /* =======================================================================
-   8. ISLAND CLICK-TO-REVEAL + SPARKLE BURST
+   10. ISLAND CLICK-TO-REVEAL + SPARKLE BURST
    ======================================================================= */
 function burstSparkle(anchorEl){
   if (!anchorEl) return;
@@ -1550,7 +1585,7 @@ document.querySelectorAll('.reveal-btn').forEach(btn=>{
 });
 
 /* =======================================================================
-   9. RESIZE — recompute path length / dash state
+   11. RESIZE — recompute path length / dash state
    ======================================================================= */
 window.addEventListener('resize', ()=>{
   if (window.ScrollTrigger) ScrollTrigger.refresh();

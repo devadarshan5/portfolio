@@ -360,6 +360,7 @@ html{ scrollbar-color: var(--pink) var(--cream); scrollbar-width: thin; }
 </head>
 <body>
 
+<!-- ==================== PAGE TRANSITIONS & LOADING SCREENS ==================== -->
 <div class="page-transition" id="pageTransition">
   <div class="pt-blot pt-blot1"></div>
   <div class="pt-blot pt-blot2"></div>
@@ -417,12 +418,12 @@ html{ scrollbar-color: var(--pink) var(--cream); scrollbar-width: thin; }
       <button class="crew-close" id="crewClose">&times;</button>
     </div>
     <div class="crew-grid">
-      <a class="crew-link" href="Luffy.html"><img src="Wanted_Posters/luffy_wanted_poster.jpg" alt="Luffy"><span class="cl-name">Luffy</span></a>
+      <a class="crew-link" href="Luffy.html" data-loading="luffy"><img src="Wanted_Posters/luffy_wanted_poster.jpg" alt="Luffy"><span class="cl-name">Luffy</span></a>
       <a class="crew-link" href="Zoro.html"><img src="Wanted_Posters/zoro_wanted_poster.jpg" alt="Zoro"><span class="cl-name">Zoro</span></a>
       <a class="crew-link" href="Nami.html" data-loading="nami"><img src="Wanted_Posters/nami_wanted_poster.jpg" alt="Nami"><span class="cl-name">Nami</span></a>
       <a class="crew-link" href="Sanji.html" data-loading="sanji"><img src="Wanted_Posters/sanji_wanted_poster.jpg" alt="Sanji"><span class="cl-name">Sanji</span></a>
       <a class="crew-link" href="Robin.html" data-loading="robin"><img src="Wanted_Posters/robin_wanted_poster.jpg" alt="Robin"><span class="cl-name">Robin</span></a>
-      <a class="crew-link" href="Franky.html"><img src="Wanted_Posters/franky_wanted_poster.jpg" alt="Franky"><span class="cl-name">Franky</span></a>
+      <a class="crew-link" href="Franky.html" data-loading="franky"><img src="Wanted_Posters/franky_wanted_poster.jpg" alt="Franky"><span class="cl-name">Franky</span></a>
       <a class="crew-link" href="Brook.html"><img src="Wanted_Posters/brook_wanted_poster.jpg" alt="Brook"><span class="cl-name">Brook</span></a>
       <a class="crew-link" href="Usopp.html"><img src="Wanted_Posters/usopp_wanted_poster.jpg" alt="Usopp"><span class="cl-name">Usopp</span></a>
       <a class="crew-link" href="Jinbe.html"><img src="Wanted_Posters/jinbe_wanted_poster.jpg" alt="Jinbe"><span class="cl-name">Jinbe</span></a>
@@ -575,6 +576,7 @@ const SoundEngine = (function(){
   return { playTick, playSparkle };
 })();
 
+/* ---- sparkle burst at exact pixel coordinates (rain-icon clicks) ---- */
 function burstSparkleAt(x, y){
   const glyphs = ['&#10022;','&#10023;','&#10039;'];
   for (let i=0;i<10;i++){
@@ -619,16 +621,17 @@ function playExitTransition(x, y, href){
   gsapFreeScale(blots, 0, 1, reduceMotion ? 150 : 850, ()=>{ window.location.href = href; });
 }
 
-/* ---- sakura screen-fill transition ---- */
-function playSakuraWipe(done){
+/* ---- sakura + tangerine screen-fill transition ---- */
+function playPetalWipe(emoji, colorA, colorB, done){
   const wipe = document.getElementById('sakuraWipe');
+  wipe.style.background = `radial-gradient(circle at 50% 50%, ${colorA}, ${colorB})`;
   wipe.innerHTML = '';
   wipe.classList.add('is-active');
   const count = reduceMotion ? 0 : 46;
   for (let i=0;i<count;i++){
     const p = document.createElement('span');
     p.className = 'wipe-petal';
-    p.textContent = '\u{1F338}';
+    p.textContent = emoji;
     p.style.left = (Math.random()*100) + 'vw';
     p.style.top  = (Math.random()*100) + 'vh';
     p.style.fontSize = (22 + Math.random()*30) + 'px';
@@ -641,28 +644,51 @@ function playSakuraWipe(done){
   }
   setTimeout(()=>{ if (done) done(); }, reduceMotion ? 80 : 650);
 }
+function playSakuraWipe(done){ playPetalWipe('\u{1F338}', '#ffd6ef', '#ff9ad5', done); }
+function playTangerineWipe(done){ playPetalWipe('\u{1F34A}', '#ffe0b0', '#ff9a3c', done); }
+function playColaWipe(done){ playPetalWipe('\u{1F964}', '#f5e6c8', '#5c3a1e', done); }
 
-/* ---- character loading screens ---- */
+/* ---- character loading screens ----
+   images: fullscreen art, one picked at random per visit
+   icons:  falling rain art
+   caption: shown while the loading screen is up
+   href:   final destination
+   transition: optional — 'sakura' | 'tangerine' | omit for a plain fade
+---- */
 const LOADING_SCREENS = {
   nami: {
-    images: ['Nami_Page/loading1.png','Nami_Page/loading2.jpg','Nami_Page/loading3.jpeg'],
-    icons:  ['Icons/berry.png','Icons/tangerine.png'],
-    caption: "Charting a course to Nami's Route\u2026",
-    href: 'Nami.html'
-  },
+  images: ['Nami_Page/loading1.png','Nami_Page/loading2.jpg','Nami_Page/loading3.jpeg'],
+  icons:  ['Icons/berry.png','Icons/tangerine.png'],
+  caption: "Charting a course to Nami's Route\u2026",
+  href: 'Nami.html',
+  transition: 'tangerine'
+},
   sanji: {
     images: ['Sanji_Page/loading1.jpg','Sanji_Page/loading2.jpg','Sanji_Page/loading3.jpg','Sanji_Page/loading4.jpg','Sanji_Page/loading5.jpg'],
     icons:  ['Icons/meat.png','Icons/rum.png','Icons/pizza.png','Icons/mooncake.png'],
     caption: "Heading to the galley\u2026",
     href: 'Sanji.html'
-  },
+},
+  luffy: {
+  images: ['Luffy_Page/loading1.jpg','Luffy_Page/loading2.png','Luffy_Page/loading3.jpg','Luffy_Page/loading4.png','Luffy_Page/loading5.png','Luffy_Page/loading6.jpeg','Luffy_Page/loading7.jpeg','Luffy_Page/loading8.jpg'],
+  icons:  ['Icons/meat.png','Icons/pizza.png'],
+  caption: "Setting course for the Captain\u2026",
+  href: 'Luffy.html'
+},
   robin: {
     images: ['Robin_Page/loading1.jpg','Robin_Page/loading2.jpg','Robin_Page/loading3.jpg','Robin_Page/loading4.png','Robin_Page/loading5.jpg'],
     icons:  ['Icons/berry.png','Icons/tangerine.png'],
     caption: "Uncovering the record\u2026",
     href: 'Robin.html',
     transition: 'sakura'
-  }
+},
+ franky: {
+  images: ['Franky_Page/loading1.jpg','Franky_Page/loading2.jpg','Franky_Page/loading3.jpg','Franky_Page/loading4.jpg','Franky_Page/loading5.jpg'],
+  icons:  ['Icons/cola.png'],
+  caption: "Heading to the workshop\u2026",
+  href: 'Franky.html',
+  transition: 'cola'
+}
 };
 
 function spawnRainIcon(container, icons){
@@ -715,6 +741,10 @@ function playCharLoadingScreen(key){
 
   if (config.transition === 'sakura'){
     playSakuraWipe(reveal);
+  } else if (config.transition === 'tangerine'){
+    playTangerineWipe(reveal);
+  } else if (config.transition === 'cola'){
+    playColaWipe(reveal);
   } else {
     reveal();
   }

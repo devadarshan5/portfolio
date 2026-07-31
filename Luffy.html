@@ -228,7 +228,7 @@
     <a class="poster-trigger" href="Sanji.html" data-loading="sanji" style="--rot:-4deg;"><img src="Wanted_Posters/sanji_wanted_poster.jpg" alt="Sanji"><span class="poster-label">Sanji</span></a>
     <a class="poster-trigger" href="Chopper.html" data-loading="chopper" style="--rot:7deg;"><img src="Wanted_Posters/chopper_wanted_poster.jpg" alt="Chopper"><span class="poster-label">Chopper</span></a>
     <a class="poster-trigger" href="Robin.html" data-loading="robin" style="--rot:-5deg;"><img src="Wanted_Posters/robin_wanted_poster.jpg" alt="Robin"><span class="poster-label">Robin</span></a>
-    <a class="poster-trigger" href="Franky.html" style="--rot:6deg;"><img src="Wanted_Posters/franky_wanted_poster.jpg" alt="Franky"><span class="poster-label">Franky</span></a>
+    <a class="poster-trigger" href="Franky.html" data-loading="franky" style="--rot:6deg;"><img src="Wanted_Posters/franky_wanted_poster.jpg" alt="Franky"><span class="poster-label">Franky</span></a>
     <a class="poster-trigger" href="Brook.html" style="--rot:-7deg;"><img src="Wanted_Posters/brook_wanted_poster.jpg" alt="Brook"><span class="poster-label">Brook</span></a>
     <a class="poster-trigger" href="Usopp.html" style="--rot:4deg;"><img src="Wanted_Posters/usopp_wanted_poster.jpg" alt="Usopp"><span class="poster-label">Usopp</span></a>
     <a class="poster-trigger" href="Jinbe.html" style="--rot:-3deg;"><img src="Wanted_Posters/jinbe_wanted_poster.jpg" alt="Jinbe"><span class="poster-label">Jinbe</span></a>
@@ -361,15 +361,16 @@
 "use strict";
 const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-function playSakuraWipe(done){
+function playPetalWipe(emoji, colorA, colorB, done){
   const wipe = document.getElementById('sakuraWipe');
+  wipe.style.background = `radial-gradient(circle at 50% 50%, ${colorA}, ${colorB})`;
   wipe.innerHTML = '';
   wipe.classList.add('is-active');
   const count = reduceMotion ? 0 : 46;
   for (let i=0;i<count;i++){
     const p = document.createElement('span');
     p.className = 'wipe-petal';
-    p.textContent = '\u{1F338}';
+    p.textContent = emoji;
     p.style.left = (Math.random()*100) + 'vw';
     p.style.top  = (Math.random()*100) + 'vh';
     p.style.fontSize = (22 + Math.random()*30) + 'px';
@@ -382,6 +383,9 @@ function playSakuraWipe(done){
   }
   setTimeout(()=>{ if (done) done(); }, reduceMotion ? 80 : 650);
 }
+function playSakuraWipe(done){ playPetalWipe('\u{1F338}', '#ffd6ef', '#ff9ad5', done); }
+function playTangerineWipe(done){ playPetalWipe('\u{1F34A}', '#ffe0b0', '#ff9a3c', done);}
+function playColaWipe(done){ playPetalWipe('\u{1F964}', '#f5e6c8', '#5c3a1e', done); }
 
 (function(){
   const overlay = document.getElementById('pageTransition');
@@ -480,11 +484,12 @@ function playExitTransition(x,y,href){
 /* ---- character loading screens (config-driven, one per crew member) ---- */
 const LOADING_SCREENS = {
   nami: {
-    images: ['Nami_Page/loading1.png','Nami_Page/loading2.jpg','Nami_Page/loading3.jpeg'],
-    icons:  ['Icons/berry.png','Icons/tangerine.png'],
-    caption: "Charting a course to Nami's Route\u2026",
-    href: 'Nami.html'
-  },
+  images: ['Nami_Page/loading1.png','Nami_Page/loading2.jpg','Nami_Page/loading3.jpeg'],
+  icons:  ['Icons/berry.png','Icons/tangerine.png'],
+  caption: "Charting a course to Nami's Route\u2026",
+  href: 'Nami.html',
+  transition: 'tangerine'
+},
   sanji: {
     images: ['Sanji_Page/loading1.jpg','Sanji_Page/loading2.jpg','Sanji_Page/loading3.jpg','Sanji_Page/loading4.jpg','Sanji_Page/loading5.jpg'],
     icons:  ['Icons/meat.png','Icons/rum.png','Icons/pizza.png','Icons/mooncake.png'],
@@ -504,7 +509,14 @@ const LOADING_SCREENS = {
     caption: "Following the sakura trail\u2026",
     href: 'Chopper.html',
     transition: 'sakura'
-  }
+  },
+  franky: {
+  images: ['Franky_Page/loading1.jpg','Franky_Page/loading2.jpg','Franky_Page/loading3.jpg','Franky_Page/loading4.jpg','Franky_Page/loading5.jpg'],
+  icons:  ['Icons/cola.png'],
+  caption: "Heading to the workshop\u2026",
+  href: 'Franky.html',
+  transition: 'cola'
+}
 };
 
 function spawnRainIcon(container, icons){
@@ -565,6 +577,10 @@ function playCharLoadingScreen(key){
 
   if (config.transition === 'sakura'){
     playSakuraWipe(reveal);
+  } else if (config.transition === 'tangerine'){
+    playTangerineWipe(reveal);
+  } else if (config.transition === 'cola'){
+    playColaWipe(reveal);
   } else {
     reveal();
   }
