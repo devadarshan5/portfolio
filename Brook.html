@@ -1,0 +1,1401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Brook — The Soul King's Stage | Devadarshan R K</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,wght@0,600;1,500&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Special+Elite&display=swap" rel="stylesheet">
+
+<style>
+/* =======================================================================
+   DESIGN TOKENS
+   ======================================================================= */
+:root{
+  --void:        #0d0b12;
+  --void-soft:   #1a1620;
+  --gold:        #c9a227;
+  --gold-bright: #e8c25f;
+  --bone:        #ece6d8;
+  --violin:      #5c2e1a;
+  --shadow:      rgba(0,0,0,.65);
+
+  --rave-pink:   #ff2fd6;
+  --rave-green:  #39ff6a;
+  --rave-purple: #8a2fff;
+
+  --font-display: 'Bodoni Moda', serif;
+  --font-body:    'Cormorant Garamond', serif;
+  --font-mono:    'Special Elite', monospace;
+}
+
+*{ margin:0; padding:0; box-sizing:border-box; }
+html{ scroll-behavior:smooth; }
+body{
+  font-family: var(--font-body);
+  background: radial-gradient(ellipse at 50% 0%, var(--void-soft) 0%, var(--void) 70%);
+  color: var(--bone);
+  overflow-x:hidden;
+  position:relative;
+  transition: transform .6s ease;
+  transform-origin: 50% 50%;
+}
+body.is-tilted{ transform: rotate(-45deg) scale(.72); }
+
+@media (prefers-reduced-motion: reduce){
+  *{ animation-duration:.001ms !important; animation-iteration-count:1 !important; }
+}
+
+::-webkit-scrollbar{ width:11px; }
+::-webkit-scrollbar-track{ background: var(--void); }
+::-webkit-scrollbar-thumb{ background: var(--gold); border-radius:8px; border:2px solid var(--void); }
+html{ scrollbar-color: var(--gold) var(--void); scrollbar-width: thin; }
+
+/* ---- rave mode override (applied to body via class) ---- */
+body.is-rave{
+  background: radial-gradient(ellipse at 50% 0%, #1a0a2a 0%, #0a0512 70%);
+}
+body.is-rave .card{ border-color: var(--rave-pink); box-shadow: 0 0 24px rgba(255,47,214,.4); }
+body.is-rave .eyebrow, body.is-rave .card h3{ color: var(--rave-green); }
+body.is-rave .title{ color: var(--rave-pink); text-shadow: 0 0 30px var(--rave-purple); }
+
+.note-particle{
+  position:fixed; bottom:-30px; z-index:3; pointer-events:none;
+  font-size:20px; color: var(--rave-green);
+  animation: note-rise linear infinite;
+}
+@keyframes note-rise{
+  0%{ transform: translateY(0) rotate(0deg); opacity:.9; }
+  100%{ transform: translateY(-110vh) rotate(360deg); opacity:0; }
+}
+
+.spotify-btn{ background: #1DB954; color: #0d0b12; }
+.spotify-btn:hover{ background: #22e563; }
+
+/* =======================================================================
+   AMBIENT BACKDROP
+   ======================================================================= */
+.sheet-lines{
+  position:fixed; inset:0; z-index:0; pointer-events:none;
+  background-image: repeating-linear-gradient(0deg, rgba(201,162,39,.05) 0 1px, transparent 1px 34px);
+}
+
+/* =======================================================================
+   HEADER
+   ======================================================================= */
+.wrap{ position:relative; z-index:2; max-width:1080px; margin:0 auto; padding: 90px 6vw 60px; }
+.intro{ text-align:center; min-height:60vh; display:flex; flex-direction:column; justify-content:center; align-items:center; gap:16px; }
+.eyebrow{ font-family: var(--font-mono); font-size:12px; letter-spacing:.35em; text-transform:uppercase; color: var(--gold); }
+.title{ font-family: var(--font-display); font-style:italic; font-weight:600; font-size: clamp(34px, 6vw, 66px); color: var(--bone); text-shadow: 0 6px 26px rgba(0,0,0,.6); }
+.sub{ font-style:italic; color: rgba(236,230,216,.7); max-width:520px; font-size:16px; line-height:1.7; }
+.scroll-hint{ margin-top:20px; font-family: var(--font-mono); font-size:11px; letter-spacing:.2em; color: var(--gold-bright); animation: hint-bob 2.6s ease-in-out infinite; }
+@keyframes hint-bob{ 0%,100%{ transform:translateY(0);} 50%{ transform:translateY(8px);} }
+
+/* =======================================================================
+   FEATURE GRID
+   ======================================================================= */
+.grid{ display:grid; grid-template-columns: repeat(2, 1fr); gap:26px; margin-bottom:60px; }
+@media (max-width: 760px){ .grid{ grid-template-columns: 1fr; } }
+
+.card{
+  position:relative;
+  background: linear-gradient(160deg, #1e1a26 0%, #120f16 100%);
+  border: 2px solid var(--gold);
+  border-radius: 12px;
+  padding: 26px 24px;
+  box-shadow: 0 14px 30px var(--shadow);
+  transition: border-color .3s ease, box-shadow .3s ease;
+}
+.card h3{ font-family: var(--font-display); font-style:italic; font-size:19px; color: var(--gold-bright); margin-bottom:6px; }
+.card p.desc{ font-size:14.5px; color: rgba(236,230,216,.7); margin-bottom:16px; line-height:1.55; }
+
+.btn{
+  font-family: var(--font-mono); font-size:12px; letter-spacing:.05em;
+  padding:10px 18px; background: var(--gold); color: var(--void);
+  border: none; border-radius:20px; cursor:pointer;
+  transition: transform .2s ease, background .2s ease;
+}
+.btn:hover{ transform: translateY(-2px); background: var(--gold-bright); }
+.btn:disabled{ opacity:.5; cursor:not-allowed; transform:none; }
+
+.media-row{ display:flex; gap:26px; flex-wrap:wrap; margin-bottom:50px; }
+.media-row .card{ flex:1; min-width:280px; min-height:480px; display:flex; flex-direction:column; }
+.media-row .card .record-player{ flex:1; justify-content:center; }
+@media (max-width:760px){ .media-row{ flex-direction:column; } }
+
+/* ---- bone joke ---- */
+.joke-box{
+  margin-top:14px; min-height:60px;
+  font-family: var(--font-body); font-style:italic; font-size:15px; color: var(--bone);
+  padding:12px 14px; border-left:3px solid var(--gold); background: rgba(201,162,39,.06);
+  border-radius: 0 6px 6px 0;
+}
+
+/* ---- ghost projection ---- */
+.ghost-stage{
+  position:relative; height:150px; display:flex; align-items:flex-end; justify-content:center;
+  margin-top:6px; cursor:pointer;
+}
+.skeleton-figure{ font-size:64px; position:relative; z-index:2; }
+.soul-double{
+  position:absolute; bottom:0; font-size:64px;
+  color: #8fd9ff; opacity:0; filter: blur(1px);
+  transition: opacity .5s ease, transform 1.4s ease;
+  pointer-events:none;
+}
+.ghost-stage:hover .soul-double{ opacity:.55; transform: translateY(-38px) scale(1.08); }
+
+/* ---- mirror gag ---- */
+.mirror-frame{
+  width:90px; height:120px; margin:6px auto 0;
+  background: linear-gradient(160deg, #d8d8e0, #9098a8);
+  border: 4px solid var(--gold); border-radius: 50% 50% 8px 8px;
+  cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:28px;
+  box-shadow: 0 8px 16px rgba(0,0,0,.5);
+}
+.slap-note{
+  margin-top:10px; min-height:24px; text-align:center;
+  font-family: var(--font-body); font-style:italic; font-size:14px; color: var(--gold-bright);
+}
+.slap-flash{ display:inline-block; animation: slap-shake .35s ease; }
+@keyframes slap-shake{ 0%,100%{ transform:translateX(0);} 25%{ transform:translateX(-6px);} 75%{ transform:translateX(6px);} }
+
+/* ---- concert ticket ---- */
+.ticket{
+  margin-top:14px; background: var(--bone); color: var(--void);
+  border-radius:8px; padding:14px 16px; position:relative;
+  clip-path: polygon(0 0, 46% 0, 46% 8%, 54% 8%, 54% 0, 100% 0, 100% 92%, 54% 92%, 54% 100%, 46% 100%, 46% 92%, 0 92%);
+  font-family: var(--font-mono);
+}
+.ticket .t-head{ font-size:11px; letter-spacing:.1em; color: var(--violin); text-transform:uppercase; }
+.ticket .t-venue{ font-family: var(--font-display); font-style:italic; font-size:17px; margin:4px 0; }
+.ticket .t-date{ font-size:12px; }
+.ticket .t-tag{ font-size:10px; font-style:italic; margin-top:6px; opacity:.75; }
+
+/* ---- tilt & rave triggers ---- */
+.hidden-afro{
+  position:absolute; top:10px; right:12px; font-size:16px; opacity:.35; cursor:pointer;
+  transition: opacity .2s ease;
+}
+.hidden-afro:hover{ opacity:1; }
+
+.finale{ text-align:center; min-height:40vh; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:14px; }
+
+/* =======================================================================
+   CREW DRAWER TRIGGER
+   ======================================================================= */
+.dig-trigger{
+  position:fixed; top:20px; left:20px; z-index:60;
+  width:54px; height:54px; border-radius:50%;
+  background: var(--void-soft); border: 2px solid var(--gold);
+  display:flex; align-items:center; justify-content:center;
+  font-size:22px; cursor:pointer;
+  box-shadow: 0 4px 0 var(--shadow);
+  transition: transform .25s ease;
+}
+.dig-trigger:hover{ transform: scale(1.08) rotate(-6deg); }
+
+.crew-drawer{ position:fixed; inset:0; z-index:70; background: rgba(0,0,0,.7); display:flex; align-items:center; justify-content:center; opacity:0; pointer-events:none; transition: opacity .35s ease; padding: 5vh 4vw; }
+.crew-drawer.is-open{ opacity:1; pointer-events:auto; }
+.crew-panel{
+  background: var(--void-soft); border: 3px solid var(--gold); border-radius:12px;
+  padding: 28px 28px 22px; max-width:560px; width:100%; max-height:84vh; overflow-y:auto;
+  box-shadow: 0 20px 50px var(--shadow);
+  transform: scale(.92) translateY(10px); transition: transform .35s cubic-bezier(.3,1.4,.4,1);
+  scrollbar-color: var(--gold) transparent; scrollbar-width: thin;
+}
+.crew-panel::-webkit-scrollbar{ width:6px; }
+.crew-panel::-webkit-scrollbar-track{ background: transparent; }
+.crew-panel::-webkit-scrollbar-thumb{ background: var(--gold); border-radius:6px; }
+.crew-drawer.is-open .crew-panel{ transform: scale(1) translateY(0); }
+.crew-panel-head{ display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; }
+.crew-panel-head h3{ font-family: var(--font-display); font-style:italic; font-size:15px; color: var(--gold-bright); }
+.crew-close{ width:30px; height:30px; border-radius:50%; border:1px solid var(--gold); background:transparent; color: var(--bone); font-size:16px; cursor:pointer; }
+.crew-grid{ display:grid; grid-template-columns: repeat(3, 1fr); gap:12px; }
+.crew-link{ display:block; border:2px solid #000; border-radius:5px; overflow:hidden; text-decoration:none; transition: transform .25s cubic-bezier(.34,1.5,.4,1); }
+.crew-link:hover{ transform: scale(1.06) rotate(-1deg); }
+.crew-link img{ display:block; width:100%; height:auto; }
+.crew-link .cl-name{ display:block; text-align:center; font-family: var(--font-display); font-style:italic; font-size:10px; padding:5px 0; background: var(--gold); color: var(--void); }
+
+/* =======================================================================
+   PAGE TRANSITIONS & LOADING SCREENS
+   ======================================================================= */
+.page-transition{ position:fixed; inset:0; z-index:9997; pointer-events:none; }
+.pt-blot{ position:absolute; left:50%; top:50%; width:160vmax; height:160vmax; background: var(--void); border-radius:50%; transform:translate(-50%,-50%) scale(1); }
+.pt-blot2{ width:140vmax; height:140vmax; opacity:.92; }
+.pt-blot3{ width:120vmax; height:120vmax; opacity:.85; }
+
+.char-loading{ position:fixed; inset:0; z-index:9999; background:#000; opacity:0; pointer-events:none; transition:opacity .5s ease; overflow:hidden; }
+.char-loading.is-active{ opacity:1; pointer-events:auto; }
+.char-loading img.nl-bg{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; opacity:0; transition:opacity .6s ease, transform 6s ease; transform:scale(1.06); }
+.char-loading img.nl-bg.is-shown{ opacity:1; transform:scale(1); }
+.rain-layer{ position:absolute; inset:0; overflow:hidden; }
+.rain-icon{ position:absolute; top:-60px; cursor:pointer; will-change:transform; filter:drop-shadow(0 2px 4px rgba(0,0,0,.5)); }
+.rain-icon img{ display:block; width:100%; height:100%; object-fit:contain; }
+.nl-caption{ position:absolute; bottom:40px; left:50%; transform:translateX(-50%); font-family: var(--font-display); font-style:italic; letter-spacing:.05em; color: var(--gold-bright); font-size:14px; opacity:0; transition:opacity .5s ease .3s; text-shadow:0 0 10px rgba(0,0,0,.8); }
+.char-loading.is-active .nl-caption{ opacity:1; }
+
+.sakura-wipe{ position:fixed; inset:0; z-index:9996; pointer-events:none; opacity:0; overflow:hidden; background: radial-gradient(circle at 50% 50%, #ffd6ef, #ff9ad5); transition: opacity .35s ease; }
+.sakura-wipe.is-active{ opacity:1; }
+.wipe-petal{ position:absolute; opacity:0; transform: scale(.2) rotate(0deg); transition: opacity .5s ease, transform .5s cubic-bezier(.2,1.4,.4,1); }
+.wipe-petal.is-in{ opacity:.95; }
+
+.sparkle{ position:fixed; font-family: var(--font-display); color: var(--gold-bright); pointer-events:none; z-index:10000; animation: sparkle-pop .9s ease-out forwards; }
+@keyframes sparkle-pop{ 0%{ opacity:1; transform: translate(0,0) scale(.6); } 100%{ opacity:0; transform: translate(var(--sx), var(--sy)) scale(1.3); } }
+
+/* =======================================================================
+   PHASE 5: FIGHT WITH THE SOUL KING
+   ======================================================================= */
+.battle-stage{ display:flex; align-items:center; justify-content:center; gap:26px; margin-bottom:18px; flex-wrap:wrap; }
+.battle-side{ width:200px; text-align:center; }
+.battle-name{ font-family: var(--font-display); font-style:italic; font-size:15px; color: var(--gold-bright); margin-bottom:6px; }
+.battle-vs{ font-family: var(--font-mono); font-size:13px; color: rgba(236,230,216,.5); }
+.hp-bar{ width:100%; height:14px; border:2px solid var(--gold); border-radius:8px; background:#241f2c; overflow:hidden; }
+.hp-fill{ height:100%; width:100%; background: linear-gradient(90deg, var(--gold), var(--gold-bright)); transition: width .4s ease; }
+.hp-fill.enemy{ background: linear-gradient(90deg, #8a2f2f, #c44d4d); }
+.hp-label{ font-family: var(--font-mono); font-size:11px; color: rgba(236,230,216,.6); margin-top:4px; }
+
+.battle-log{
+  max-width:520px; margin: 0 auto 20px; min-height:44px;
+  font-family: var(--font-body); font-style:italic; font-size:15px; text-align:center;
+  color: var(--bone); line-height:1.5;
+}
+.battle-moves{ display:flex; flex-wrap:wrap; gap:10px; justify-content:center; }
+
+/* =======================================================================
+   PHASE 4: BINK'S SAKE RHYTHM GAME
+   ======================================================================= */
+.rhythm-stage{ display:flex; flex-direction:column; align-items:center; gap:20px; }
+.rhythm-lanes{
+  position:relative; display:flex; gap:10px;
+  width: min(400px, 90vw); height: 320px;
+  background: #0a0810; border: 2px solid var(--gold); border-radius:8px; overflow:hidden;
+}
+.lane{ position:relative; flex:1; border-right:1px solid rgba(201,162,39,.15); }
+.lane:last-child{ border-right:none; }
+.lane-key{
+  position:absolute; bottom:8px; left:50%; transform:translateX(-50%);
+  font-family: var(--font-mono); font-size:12px; color: var(--gold-bright);
+  width:28px; height:28px; border:2px solid var(--gold); border-radius:6px;
+  display:flex; align-items:center; justify-content:center; z-index:2;
+}
+.hit-line{ position:absolute; left:0; right:0; bottom:44px; height:2px; background: var(--gold); opacity:.6; }
+.rhythm-note{
+  position:absolute; left:50%; top:0; width:34px; height:14px; margin-left:-17px;
+  background: linear-gradient(180deg, var(--gold-bright), var(--gold));
+  border-radius:6px; box-shadow: 0 2px 6px rgba(0,0,0,.5);
+}
+.lane.is-flash .lane-key{ background: var(--gold); color: var(--void); }
+
+.rhythm-controls{ display:flex; flex-direction:column; align-items:center; gap:8px; }
+.rhythm-score{ font-family: var(--font-mono); font-size:13px; color: var(--bone); }
+.rhythm-status{ font-family: var(--font-mono); font-size:12px; color: var(--gold-bright); min-height:16px; }
+
+.reward-panel{
+  margin-top:20px; text-align:center; padding:18px;
+  border: 2px dashed var(--gold-bright); border-radius:10px;
+  background: rgba(201,162,39,.06);
+}
+.reward-text{ font-style:italic; margin-bottom:10px; }
+.reward-laboon{ width: 160px; height:auto; margin: 0 auto 16px; display:block; filter: drop-shadow(0 6px 14px rgba(0,0,0,.5)); }
+
+/* =======================================================================
+   PHASE 3: SOUL KING AUDIO PLAYER
+   ======================================================================= */
+.record-player{ display:flex; flex-direction:column; align-items:center; gap:10px; }
+.record-disc{
+  width:130px; height:130px; border-radius:50%;
+  background: repeating-radial-gradient(circle, #111 0 3px, #222 3px 6px);
+  border: 3px solid var(--gold);
+  display:flex; align-items:center; justify-content:center;
+  animation: disc-spin 3s linear infinite;
+  animation-play-state: paused;
+  box-shadow: 0 8px 16px rgba(0,0,0,.5);
+}
+.record-disc.is-spinning{ animation-play-state: running; }
+.record-label{
+  width:44px; height:44px; border-radius:50%;
+  background: var(--bone); display:flex; align-items:center; justify-content:center;
+  font-size:20px; border:2px solid var(--void);
+}
+@keyframes disc-spin{ to{ transform: rotate(360deg); } }
+
+.tonearm{ position:relative; width:120px; height:4px; margin-top:-8px; }
+.tonearm-arm{
+  position:absolute; right:6px; top:-40px; width:70px; height:5px;
+  background: var(--gold); border-radius:3px; transform-origin: right center;
+  transform: rotate(-24deg);
+  transition: transform .5s ease;
+}
+.tonearm-arm::after{ content:''; position:absolute; left:-6px; top:-4px; width:12px; height:12px; border-radius:50%; background: var(--gold-bright); }
+.tonearm-arm.is-down{ transform: rotate(2deg); }
+
+.player-controls{ display:flex; gap:12px; align-items:center; }
+.player-status{ font-family: var(--font-mono); font-size:11px; color: rgba(236,230,216,.6); text-align:center; max-width:220px; min-height:14px; }
+
+/* =======================================================================
+   PHASE 2: SKULL INSTRUMENT + SIMON SAYS + MILK GAUGE
+   ======================================================================= */
+.instrument-section{
+  background: linear-gradient(160deg, #1e1a26 0%, #120f16 100%);
+  border: 2px solid var(--gold);
+  border-radius: 12px;
+  padding: 30px 26px;
+  margin-bottom: 60px;
+  box-shadow: 0 14px 30px var(--shadow);
+}
+.instrument-head{ text-align:center; margin-bottom:22px; }
+.instrument-head h3{ font-family: var(--font-display); font-style:italic; font-size:22px; color: var(--gold-bright); }
+.instrument-head p{ font-size:14px; color: rgba(236,230,216,.7); margin-top:6px; }
+.instrument-body{ display:flex; flex-wrap:wrap; gap:30px; align-items:flex-start; justify-content:center; }
+
+.bone-row{ display:flex; gap:10px; flex-wrap:wrap; justify-content:center; }
+.bone{
+  width:52px; height:88px; border-radius:10px;
+  background: linear-gradient(180deg, var(--bone), #cfc6ae);
+  border: 2px solid var(--void);
+  cursor:pointer; display:flex; align-items:flex-end; justify-content:center;
+  padding-bottom:8px; font-family: var(--font-mono); font-size:11px; color: var(--void);
+  transition: transform .12s ease, background .12s ease;
+  box-shadow: 0 6px 10px rgba(0,0,0,.4);
+}
+.bone:hover{ transform: translateY(-4px); }
+.bone.is-hit{ background: linear-gradient(180deg, var(--gold-bright), var(--gold)); transform: translateY(-6px) scale(1.05); }
+
+.simon-controls{ display:flex; flex-direction:column; gap:10px; align-items:center; min-width:180px; }
+.simon-status{ font-family: var(--font-mono); font-size:13px; color: var(--gold-bright); text-align:center; min-height:20px; }
+.simon-level{ font-family: var(--font-display); font-style:italic; font-size:16px; color: var(--bone); }
+
+.milk-gauge{ display:flex; flex-direction:column; align-items:center; gap:8px; }
+.milk-carton{
+  width:56px; height:78px; border:3px solid var(--void); border-radius:4px 4px 10px 10px;
+  background: #241f2c; position:relative; overflow:hidden;
+  clip-path: polygon(0 12%, 50% 0, 100% 12%, 100% 100%, 0 100%);
+}
+.milk-segment{ position:absolute; left:0; right:0; height:33.333%; background: linear-gradient(180deg, #fdfdf8, #e8e4d8); transition: opacity .3s ease; }
+.milk-segment.seg1{ bottom:0; }
+.milk-segment.seg2{ bottom:33.333%; }
+.milk-segment.seg3{ bottom:66.666%; }
+.milk-segment.is-lost{ opacity:.08; }
+.milk-refill{ font-size:26px; cursor:pointer; transition: transform .2s ease; }
+.milk-refill:hover{ transform: scale(1.15); }
+.milk-label{ font-family: var(--font-mono); font-size:10px; color: rgba(236,230,216,.6); }
+
+</style>
+</head>
+<body>
+
+<!-- ==================== PAGE TRANSITIONS & LOADING SCREENS ==================== -->
+<div class="page-transition" id="pageTransition">
+  <div class="pt-blot pt-blot1"></div>
+  <div class="pt-blot pt-blot2"></div>
+  <div class="pt-blot pt-blot3"></div>
+</div>
+<div class="sakura-wipe" id="sakuraWipe"></div>
+<div class="char-loading" id="charLoading">
+  <img class="nl-bg" id="charLoadingImg" src="" alt="">
+  <div class="rain-layer" id="rainLayer"></div>
+  <div class="nl-caption" id="charLoadingCaption"></div>
+</div>
+
+<div class="sheet-lines"></div>
+
+<!-- ==================== CREW TRIGGER ==================== -->
+<div class="dig-trigger" id="digTrigger">&#127925;</div>
+<div class="crew-drawer" id="crewDrawer">
+  <div class="crew-panel">
+    <div class="crew-panel-head">
+      <h3>THE REST OF THE CREW</h3>
+      <button class="crew-close" id="crewClose">&times;</button>
+    </div>
+    <div class="crew-grid">
+      <a class="crew-link" href="Luffy.html" data-loading="luffy"><img src="Wanted_Posters/luffy_wanted_poster.jpg" alt="Luffy"><span class="cl-name">Luffy</span></a>
+      <a class="crew-link" href="Zoro.html"><img src="Wanted_Posters/zoro_wanted_poster.jpg" alt="Zoro"><span class="cl-name">Zoro</span></a>
+      <a class="crew-link" href="Nami.html" data-loading="nami"><img src="Wanted_Posters/nami_wanted_poster.jpg" alt="Nami"><span class="cl-name">Nami</span></a>
+      <a class="crew-link" href="Sanji.html" data-loading="sanji"><img src="Wanted_Posters/sanji_wanted_poster.jpg" alt="Sanji"><span class="cl-name">Sanji</span></a>
+      <a class="crew-link" href="Chopper.html" data-loading="chopper"><img src="Wanted_Posters/chopper_wanted_poster.jpg" alt="Chopper"><span class="cl-name">Chopper</span></a>
+      <a class="crew-link" href="Robin.html" data-loading="robin"><img src="Wanted_Posters/robin_wanted_poster.jpg" alt="Robin"><span class="cl-name">Robin</span></a>
+      <a class="crew-link" href="Franky.html" data-loading="franky"><img src="Wanted_Posters/franky_wanted_poster.jpg" alt="Franky"><span class="cl-name">Franky</span></a>
+      <a class="crew-link" href="Usopp.html"><img src="Wanted_Posters/usopp_wanted_poster.jpg" alt="Usopp"><span class="cl-name">Usopp</span></a>
+      <a class="crew-link" href="Jinbe.html"><img src="Wanted_Posters/jinbe_wanted_poster.jpg" alt="Jinbe"><span class="cl-name">Jinbe</span></a>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <!-- ==================== INTRO ==================== -->
+  <section class="intro">
+    <span class="eyebrow">Phase One &middot; The Soul King's Stage</span>
+    <h1 class="title">Yohohoho!</h1>
+    <p class="sub">Ninety years young and still touring. A few tricks below — go on, poke around. There's a hidden note or two in here as well.</p>
+    <span class="scroll-hint">&#9662; the show's just getting started &#9662;</span>
+  </section>
+
+  <!-- ==================== FEATURE GRID ==================== -->
+  <div class="grid">
+
+    <!-- Bone Joke Button -->
+    <div class="card">
+      <h3>A Joke, As Requested</h3>
+      <p class="desc">Ninety years of material. None of it good. All of it delivered with total confidence.</p>
+      <button class="btn" id="jokeBtn">Tell Me a Bone Joke</button>
+      <div class="joke-box" id="jokeBox">Click for wisdom.</div>
+    </div>
+
+    <!-- Ghost Projection -->
+    <div class="card">
+      <h3>The Soul Steps Out</h3>
+      <p class="desc">Hover over him. It's what happens when you've already died once — the soul gets a little restless.</p>
+      <div class="ghost-stage">
+        <span class="soul-double">&#128123;</span>
+        <span class="skeleton-figure">&#128128;</span>
+      </div>
+    </div>
+
+    <!-- Mirror Gag -->
+    <div class="card">
+      <h3>The Mirror</h3>
+      <p class="desc">Every stage has a dressing-room mirror. This one has consequences.</p>
+      <div class="mirror-frame" id="mirrorBtn">&#128069;</div>
+      <div class="slap-note" id="slapNote"></div>
+    </div>
+
+    <!-- Concert Ticket Generator -->
+    <div class="card">
+      <h3>World Tour, Ongoing</h3>
+      <p class="desc">Ninety years of touring means ninety years of venues. Generate tonight's stop.</p>
+      <button class="btn" id="ticketBtn">Generate Ticket</button>
+      <div class="ticket" id="ticketBox" style="display:none;">
+        <div class="t-head">Soul King World Tour</div>
+        <div class="t-venue" id="ticketVenue"></div>
+        <div class="t-date" id="ticketDate"></div>
+        <div class="t-tag" id="ticketTag"></div>
+      </div>
+    </div>
+
+    <!-- 45-Degree Tilt -->
+    <div class="card">
+      <h3>The Signature Lean</h3>
+      <p class="desc">Five seconds of commitment to the bit. The page tilts. It comes back. Mostly fine.</p>
+      <button class="btn" id="tiltBtn">45 Degrees!</button>
+    </div>
+
+    <!-- Neon Rave Mode -->
+    <div class="card">
+      <span class="hidden-afro" id="afroTrigger" title="???">&#127775;</span>
+      <h3>Backstage</h3>
+      <p class="desc">Nothing to see here. Probably. (There's a small star in the corner of this card, for the curious.)</p>
+    </div>
+
+  </div>
+
+  <div class="media-row">
+    <!-- Spotify Playlist -->
+    <div class="card">
+      <h3>Off-Stage Listening</h3>
+      <p class="desc">What the Soul King's actually got queued up.</p>
+      <iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/37i9dQZF1DX13sApGEHdQm?utm_source=generator" width="100%" height="352" frameBorder="0" allowfullscreen loading="lazy" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"></iframe>
+    </div>
+
+    <!-- Soul King Audio Player -->
+    <div class="card">
+      <h3>The Soul King Plays</h3>
+      <p class="desc">Drop the needle and see what happens.</p>
+      <div class="record-player">
+        <div class="record-disc" id="recordDisc">
+          <div class="record-label">&#128128;</div>
+        </div>
+        <div class="tonearm">
+          <div class="tonearm-arm" id="tonearmArm"></div>
+        </div>
+        <div class="player-controls">
+          <button class="btn" id="playBtn">&#9658; Play</button>
+        </div>
+        <div class="player-status" id="playerStatus"></div>
+        <audio id="soulKingAudio" src="Brook_Page/binks-sake.mp3" loop preload="none"></audio>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== SKULL INSTRUMENT + SIMON SAYS ==================== -->
+  <div class="instrument-section">
+    <div class="instrument-head">
+      <h3>The Skull Instrument</h3>
+      <p>Click a bone to play it. Start the game and it'll test your memory instead.</p>
+    </div>
+    <div class="instrument-body">
+      <div class="bone-row" id="boneRow">
+        <div class="bone" data-note="0">Do</div>
+        <div class="bone" data-note="1">Re</div>
+        <div class="bone" data-note="2">Mi</div>
+        <div class="bone" data-note="3">Sol</div>
+        <div class="bone" data-note="4">La</div>
+        <div class="bone" data-note="5">Do'</div>
+      </div>
+      <div class="simon-controls">
+        <div class="simon-level" id="simonLevel">Free Play</div>
+        <button class="btn" id="simonStartBtn">Start Tone-Deaf Simon Says</button>
+        <div class="simon-status" id="simonStatus"></div>
+      </div>
+      <div class="milk-gauge">
+        <div class="milk-carton" id="milkCarton">
+          <div class="milk-segment seg1" data-seg="1"></div>
+          <div class="milk-segment seg2" data-seg="2"></div>
+          <div class="milk-segment seg3" data-seg="3"></div>
+        </div>
+        <span class="milk-refill" id="milkRefill" title="Refill">&#129371;</span>
+        <span class="milk-label">Recovery Milk</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== BINK'S SAKE RHYTHM GAME ==================== -->
+  <div class="instrument-section">
+    <div class="instrument-head">
+      <h3>Bink's Sake (Sort Of)</h3>
+      <p>An original beat in the spirit of it &mdash; press D / F / J / K as the notes hit the line.</p>
+    </div>
+    <div class="rhythm-stage">
+      <div class="rhythm-lanes" id="rhythmLanes">
+        <div class="lane" data-lane="0"><div class="lane-key">D</div><div class="hit-line"></div></div>
+        <div class="lane" data-lane="1"><div class="lane-key">F</div><div class="hit-line"></div></div>
+        <div class="lane" data-lane="2"><div class="lane-key">J</div><div class="hit-line"></div></div>
+        <div class="lane" data-lane="3"><div class="lane-key">K</div><div class="hit-line"></div></div>
+      </div>
+      <div class="rhythm-controls">
+        <button class="btn" id="rhythmStartBtn">Start the Song</button>
+        <div class="rhythm-score" id="rhythmScore">Score: 0 &middot; Combo: 0</div>
+        <div class="rhythm-status" id="rhythmStatus"></div>
+      </div>
+    </div>
+    <div class="reward-panel" id="rewardPanel" style="display:none;">
+      <p class="reward-text">Flawless run! Here's something for the effort:</p>
+      <img class="reward-laboon" src="Brook_Page/laboon.png" alt="Laboon">
+      <br>
+      <a class="btn" id="rewardLink" href="#" target="_blank" rel="noopener">See the Best of the Repo</a>
+    </div>
+  </div>
+
+<!-- ==================== FIGHT WITH THE SOUL KING ==================== -->
+  <div class="instrument-section">
+    <div class="instrument-head">
+      <h3>Fight With the Soul King</h3>
+      <p>A rowdy crew wants a piece of the Soul King. Pick your move.</p>
+    </div>
+    <div class="battle-stage">
+      <div class="battle-side">
+        <div class="battle-name">You</div>
+        <div class="hp-bar"><div class="hp-fill" id="playerHpFill"></div></div>
+        <div class="hp-label" id="playerHpLabel">100 / 100</div>
+      </div>
+      <div class="battle-vs">VS</div>
+      <div class="battle-side">
+        <div class="battle-name">Rowdy Pirates</div>
+        <div class="hp-bar"><div class="hp-fill enemy" id="enemyHpFill"></div></div>
+        <div class="hp-label" id="enemyHpLabel">80 / 80</div>
+      </div>
+    </div>
+    <div class="battle-log" id="battleLog">A band of pirates has picked a fight. Yohohoho — how rude.</div>
+    <div class="battle-moves" id="battleMoves">
+      <button class="btn" data-move="slash">Humming Slash</button>
+      <button class="btn" data-move="parade">Soul Parade</button>
+      <button class="btn" data-move="star">Speedy Star</button>
+      <button class="btn" data-move="taunt">Yohohoho! (Heal)</button>
+    </div>
+    <button class="btn" id="battleResetBtn" style="display:none;">Fight Again</button>
+  </div>
+
+  <!-- ==================== FINALE ==================== -->
+  <section class="finale">
+    <span class="eyebrow">End of Phase One</span>
+    <h1 class="title" style="font-size:clamp(24px,4vw,38px);">More Encores Later</h1>
+    <p class="sub">The skull instrument, the rhythm game, and the rest of the set are still being rehearsed.</p>
+  </section>
+
+</div>
+
+<script>
+(function(){
+"use strict";
+const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* ---- lightweight sound engine ---- */
+const SoundEngine = (function(){
+  let ctx=null, masterGain=null;
+  function ensureCtx(){
+    if (ctx) return;
+    ctx = new (window.AudioContext||window.webkitAudioContext)();
+    masterGain = ctx.createGain();
+    masterGain.gain.value = 0.6;
+    masterGain.connect(ctx.destination);
+  }
+  function playTick(){
+    ensureCtx();
+    if (ctx.state==='suspended') ctx.resume();
+    const o=ctx.createOscillator(), g=ctx.createGain();
+    o.type='triangle'; o.frequency.value=440;
+    g.gain.value=0.0001;
+    o.connect(g); g.connect(masterGain);
+    const t=ctx.currentTime;
+    g.gain.exponentialRampToValueAtTime(0.3,t+0.01);
+    g.gain.exponentialRampToValueAtTime(0.0001,t+0.2);
+    o.start(t); o.stop(t+0.22);
+  }
+  function playSparkle(){
+    ensureCtx();
+    if (ctx.state==='suspended') ctx.resume();
+    [880,1180,1560].forEach((f,i)=>{
+      const o=ctx.createOscillator(), g=ctx.createGain();
+      o.type='sine'; o.frequency.value=f;
+      g.gain.value=0.0001;
+      o.connect(g); g.connect(masterGain);
+      const t=ctx.currentTime+i*0.07;
+      g.gain.exponentialRampToValueAtTime(0.22,t+0.01);
+      g.gain.exponentialRampToValueAtTime(0.0001,t+0.3);
+      o.start(t); o.stop(t+0.32);
+    });
+  }
+  function playNote(freq){
+    ensureCtx();
+    if (ctx.state==='suspended') ctx.resume();
+    const o=ctx.createOscillator(), g=ctx.createGain();
+    o.type='sine'; o.frequency.value=freq;
+    g.gain.value=0.0001;
+    o.connect(g); g.connect(masterGain);
+    const t=ctx.currentTime;
+    g.gain.exponentialRampToValueAtTime(0.28,t+0.02);
+    g.gain.exponentialRampToValueAtTime(0.0001,t+0.5);
+    o.start(t); o.stop(t+0.52);
+  }
+  function playBeat(){
+    ensureCtx();
+    if (ctx.state==='suspended') ctx.resume();
+    const o=ctx.createOscillator(), g=ctx.createGain();
+    o.type='sine'; o.frequency.value=90;
+    g.gain.value=0.0001;
+    o.connect(g); g.connect(masterGain);
+    const t=ctx.currentTime;
+    g.gain.exponentialRampToValueAtTime(0.5,t+0.01);
+    g.gain.exponentialRampToValueAtTime(0.0001,t+0.18);
+    o.start(t); o.stop(t+0.2);
+  }
+  function playWhiff(){
+    ensureCtx();
+    if (ctx.state==='suspended') ctx.resume();
+    const o=ctx.createOscillator(), g=ctx.createGain();
+    o.type='triangle'; o.frequency.value=140;
+    g.gain.value=0.0001;
+    o.connect(g); g.connect(masterGain);
+    const t=ctx.currentTime;
+    g.gain.exponentialRampToValueAtTime(0.15,t+0.01);
+    g.gain.exponentialRampToValueAtTime(0.0001,t+0.12);
+    o.start(t); o.stop(t+0.14);
+  }
+  return { playTick, playSparkle, playNote, playBeat, playWhiff };
+})();
+
+/* ---- sparkle burst at exact pixel coordinates (rain-icon clicks) ---- */
+function burstSparkleAt(x, y){
+  const glyphs = ['&#10022;','&#10023;','&#10039;'];
+  for (let i=0;i<10;i++){
+    const s = document.createElement('span');
+    s.className = 'sparkle';
+    s.innerHTML = glyphs[Math.floor(Math.random()*glyphs.length)];
+    const angle = Math.random()*Math.PI*2, dist = 40+Math.random()*60;
+    s.style.setProperty('--sx', Math.cos(angle)*dist+'px');
+    s.style.setProperty('--sy', Math.sin(angle)*dist+'px');
+    s.style.left = x+'px'; s.style.top = y+'px';
+    s.style.fontSize = (14+Math.random()*10)+'px';
+    document.body.appendChild(s);
+    setTimeout(()=> s.remove(), 950);
+  }
+  SoundEngine.playSparkle();
+}
+
+/* ---- entrance + generic exit transition ---- */
+function gsapFreeScale(elements, from, to, duration, done){
+  const start = performance.now();
+  elements.forEach(el=> el.style.transform = `translate(-50%,-50%) scale(${from})`);
+  function step(now){
+    const p = Math.min(1, (now-start)/duration);
+    const eased = 1 - Math.pow(1-p, 3);
+    const val = from + (to-from)*eased;
+    elements.forEach(el=> el.style.transform = `translate(-50%,-50%) scale(${val})`);
+    if (p<1) requestAnimationFrame(step); else if (done) done();
+  }
+  requestAnimationFrame(step);
+}
+function playEntranceTransition(){
+  const blots = document.querySelectorAll('.pt-blot');
+  gsapFreeScale(blots, 1, 0, reduceMotion ? 150 : 700, ()=>{ document.getElementById('pageTransition').style.pointerEvents='none'; });
+}
+playEntranceTransition();
+function playExitTransition(x, y, href){
+  const overlay = document.getElementById('pageTransition');
+  const blots = overlay.querySelectorAll('.pt-blot');
+  blots.forEach(b=>{ b.style.left = x+'px'; b.style.top = y+'px'; });
+  overlay.style.pointerEvents = 'auto';
+  gsapFreeScale(blots, 0, 1, reduceMotion ? 150 : 850, ()=>{ window.location.href = href; });
+}
+
+/* ---- petal screen-fill wipes (shared engine; sakura = Robin/Chopper, tangerine = Nami, cola = Franky) ---- */
+function playPetalWipe(emoji, colorA, colorB, done){
+  const wipe = document.getElementById('sakuraWipe');
+  wipe.style.background = `radial-gradient(circle at 50% 50%, ${colorA}, ${colorB})`;
+  wipe.innerHTML = '';
+  wipe.classList.add('is-active');
+  const count = reduceMotion ? 0 : 46;
+  for (let i=0;i<count;i++){
+    const p = document.createElement('span');
+    p.className = 'wipe-petal';
+    p.textContent = emoji;
+    p.style.left = (Math.random()*100) + 'vw';
+    p.style.top  = (Math.random()*100) + 'vh';
+    p.style.fontSize = (22 + Math.random()*30) + 'px';
+    const rot = Math.random()*360;
+    wipe.appendChild(p);
+    setTimeout(()=>{
+      p.classList.add('is-in');
+      p.style.transform = `scale(1.15) rotate(${rot}deg)`;
+    }, Math.random() * (reduceMotion ? 0 : 260));
+  }
+  setTimeout(()=>{ if (done) done(); }, reduceMotion ? 80 : 650);
+}
+function playSakuraWipe(done){ playPetalWipe('\u{1F338}', '#ffd6ef', '#ff9ad5', done); }
+function playTangerineWipe(done){ playPetalWipe('\u{1F34A}', '#ffe0b0', '#ff9a3c', done); }
+function playColaWipe(done){ playPetalWipe('\u{1F964}', '#f5e6c8', '#5c3a1e', done); }
+
+/* ---- character loading screens ----
+   images: fullscreen art, one picked at random per visit
+   icons:  falling rain art
+   caption: shown while the loading screen is up
+   href:   final destination
+   transition: optional — 'sakura' | 'tangerine' | 'cola' | omit for a plain fade
+---- */
+const LOADING_SCREENS = {
+  nami: {
+    images: ['Nami_Page/loading1.png','Nami_Page/loading2.jpg','Nami_Page/loading3.jpeg'],
+    icons:  ['Icons/berry.png','Icons/tangerine.png'],
+    caption: "Charting a course to Nami's Route\u2026",
+    href: 'Nami.html',
+    transition: 'tangerine'
+  },
+  sanji: {
+    images: ['Sanji_Page/loading1.jpg','Sanji_Page/loading2.jpg','Sanji_Page/loading3.jpg','Sanji_Page/loading4.jpg','Sanji_Page/loading5.jpg'],
+    icons:  ['Icons/meat.png','Icons/rum.png','Icons/pizza.png','Icons/mooncake.png'],
+    caption: "Heading to the galley\u2026",
+    href: 'Sanji.html'
+  },
+  chopper: {
+    images: ['Chopper_Page/loading1.jpg','Chopper_Page/loading2.jpg','Chopper_Page/loading3.jpg'],
+    icons:  ['Icons/berry.png','Icons/tangerine.png'],
+    caption: "Following the sakura trail\u2026",
+    href: 'Chopper.html',
+    transition: 'sakura'
+  },
+  robin: {
+    images: ['Robin_Page/loading1.jpg','Robin_Page/loading2.jpg','Robin_Page/loading3.jpg','Robin_Page/loading4.jpg','Robin_Page/loading5.jpg'],
+    icons:  ['Icons/berry.png','Icons/tangerine.png'],
+    caption: "Uncovering the record\u2026",
+    href: 'Robin.html',
+    transition: 'sakura'
+  },
+  luffy: {
+    images: ['Luffy_Page/loading1.jpg','Luffy_Page/loading2.png','Luffy_Page/loading3.jpg','Luffy_Page/loading4.png','Luffy_Page/loading5.png','Luffy_Page/loading6.jpeg','Luffy_Page/loading7.jpeg','Luffy_Page/loading8.jpg'],
+    icons:  ['Icons/meat.png','Icons/pizza.png'],
+    caption: "Setting course for the Captain\u2026",
+    href: 'Luffy.html'
+  },
+  franky: {
+    images: ['Franky_Page/loading1.jpg','Franky_Page/loading2.jpg','Franky_Page/loading3.jpg','Franky_Page/loading4.jpg','Franky_Page/loading5.jpg'],
+    icons:  ['Icons/cola.png'],
+    caption: "Heading to the workshop\u2026",
+    href: 'Franky.html',
+    transition: 'cola'
+  }
+};
+
+function spawnRainIcon(container, icons){
+  const el=document.createElement('div');
+  el.className='rain-icon';
+  const size = 26+Math.random()*30;
+  el.style.width=size+'px'; el.style.height=size+'px';
+  el.style.left=(Math.random()*100)+'vw';
+  const duration = 2.4+Math.random()*1.8;
+  const rot = (Math.random()*80-40);
+  el.style.transition=`transform ${duration}s linear, opacity .3s ease`;
+  const img=document.createElement('img');
+  img.src = icons[Math.floor(Math.random()*icons.length)];
+  el.appendChild(img);
+  container.appendChild(el);
+  requestAnimationFrame(()=>{ el.style.transform = `translateY(115vh) rotate(${rot}deg)`; });
+  el.addEventListener('click', (e)=>{
+    e.stopPropagation();
+    burstSparkleAt(e.clientX, e.clientY);
+    el.style.opacity='0';
+    setTimeout(()=>el.remove(),300);
+  });
+  setTimeout(()=>{ if (el.parentNode) el.remove(); }, duration*1000+200);
+}
+
+function playCharLoadingScreen(key){
+  const config = LOADING_SCREENS[key];
+  if (!config) return;
+
+  function reveal(){
+    const overlay   = document.getElementById('charLoading');
+    const img       = document.getElementById('charLoadingImg');
+    const rainLayer = document.getElementById('rainLayer');
+    const caption   = document.getElementById('charLoadingCaption');
+    img.src = config.images[Math.floor(Math.random()*config.images.length)];
+    img.classList.remove('is-shown');
+    caption.textContent = config.caption;
+    overlay.classList.add('is-active');
+    requestAnimationFrame(()=> img.classList.add('is-shown'));
+    const rainInterval = setInterval(()=> spawnRainIcon(rainLayer, config.icons), 180);
+    setTimeout(()=>{
+      const wipe = document.getElementById('sakuraWipe');
+      if (wipe) wipe.classList.remove('is-active');
+    }, 400);
+    setTimeout(()=>{
+      clearInterval(rainInterval);
+      window.location.href = config.href;
+    }, 2600);
+  }
+
+  if (config.transition === 'sakura'){
+    playSakuraWipe(reveal);
+  } else if (config.transition === 'tangerine'){
+    playTangerineWipe(reveal);
+  } else if (config.transition === 'cola'){
+    playColaWipe(reveal);
+  } else {
+    reveal();
+  }
+}
+
+/* ---- wire up the crew links ---- */
+document.querySelectorAll('.crew-link').forEach(a=>{
+  a.addEventListener('click', function(e){
+    e.preventDefault();
+    const href = this.getAttribute('href');
+    const rect = this.getBoundingClientRect();
+    const cx = rect.left + rect.width/2;
+    const cy = rect.top + rect.height/2;
+    SoundEngine.playTick();
+    if (this.dataset.loading){
+      playCharLoadingScreen(this.dataset.loading);
+    } else {
+      playExitTransition(cx, cy, href);
+    }
+  });
+});
+
+/* ---- crew drawer ---- */
+const digTrigger = document.getElementById('digTrigger');
+const crewDrawer = document.getElementById('crewDrawer');
+const crewClose  = document.getElementById('crewClose');
+digTrigger.addEventListener('click', ()=> crewDrawer.classList.add('is-open'));
+crewClose.addEventListener('click', ()=> crewDrawer.classList.remove('is-open'));
+crewDrawer.addEventListener('click', (e)=>{ if (e.target === crewDrawer) crewDrawer.classList.remove('is-open'); });
+
+/* =======================================================================
+   PHASE 2: SKULL INSTRUMENT + SIMON SAYS + MILK GAUGE
+   ======================================================================= */
+const BONE_NOTES = [261.63, 293.66, 329.63, 392.00, 440.00, 523.25];
+
+const bones = document.querySelectorAll('.bone');
+const simonLevelEl  = document.getElementById('simonLevel');
+const simonStatusEl = document.getElementById('simonStatus');
+const simonStartBtn = document.getElementById('simonStartBtn');
+const milkSegments  = document.querySelectorAll('.milk-segment');
+const milkRefill    = document.getElementById('milkRefill');
+
+let simonActive = false;
+let simonPlaying = false;
+let simonSequence = [];
+let simonUserIndex = 0;
+let simonLevel = 0;
+let lives = 3;
+
+function hitBoneVisual(idx){
+  const bone = bones[idx];
+  bone.classList.add('is-hit');
+  setTimeout(()=> bone.classList.remove('is-hit'), 220);
+}
+
+function playSequence(){
+  simonPlaying = true;
+  simonStatusEl.textContent = 'Listen carefully\u2026';
+  simonSequence.forEach((idx, i)=>{
+    setTimeout(()=>{
+      SoundEngine.playNote(BONE_NOTES[idx]);
+      hitBoneVisual(idx);
+      if (i === simonSequence.length - 1){
+        setTimeout(()=>{ simonPlaying = false; simonUserIndex = 0; simonStatusEl.textContent = 'Your turn!'; }, 500);
+      }
+    }, i * 650);
+  });
+}
+
+function nextRound(){
+  simonLevel++;
+  simonSequence.push(Math.floor(Math.random()*BONE_NOTES.length));
+  simonLevelEl.textContent = 'Level ' + simonLevel;
+  setTimeout(playSequence, 500);
+}
+
+function simonMiss(){
+  lives--;
+  const seg = document.querySelector('.milk-segment[data-seg="'+ (lives+1) +'"]');
+  if (seg) seg.classList.add('is-lost');
+  simonStatusEl.textContent = "Ah! That note pierced my ears\u2026 though I don't have ears! Yohohoho!";
+  if (lives <= 0){
+    simonStatusEl.textContent += ' Game over — starting fresh.';
+    simonActive = false;
+    simonSequence = [];
+    simonLevel = 0;
+    simonLevelEl.textContent = 'Free Play';
+    simonStartBtn.textContent = 'Start Tone-Deaf Simon Says';
+  } else {
+    simonUserIndex = 0;
+    setTimeout(playSequence, 1200);
+  }
+}
+
+simonStartBtn.addEventListener('click', ()=>{
+  simonActive = true;
+  simonSequence = [];
+  simonLevel = 0;
+  lives = 3;
+  milkSegments.forEach(s=> s.classList.remove('is-lost'));
+  simonStartBtn.textContent = 'Restart';
+  nextRound();
+});
+
+milkRefill.addEventListener('click', ()=>{
+  lives = 3;
+  milkSegments.forEach(s=> s.classList.remove('is-lost'));
+  const r = milkRefill.getBoundingClientRect();
+  burstSparkleAt(r.left+13, r.top+13);
+  SoundEngine.playSparkle();
+});
+
+bones.forEach((bone, idx)=>{
+  bone.addEventListener('click', ()=>{
+    if (simonActive && simonPlaying) return;
+    SoundEngine.playNote(BONE_NOTES[idx]);
+    hitBoneVisual(idx);
+    if (!simonActive) return;
+
+    if (idx === simonSequence[simonUserIndex]){
+      simonUserIndex++;
+      if (simonUserIndex === simonSequence.length){
+        simonStatusEl.textContent = 'Perfect! Next round\u2026';
+        setTimeout(nextRound, 700);
+      }
+    } else {
+      simonMiss();
+    }
+  });
+});
+
+/* =======================================================================
+   PHASE 3: SOUL KING AUDIO PLAYER
+   ======================================================================= */
+const recordDisc   = document.getElementById('recordDisc');
+const tonearmArm    = document.getElementById('tonearmArm');
+const playBtn       = document.getElementById('playBtn');
+const playerStatus  = document.getElementById('playerStatus');
+const soulKingAudio = document.getElementById('soulKingAudio');
+let audioPlaying = false;
+
+playBtn.addEventListener('click', ()=>{
+  if (!audioPlaying){
+    soulKingAudio.play().then(()=>{
+      audioPlaying = true;
+      recordDisc.classList.add('is-spinning');
+      tonearmArm.classList.add('is-down');
+      playBtn.innerHTML = '&#10074;&#10074; Pause';
+      playerStatus.textContent = '';
+    }).catch(()=>{
+      playerStatus.textContent = 'No track loaded yet \u2014 drop binks-sake.mp3 into Brook_Page/ to hear it.';
+    });
+  } else {
+    soulKingAudio.pause();
+    audioPlaying = false;
+    recordDisc.classList.remove('is-spinning');
+    tonearmArm.classList.remove('is-down');
+    playBtn.innerHTML = '&#9658; Play';
+  }
+});
+
+/* =======================================================================
+   PHASE 4: BINK'S SAKE RHYTHM GAME (original beat, synthesized, independent)
+   ======================================================================= */
+const LANE_NOTES = [261.63, 329.63, 392.00, 523.25];
+const KEY_MAP = { d:0, f:1, j:2, k:3 };
+const BEAT_MS = 600;
+const TRAVEL_MS = 1800;
+const REWARD_URL = 'https://github.com/devadarshan5/portfolio'; // Actual repo link
+
+const laneEls = document.querySelectorAll('.lane');
+const rhythmStartBtn = document.getElementById('rhythmStartBtn');
+const rhythmScoreEl = document.getElementById('rhythmScore');
+const rhythmStatusEl = document.getElementById('rhythmStatus');
+const rewardPanel = document.getElementById('rewardPanel');
+const rewardLink = document.getElementById('rewardLink');
+rewardLink.href = REWARD_URL;
+
+let rhythmActive = false;
+let activeNotes = [];
+let score = 0, combo = 0, misses = 0;
+let beatTimer = null;
+let spawnTimers = [];
+
+function buildChart(){
+  const chart = [];
+  const totalBeats = 40;
+  for (let i=0;i<totalBeats;i++){
+    if (Math.random() < 0.15) continue;
+    chart.push({ lane: Math.floor(Math.random()*4), time: i*BEAT_MS });
+  }
+  return chart;
+}
+
+function spawnNote(lane){
+  const laneEl = laneEls[lane];
+  const el = document.createElement('div');
+  el.className = 'rhythm-note';
+  laneEl.appendChild(el);
+  activeNotes.push({ el, lane, spawnTime: performance.now(), resolved:false });
+}
+
+function rhythmFrame(){
+  if (!rhythmActive) return;
+  const now = performance.now();
+  activeNotes.forEach(n=>{
+    if (n.resolved) return;
+    const progress = (now - n.spawnTime) / TRAVEL_MS;
+    n.el.style.top = Math.min(progress,1.08) * 100 + '%';
+    if (progress > 1.08){
+      n.resolved = true;
+      n.el.remove();
+      registerMiss();
+    }
+  });
+  activeNotes = activeNotes.filter(n=> !n.resolved);
+  requestAnimationFrame(rhythmFrame);
+}
+
+function updateScoreDisplay(){
+  rhythmScoreEl.textContent = 'Score: ' + score + ' \u00b7 Combo: ' + combo;
+}
+
+function registerMiss(){
+  misses++;
+  combo = 0;
+  updateScoreDisplay();
+  rhythmStatusEl.textContent = "Ah! That note pierced my ears\u2026 though I don't have ears! Yohohoho!";
+}
+
+function judgeHit(lane){
+  laneEls[lane].classList.add('is-flash');
+  setTimeout(()=> laneEls[lane].classList.remove('is-flash'), 120);
+
+  const candidates = activeNotes.filter(n=> n.lane===lane && !n.resolved);
+  if (!candidates.length){
+    SoundEngine.playWhiff();
+    return;
+  }
+  candidates.sort((a,b)=>{
+    const pa = (performance.now()-a.spawnTime)/TRAVEL_MS;
+    const pb = (performance.now()-b.spawnTime)/TRAVEL_MS;
+    return Math.abs(pa-1) - Math.abs(pb-1);
+  });
+  const n = candidates[0];
+  const progress = (performance.now()-n.spawnTime)/TRAVEL_MS;
+  const offset = Math.abs(progress-1);
+
+  if (offset < 0.09){
+    n.resolved = true; n.el.remove();
+    score += 100; combo++; updateScoreDisplay();
+    rhythmStatusEl.textContent = 'Perfect!';
+    SoundEngine.playNote(LANE_NOTES[lane]);
+  } else if (offset < 0.2){
+    n.resolved = true; n.el.remove();
+    score += 50; combo++; updateScoreDisplay();
+    rhythmStatusEl.textContent = 'Good.';
+    SoundEngine.playNote(LANE_NOTES[lane]);
+  } else {
+    SoundEngine.playWhiff();
+  }
+}
+
+document.addEventListener('keydown', (e)=>{
+  if (!rhythmActive) return;
+  const lane = KEY_MAP[e.key.toLowerCase()];
+  if (lane === undefined) return;
+  judgeHit(lane);
+});
+laneEls.forEach((laneEl, lane)=>{
+  laneEl.addEventListener('click', ()=>{ if (rhythmActive) judgeHit(lane); });
+});
+
+function endRhythmGame(){
+  rhythmActive = false;
+  clearInterval(beatTimer);
+  activeNotes.forEach(n=> n.el.remove());
+  activeNotes = [];
+  rhythmStartBtn.disabled = false;
+  rhythmStartBtn.textContent = 'Play Again';
+  if (misses === 0 && score > 0){
+    rhythmStatusEl.textContent = 'Flawless. Not bad for a skeleton.';
+    rewardPanel.style.display = 'block';
+  } else {
+    rhythmStatusEl.textContent = 'Final score: ' + score + ' (' + misses + ' missed notes).';
+  }
+}
+
+rhythmStartBtn.addEventListener('click', ()=>{
+  rhythmActive = true;
+  score = 0; combo = 0; misses = 0;
+  updateScoreDisplay();
+  rhythmStatusEl.textContent = 'Here we go\u2026';
+  rewardPanel.style.display = 'none';
+  rhythmStartBtn.disabled = true;
+  rhythmStartBtn.textContent = 'Playing\u2026';
+  activeNotes.forEach(n=> n.el.remove());
+  activeNotes = [];
+
+  const chart = buildChart();
+  spawnTimers.forEach(t=> clearTimeout(t));
+  spawnTimers = chart.map(note=>
+    setTimeout(()=> spawnNote(note.lane), Math.max(0, note.time - TRAVEL_MS))
+  );
+
+  let beatCount = 0;
+  const totalBeats = 40;
+  beatTimer = setInterval(()=>{
+    SoundEngine.playBeat();
+    beatCount++;
+    if (beatCount >= totalBeats) clearInterval(beatTimer);
+  }, BEAT_MS);
+
+  requestAnimationFrame(rhythmFrame);
+  setTimeout(endRhythmGame, totalBeats*BEAT_MS + TRAVEL_MS + 400);
+});
+
+/* =======================================================================
+   PHASE 5: FIGHT WITH THE SOUL KING
+   ======================================================================= */
+const MOVES = {
+  slash:  { label:'Humming Slash', dmgMin:12, dmgMax:18, hitChance:1.0, heal:0 },
+  parade: { label:'Soul Parade',   dmgMin:22, dmgMax:30, hitChance:0.7, heal:0 },
+  star:   { label:'Speedy Star',   dmgMin:8,  dmgMax:12, hitChance:1.0, heal:0 },
+  taunt:  { label:'Yohohoho!',     dmgMin:0,  dmgMax:0,  hitChance:1.0, heal:10 }
+};
+const PLAYER_LINES = [
+  "Not done yet! I'm working myself to the bone here!",
+  "Yohohoho! Right between the ribs \u2014 well, theirs, not mine!",
+  "A gentleman never misses his cue!",
+  "That's the spirit! Quite literally, in my case!"
+];
+const MISS_LINES = [
+  "A clean miss \u2014 all bone, no balance today.",
+  "Overcommitted on that one. Yohohoho, embarrassing!"
+];
+const ENEMY_LINES = [
+  "The crew swings back \u2014 hard.",
+  "A cutlass whistles past your collarbone.",
+  "They're not impressed by the music."
+];
+const WIN_LINES = ["Yohohoho! Encore, anyone?", "Not bad, for a man with no muscles left."];
+const LOSE_LINES = ["Ah, well. Can't win them all \u2014 especially with no stamina to begin with!", "Time for a nap. A very long, skeletal nap."];
+
+let playerHp = 100, playerMax = 100;
+let enemyHp = 80, enemyMax = 80;
+let battleOver = false;
+
+const playerHpFill = document.getElementById('playerHpFill');
+const enemyHpFill = document.getElementById('enemyHpFill');
+const playerHpLabel = document.getElementById('playerHpLabel');
+const enemyHpLabel = document.getElementById('enemyHpLabel');
+const battleLog = document.getElementById('battleLog');
+const battleMoves = document.getElementById('battleMoves');
+const battleResetBtn = document.getElementById('battleResetBtn');
+
+function updateBattleUI(){
+  playerHpFill.style.width = Math.max(0,(playerHp/playerMax*100)) + '%';
+  enemyHpFill.style.width = Math.max(0,(enemyHp/enemyMax*100)) + '%';
+  playerHpLabel.textContent = Math.max(0,playerHp) + ' / ' + playerMax;
+  enemyHpLabel.textContent = Math.max(0,enemyHp) + ' / ' + enemyMax;
+}
+function randInt(min,max){ return Math.floor(Math.random()*(max-min+1))+min; }
+function pick(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+
+function endBattle(won){
+  battleOver = true;
+  battleMoves.style.display = 'none';
+  battleResetBtn.style.display = 'inline-block';
+  battleLog.textContent = won ? pick(WIN_LINES) : pick(LOSE_LINES);
+  if (won) SoundEngine.playSparkle(); else SoundEngine.playTick();
+}
+
+function enemyTurn(){
+  if (battleOver) return;
+  const dmg = randInt(10,16);
+  playerHp -= dmg;
+  updateBattleUI();
+  battleLog.textContent = pick(ENEMY_LINES) + ' (-' + dmg + ' HP)';
+  SoundEngine.playTick();
+  if (playerHp <= 0){ endBattle(false); }
+}
+
+battleMoves.querySelectorAll('button').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    if (battleOver) return;
+    const move = MOVES[btn.dataset.move];
+    if (move.heal){
+      playerHp = Math.min(playerMax, playerHp + move.heal);
+      battleLog.textContent = 'A quick tune steadies the nerves. (+' + move.heal + ' HP)';
+      SoundEngine.playNote(392.00);
+    } else if (Math.random() <= move.hitChance){
+      const dmg = randInt(move.dmgMin, move.dmgMax);
+      enemyHp -= dmg;
+      battleLog.textContent = pick(PLAYER_LINES) + ' (-' + dmg + ' HP)';
+      SoundEngine.playNote(523.25);
+    } else {
+      battleLog.textContent = pick(MISS_LINES);
+      SoundEngine.playTick();
+    }
+    updateBattleUI();
+    if (enemyHp <= 0){ endBattle(true); return; }
+    setTimeout(enemyTurn, 900);
+  });
+});
+
+battleResetBtn.addEventListener('click', ()=>{
+  playerHp = playerMax; enemyHp = enemyMax; battleOver = false;
+  updateBattleUI();
+  battleMoves.style.display = 'flex';
+  battleResetBtn.style.display = 'none';
+  battleLog.textContent = 'A band of pirates has picked a fight. Yohohoho \u2014 how rude.';
+});
+
+updateBattleUI();
+
+/* =======================================================================
+   PHASE 1 FEATURES
+   ======================================================================= */
+
+/* ---- bone joke button ---- */
+const BONE_JOKES = [
+  "Yohohoho! But I don't have skin, so 'goosebumps' don't really apply to me!",
+  "I'd tell you a joint joke, but I'm afraid it might crack you up... quite literally.",
+  "People say I have no one to talk to. Rude! I have myself to talk to. Yohohoho!",
+  "Do I believe in ghosts? Well, I am one. Bit of an awkward question, really.",
+  "My favorite instrument is the violin, obviously. Though my ribs make a decent xylophone too.",
+  "I never get cold feet before a performance. I don't have feet-feeling nerves left, yohoho!",
+  "Someone asked if I lost weight. I said, 'I lost everything, thank you for noticing.'",
+  "Ninety years old and still touring? At this point I'm basically vintage. Well-aged, bone vintage.",
+  "I asked a doctor about a rib removal. He said I was ninety percent there already."
+];
+const jokeBtn = document.getElementById('jokeBtn');
+const jokeBox = document.getElementById('jokeBox');
+let lastJoke = -1;
+jokeBtn.addEventListener('click', ()=>{
+  let idx;
+  do { idx = Math.floor(Math.random()*BONE_JOKES.length); } while (idx === lastJoke && BONE_JOKES.length > 1);
+  lastJoke = idx;
+  jokeBox.textContent = BONE_JOKES[idx];
+  SoundEngine.playTick();
+});
+
+/* ---- mirror gag ---- */
+const mirrorBtn = document.getElementById('mirrorBtn');
+const slapNote = document.getElementById('slapNote');
+let mirrorBusy = false;
+mirrorBtn.addEventListener('click', ()=>{
+  if (mirrorBusy) return;
+  mirrorBusy = true;
+  slapNote.textContent = 'Can I see your\u2026';
+  setTimeout(()=>{
+    slapNote.innerHTML = '<span class="slap-flash">&#128077; SLAP! &mdash; worth it. Yohohoho!</span>';
+    burstSparkleAt(mirrorBtn.getBoundingClientRect().left+45, mirrorBtn.getBoundingClientRect().top+60);
+    SoundEngine.playTick();
+    mirrorBusy = false;
+  }, 650);
+});
+
+/* ---- concert ticket generator ---- */
+const VENUES = [
+  "Skypiea Sky Dome", "Whole Cake Concert Hall", "Fishman Island Aquadome",
+  "Wano Kabuki Theater", "Baratie Floating Stage", "Thriller Bark Amphitheater",
+  "Water 7 Dockside Stage", "Alabasta Desert Arena"
+];
+const TAGS = [
+  "Standing room only (I have no flesh to sit on anyway)",
+  "All ages welcome, ninety years running",
+  "Bring your own soul, mine's already out",
+  "Sold out. Every night. Somehow.",
+  "Encore guaranteed, bones permitting"
+];
+function randomFutureDate(){
+  const d = new Date();
+  d.setDate(d.getDate() + Math.floor(Math.random()*300)+10);
+  return d.toLocaleDateString(undefined, { month:'long', day:'numeric', year:'numeric' });
+}
+document.getElementById('ticketBtn').addEventListener('click', ()=>{
+  document.getElementById('ticketVenue').textContent = VENUES[Math.floor(Math.random()*VENUES.length)];
+  document.getElementById('ticketDate').textContent = randomFutureDate();
+  document.getElementById('ticketTag').textContent = TAGS[Math.floor(Math.random()*TAGS.length)];
+  document.getElementById('ticketBox').style.display = 'block';
+  SoundEngine.playTick();
+});
+
+/* ---- 45-degree tilt (5s auto-revert) ---- */
+const tiltBtn = document.getElementById('tiltBtn');
+tiltBtn.addEventListener('click', ()=>{
+  if (document.body.classList.contains('is-tilted')) return;
+  tiltBtn.disabled = true;
+  document.body.classList.add('is-tilted');
+  SoundEngine.playTick();
+  setTimeout(()=>{
+    document.body.classList.remove('is-tilted');
+    tiltBtn.disabled = false;
+  }, 5000);
+});
+
+/* ---- neon rave mode (toggle, floating notes while active) ---- */
+let raveActive = false;
+let raveInterval = null;
+const NOTES = ['&#9834;','&#9835;','&#119070;'];
+function spawnRaveNote(){
+  const n = document.createElement('span');
+  n.className = 'note-particle';
+  n.innerHTML = NOTES[Math.floor(Math.random()*NOTES.length)];
+  n.style.left = (Math.random()*100)+'vw';
+  n.style.animationDuration = (4+Math.random()*3)+'s';
+  n.style.color = [ 'var(--rave-pink)','var(--rave-green)','var(--rave-purple)' ][Math.floor(Math.random()*3)];
+  document.body.appendChild(n);
+  setTimeout(()=> n.remove(), 8000);
+}
+document.getElementById('afroTrigger').addEventListener('click', ()=>{
+  raveActive = !raveActive;
+  document.body.classList.toggle('is-rave', raveActive);
+  SoundEngine.playSparkle();
+  if (raveActive && !reduceMotion){
+    raveInterval = setInterval(spawnRaveNote, 220);
+  } else if (raveInterval){
+    clearInterval(raveInterval);
+    raveInterval = null;
+  }
+});
+})();
+</script>
+
+</body>
+</html>
