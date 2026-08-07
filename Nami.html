@@ -674,11 +674,11 @@ a{ color: inherit; }
   <div class="mobile-crew-grid">
     <a class="mobile-poster" href="Luffy.html"><img src="Wanted_Posters/luffy_wanted_poster.jpg" alt="Luffy"></a>
     <a class="mobile-poster" href="Sanji.html" data-loading="sanji"><img src="Wanted_Posters/sanji_wanted_poster.jpg" alt="Sanji"></a>
-    <a class="mobile-poster" href="projects.html"><img src="Wanted_Posters/zoro_wanted_poster.jpg" alt="Zoro"></a>
+    <a class="mobile-poster" href="Zoro.html" data-loading="zoro"><img src="Wanted_Posters/zoro_wanted_poster.jpg" alt="Zoro"></a>
     <a class="mobile-poster" href="Chopper.html"><img src="Wanted_Posters/chopper_wanted_poster.jpg" alt="Chopper"></a>
     <a class="mobile-poster" href="Robin.html"><img src="Wanted_Posters/robin_wanted_poster.jpg" alt="Robin"></a>
     <a class="mobile-poster" href="Franky.html" data-loading="franky"><img src="Wanted_Posters/franky_wanted_poster.jpg" alt="Franky"></a>
-    <a class="mobile-poster" href="Brook.html"><img src="Wanted_Posters/brook_wanted_poster.jpg" alt="Brook"></a>
+    <a class="mobile-poster" href="Brook.html" data-loading="brook"><img src="Wanted_Posters/brook_wanted_poster.jpg" alt="Brook"></a>
     <a class="mobile-poster" href="Usopp.html"><img src="Wanted_Posters/usopp_wanted_poster.jpg" alt="Usopp"></a>
     <a class="mobile-poster" href="Jinbe.html"><img src="Wanted_Posters/jinbe_wanted_poster.jpg" alt="Jinbe"></a>
   </div>
@@ -800,7 +800,7 @@ a{ color: inherit; }
 
   <!-- ================= WINDOWS ================= -->
   <section class="island island--right" data-caption="Approaching Windows Island">
-    <a class="poster-trigger" href="projects.html" style="left:7vw; top:15%; --rot:6deg;">
+    <a class="poster-trigger" href="Zoro.html" data-loading="zoro" style="left:7vw; top:15%; --rot:6deg;">
      <img src="Wanted_Posters/zoro_wanted_poster.jpg" alt="Zoro Wanted Poster">
      <span class="poster-label">Zoro</span>
     </a>
@@ -880,7 +880,7 @@ a{ color: inherit; }
   <!-- ================= CYBERSECURITY ================= -->
   <section class="island island--right" data-caption="Approaching Cybersecurity Island">
   <img class="intro-figure nami-profile"  src="Nami_Page/nami-profile.png"      alt="Nami in profile, studying the chart" draggable="false">
-   <a class="poster-trigger" href="Brook.html" style="left:9vw; top:62%; --rot:-6deg;">
+   <a class="poster-trigger" href="Brook.html" data-loading="brook" style="left:9vw; top:62%; --rot:-6deg;">
      <img src="Wanted_Posters/brook_wanted_poster.jpg" alt="Brook Wanted Poster">
      <span class="poster-label">Brook</span>
    </a>
@@ -1039,6 +1039,8 @@ function playPetalWipe(emoji, colorA, colorB, done){
 function playSakuraWipe(done){ playPetalWipe('\u{1F338}', '#ffd6ef', '#ff9ad5', done); }
 function playTangerineWipe(done){ playPetalWipe('\u{1F34A}', '#ffe0b0', '#ff9a3c', done); }
 function playColaWipe(done){ playPetalWipe('\u{1F964}', '#f5e6c8', '#5c3a1e', done); }
+function playMusicWipe(done){ playPetalWipe('\u{1F3B5}', '#2a1a3a', '#000000', done); }
+function playThunderWipe(done){ playPetalWipe('\u{26A1}', '#1a3a1a', '#000000', done); }
 
 /* =======================================================================
    3. CUSTOM CURSOR
@@ -1392,35 +1394,56 @@ const LOADING_SCREENS = {
     images: ['Sanji_Page/loading1.jpg','Sanji_Page/loading2.jpg','Sanji_Page/loading3.jpg','Sanji_Page/loading4.jpg','Sanji_Page/loading5.jpg'],
     icons:  ['Icons/meat.png','Icons/rum.png','Icons/pizza.png','Icons/mooncake.png'],
     caption: "Heading to the galley\u2026",
-    href: 'Sanji.html'
+    href: 'Sanji.html',
+    audio: 'Sanji_Page/loading-sound.mp3'
   },
   luffy: {
-  images: ['Luffy_Page/loading1.jpg','Luffy_Page/loading2.png','Luffy_Page/loading3.jpg','Luffy_Page/loading4.png','Luffy_Page/loading5.png','Luffy_Page/loading6.jpeg','Luffy_Page/loading7.jpeg','Luffy_Page/loading8.jpg'],
-  icons:  ['Icons/meat.png','Icons/pizza.png'],
-  caption: "Setting course for the Captain\u2026",
-  href: 'Luffy.html'
-},
+    images: ['Luffy_Page/loading1.jpg','Luffy_Page/loading2.png','Luffy_Page/loading3.jpg','Luffy_Page/loading4.png','Luffy_Page/loading5.png','Luffy_Page/loading6.jpeg','Luffy_Page/loading7.jpeg','Luffy_Page/loading8.jpg'],
+    icons:  ['Icons/meat.png','Icons/pizza.png'],
+    caption: "Setting course for the Captain\u2026",
+    href: 'Luffy.html',
+    audio: 'Luffy_Page/loading-sound.mp3'
+  },
   robin: {
     images: ['Robin_Page/loading1.jpg','Robin_Page/loading2.jpg','Robin_Page/loading3.jpg','Robin_Page/loading4.png','Robin_Page/loading5.jpg'],
     icons:  ['Icons/berry.png','Icons/tangerine.png'],
     caption: "Uncovering the record\u2026",
     href: 'Robin.html',
-    transition: 'sakura'
+    transition: 'sakura',
+    audio: 'Robin_Page/loading-sound.mp3'
   },
   chopper: {
     images: ['Chopper_Page/loading1.jpg','Chopper_Page/loading2.jpg','Chopper_Page/loading3.jpg'],
     icons:  ['Icons/berry.png','Icons/tangerine.png'],
     caption: "Following the sakura trail\u2026",
     href: 'Chopper.html',
-    transition: 'sakura'
+    transition: 'sakura',
+    audio: 'Chopper_Page/loading-sound.mp3'
   },
   franky: {
-  images: ['Franky_Page/loading1.jpg','Franky_Page/loading2.jpg','Franky_Page/loading3.jpg','Franky_Page/loading4.jpg','Franky_Page/loading5.jpg'],
-  icons:  ['Icons/cola.png'],
-  caption: "Heading to the workshop\u2026",
-  href: 'Franky.html',
-  transition: 'cola'
-}
+    images: ['Franky_Page/loading1.jpg','Franky_Page/loading2.jpg','Franky_Page/loading3.jpg','Franky_Page/loading4.jpg','Franky_Page/loading5.jpg'],
+    icons:  ['Icons/cola.png'],
+    caption: "Heading to the workshop\u2026",
+    href: 'Franky.html',
+    transition: 'cola',
+    audio: 'Franky_Page/loading-sound.mp3'
+  },
+  brook: {
+    images: ['Brook_Page/loading1.jpg','Brook_Page/loading2.jpg','Brook_Page/loading3.jpg','Brook_Page/loading4.jpg','Brook_Page/loading5.jpg'],
+    icons:  ['Icons/note.png'],
+    caption: "Yohohoho\u2026 tuning in to the Soul King\u2026",
+    href: 'Brook.html',
+    transition: 'music',
+    audio: 'Brook_Page/loading-sound.mp3'
+  },
+  zoro: {
+    images: ['Zoro_Page/loading1.jpg','Zoro_Page/loading2.jpg','Zoro_Page/loading3.jpg'],
+    icons:  ['Icons/rum.png','Icons/sleep.png','Icons/katana.png'],
+    caption: "One wrong turn from Wano\u2026",
+    href: 'Zoro.html',
+    transition: 'thunder',
+    audio: 'Zoro_Page/loading-sound.mp3'
+  }
 };
 
 function spawnRainIcon(container, icons){
@@ -1472,6 +1495,24 @@ function playCharLoadingScreen(key){
   const config = LOADING_SCREENS[key];
   if (!config) return;
 
+  let audioDone = false;
+  let fallbackTimer = null;
+  let rainInterval = null;
+
+  function finish(){
+    if (fallbackTimer) clearTimeout(fallbackTimer);
+    if (rainInterval) clearInterval(rainInterval);
+    window.location.href = config.href;
+  }
+
+  if (config.audio){
+    const sound = new Audio(config.audio);
+    fallbackTimer = setTimeout(()=>{ if(!audioDone){ audioDone=true; finish(); } }, 6000);
+    sound.addEventListener('ended', ()=>{ if(audioDone) return; audioDone=true; finish(); });
+    sound.addEventListener('error', ()=>{ if(audioDone) return; audioDone=true; finish(); });
+    sound.play().catch(()=>{ if(audioDone) return; audioDone=true; finish(); });
+  }
+
   function reveal(){
     const overlay   = document.getElementById('charLoading');
     const img       = document.getElementById('charLoadingImg');
@@ -1482,15 +1523,14 @@ function playCharLoadingScreen(key){
     caption.textContent = config.caption;
     overlay.classList.add('is-active');
     requestAnimationFrame(()=> img.classList.add('is-shown'));
-    const rainInterval = setInterval(()=> spawnRainIcon(rainLayer, config.icons), 180);
+    rainInterval = setInterval(()=> spawnRainIcon(rainLayer, config.icons), 180);
     setTimeout(()=>{
       const wipe = document.getElementById('sakuraWipe');
       if (wipe) wipe.classList.remove('is-active');
     }, 400);
-    setTimeout(()=>{
-      clearInterval(rainInterval);
-      window.location.href = config.href;
-    }, 2600);
+    if (!config.audio){
+      setTimeout(finish, 2600);
+    }
   }
 
   if (config.transition === 'sakura'){
@@ -1499,6 +1539,10 @@ function playCharLoadingScreen(key){
     playTangerineWipe(reveal);
   } else if (config.transition === 'cola'){
     playColaWipe(reveal);
+  } else if (config.transition === 'music'){
+    playMusicWipe(reveal);
+  } else if (config.transition === 'thunder'){
+    playThunderWipe(reveal);
   } else {
     reveal();
   }
