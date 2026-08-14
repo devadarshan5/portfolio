@@ -1,12 +1,1185 @@
 <!DOCTYPE html>
-<html lang="">
-  <head>
-    <meta charset="utf-8">
-    <title></title>
-  </head>
-  <body>
-    <header></header>
-    <main></main>
-    <footer></footer>
-  </body>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jinbei — Knight of the Sea | Devadarshan R K</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=EB+Garamond:ital,wght@0,400;0,600;1,400&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+
+<style>
+/* =======================================================================
+   DESIGN TOKENS
+   ======================================================================= */
+:root{
+  --abyss:        #03111c;
+  --deep:         #072a3d;
+  --deep2:        #0c3f56;
+  --current:      #1b7f96;
+  --current-br:   #4fe0d4;
+  --foam:         #eaf7f6;
+  --gold:         #c9a24b;
+  --gold-br:      #f0cd76;
+  --coral:        #ff7657;
+  --ink:          #04121c;
+  --shadow:       rgba(2,8,14,.65);
+
+  --font-display: 'Cinzel', serif;
+  --font-mono:    'Share Tech Mono', monospace;
+  --font-body:    'EB Garamond', serif;
+}
+
+*{ margin:0; padding:0; box-sizing:border-box; }
+html{ scroll-behavior:smooth; }
+body{
+  font-family: var(--font-body);
+  background: linear-gradient(180deg, var(--abyss) 0%, #051826 45%, var(--abyss) 100%);
+  color: var(--foam);
+  overflow-x:hidden;
+  position:relative;
+}
+
+@media (prefers-reduced-motion: reduce){
+  *{ animation-duration:.001ms !important; animation-iteration-count:1 !important; }
+}
+
+::-webkit-scrollbar{ width:11px; }
+::-webkit-scrollbar-track{ background: var(--ink); }
+::-webkit-scrollbar-thumb{ background: var(--current-br); border-radius:8px; border:2px solid var(--ink); }
+html{ scrollbar-color: var(--current-br) var(--ink); scrollbar-width: thin; }
+
+/* =======================================================================
+   PAGE TRANSITIONS & LOADING SCREENS (shared engine — do not rename ids)
+   ======================================================================= */
+.page-transition{ position:fixed; inset:0; z-index:9997; pointer-events:none; }
+.pt-blot{ position:absolute; left:50%; top:50%; width:160vmax; height:160vmax; background: var(--ink); border-radius:50%; transform:translate(-50%,-50%) scale(1); }
+.pt-blot2{ width:140vmax; height:140vmax; opacity:.92; }
+.pt-blot3{ width:120vmax; height:120vmax; opacity:.85; }
+
+.char-loading{ position:fixed; inset:0; z-index:9999; background:#000; opacity:0; pointer-events:none; transition:opacity .5s ease; overflow:hidden; }
+.char-loading.is-active{ opacity:1; pointer-events:auto; }
+.char-loading img.nl-bg{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; opacity:0; transition:opacity .6s ease, transform 6s ease; transform:scale(1.06); }
+.char-loading img.nl-bg.is-shown{ opacity:1; transform:scale(1); }
+.rain-layer{ position:absolute; inset:0; overflow:hidden; }
+.rain-icon{ position:absolute; top:-60px; cursor:pointer; will-change:transform; filter:drop-shadow(0 2px 4px rgba(0,0,0,.5)); }
+.rain-icon img{ display:block; width:100%; height:100%; object-fit:contain; }
+.nl-caption{ position:absolute; bottom:40px; left:50%; transform:translateX(-50%); font-family: var(--font-display); letter-spacing:.05em; color: var(--current-br); font-size:14px; opacity:0; transition:opacity .5s ease .3s; text-shadow:0 0 10px rgba(0,0,0,.8); }
+.char-loading.is-active .nl-caption{ opacity:1; }
+
+/* generic petal screen-fill wipe (emoji + colors set at runtime) */
+.sakura-wipe{ position:fixed; inset:0; z-index:9996; pointer-events:none; opacity:0; overflow:hidden; background: radial-gradient(circle at 50% 50%, #ffd6ef, #ff9ad5); transition: opacity .35s ease; }
+.sakura-wipe.is-active{ opacity:1; }
+.wipe-petal{ position:absolute; opacity:0; transform: scale(.2) rotate(0deg); transition: opacity .5s ease, transform .5s cubic-bezier(.2,1.4,.4,1); }
+.wipe-petal.is-in{ opacity:.95; }
+
+/* sparkle burst */
+.sparkle{ position:fixed; font-family: var(--font-display); color: var(--gold-br); pointer-events:none; z-index:10000; animation: sparkle-pop .9s ease-out forwards; }
+@keyframes sparkle-pop{ 0%{ opacity:1; transform: translate(0,0) scale(.6); } 100%{ opacity:0; transform: translate(var(--sx), var(--sy)) scale(1.3); } }
+
+/* =======================================================================
+   AMBIENT OCEAN BACKDROP
+   ======================================================================= */
+.ocean-bg{ position:fixed; inset:0; z-index:0; pointer-events:none; overflow:hidden; }
+.ocean-bg::before{
+  content:'';
+  position:absolute; inset:0;
+  background:
+    repeating-linear-gradient(90deg, rgba(79,224,212,.04) 0 1px, transparent 1px 60px),
+    radial-gradient(ellipse at 50% -10%, rgba(27,127,150,.35), transparent 60%),
+    linear-gradient(180deg, var(--deep) 0%, var(--abyss) 100%);
+}
+#bubbleCanvas{ position:fixed; inset:0; z-index:1; pointer-events:none; }
+#rippleCanvas{ position:fixed; inset:0; z-index:3; pointer-events:none; }
+
+/* =======================================================================
+   WHALE SHARK CALL
+   ======================================================================= */
+.whale-section{ text-align:center; margin-bottom:56px; }
+.whale-btn{ font-family: var(--font-mono); font-size:13px; letter-spacing:.08em; text-transform:uppercase; background: linear-gradient(135deg, var(--current) 0%, var(--deep2) 100%); color: var(--foam); border:1px solid var(--current-br); padding:14px 28px; border-radius:30px; cursor:pointer; box-shadow: 0 10px 24px var(--shadow); transition: transform .25s ease, box-shadow .25s ease; }
+.whale-btn:hover{ transform: translateY(-3px); box-shadow: 0 14px 30px var(--shadow), 0 0 20px rgba(79,224,212,.35); }
+.whale-btn:disabled{ opacity:.5; cursor:default; transform:none; }
+.whale-btn .wb-icon{ margin-right:8px; }
+
+.whale-layer{ position:fixed; inset:0; z-index:55; pointer-events:none; overflow:hidden; }
+.whale-shark{ position:absolute; display:flex; align-items:center; gap:8px; will-change:transform; left:0; }
+.whale-shark svg{ width:110px; height:auto; filter: drop-shadow(0 4px 10px rgba(0,0,0,.5)); }
+.whale-tag{ font-family: var(--font-mono); font-size:10px; letter-spacing:.05em; background: rgba(4,18,28,.85); color: var(--gold-br); border:1px solid var(--gold); padding:3px 9px; border-radius:12px; white-space:nowrap; transform: translateY(-4px); }
+
+@keyframes whale-swim{ from{ transform: translateX(-160px); } to{ transform: translateX(calc(100vw + 160px)); } }
+
+.whale-toast{ position:fixed; left:50%; bottom:40px; transform:translateX(-50%) translateY(20px); background: var(--deep); border:1px solid var(--current-br); border-radius:10px; padding:14px 22px; font-family: var(--font-mono); font-size:12px; color: var(--foam); opacity:0; pointer-events:none; transition: opacity .4s ease, transform .4s ease; z-index:56; max-width:80vw; text-align:center; }
+.whale-toast.is-shown{ opacity:1; transform:translateX(-50%) translateY(0); }
+
+/* =======================================================================
+   SUN PIRATES TATTOO TOGGLE (Warlord Mode)
+   ======================================================================= */
+.sun-toggle{ position:fixed; bottom:20px; right:20px; z-index:58; width:34px; height:34px; opacity:.32; cursor:pointer; transition: opacity .3s ease, transform .3s ease; filter: drop-shadow(0 2px 6px rgba(0,0,0,.5)); }
+.sun-toggle:hover{ opacity:1; transform: rotate(15deg) scale(1.1); }
+.sun-toggle img{ display:block; width:100%; height:100%; object-fit:contain; }
+body.warlord-mode .sun-toggle{ opacity:.55; }
+
+body.warlord-mode{
+  --deep: #0a0a0a;
+  --deep2: #1a1a1a;
+  --current: #3a3a3a;
+  --current-br: #d9b45c;
+  --coral: #8a8a8a;
+  --foam: #f2f2f0;
+  --abyss: #030303;
+  --ink: #000000;
+  background: linear-gradient(180deg, var(--abyss) 0%, #0d0d0d 45%, var(--abyss) 100%);
+}
+body.warlord-mode .watching-block,
+body.warlord-mode .whale-section,
+body.warlord-mode .teaser{
+  display:none;
+}
+body.warlord-mode #bubbleCanvas{ opacity:.35; }
+body.warlord-mode #rippleCanvas{ display:none; }
+
+/* =======================================================================
+   THE ALL BLUE (guarded shortcut)
+   ======================================================================= */
+.all-blue-spark{
+  display:inline-block; width:9px; height:9px; border-radius:50%;
+  background:radial-gradient(circle, #eaf7f6, var(--current-br) 70%); box-shadow:0 0 8px 2px rgba(79,224,212,0.55);
+  margin-left:8px; vertical-align:middle; cursor:pointer; animation: ab-twinkle 2.4s ease-in-out infinite; border:none; padding:0;
+}
+@keyframes ab-twinkle{ 0%,100%{ opacity:0.55; transform:scale(0.9); } 50%{ opacity:1; transform:scale(1.15); } }
+
+.modal-backdrop{ position:fixed; inset:0; background:rgba(3,10,16,0.82); display:none; align-items:center; justify-content:center; z-index:200; padding:24px; }
+.modal-backdrop.show{ display:flex; }
+.ab-modal{ background:linear-gradient(160deg, #0d3550, #082230); border:1px solid var(--gold); border-radius:10px; max-width:420px; padding:36px 30px; text-align:center; position:relative; box-shadow: 0 20px 50px var(--shadow); }
+.ab-modal h3{ font-family:var(--font-display); color:var(--gold-br); font-size:24px; margin:0 0 10px; }
+.ab-modal p{ color: rgba(234,247,246,.78); font-size:15px; line-height:1.65; font-family: var(--font-body); font-style:italic; }
+.ab-modal a.go{ display:inline-block; margin-top:16px; color:var(--current-br); border-bottom:1px solid var(--current-br); text-decoration:none; padding-bottom:2px; font-family:var(--font-mono); font-size:12px; letter-spacing:0.12em; text-transform:uppercase; transition: color .2s ease, border-color .2s ease; }
+.ab-modal a.go:hover{ color: var(--gold-br); border-color: var(--gold-br); }
+.modal-close{ position:absolute; top:12px; right:14px; background:none; border:none; color: rgba(234,247,246,.6); font-size:20px; cursor:pointer; }
+
+/* =======================================================================
+   HEADER / INTRO
+   ======================================================================= */
+.wrap{ position:relative; z-index:2; max-width:1080px; margin:0 auto; padding: 90px 6vw 60px; }
+
+.intro{ text-align:center; min-height:66vh; display:flex; flex-direction:column; justify-content:center; align-items:center; gap:16px; }
+.eyebrow{ font-family: var(--font-mono); font-size:12px; letter-spacing:.35em; text-transform:uppercase; color: var(--gold-br); }
+.title{ font-family: var(--font-display); font-weight:700; font-size: clamp(34px, 6vw, 64px); color: var(--foam); text-shadow: 0 0 30px rgba(79,224,212,.35), 2px 2px 0 var(--ink); }
+.sub{ font-style:italic; color: rgba(234,247,246,.75); max-width:560px; font-size:17px; line-height:1.7; }
+.scroll-hint{ margin-top:20px; font-family: var(--font-mono); font-size:11px; letter-spacing:.2em; color: var(--current-br); animation: hint-bob 2.6s ease-in-out infinite; }
+@keyframes hint-bob{ 0%,100%{ transform:translateY(0);} 50%{ transform:translateY(8px);} }
+
+.section-head{ text-align:center; margin: 40px 0 34px; }
+.section-head h2{ font-family: var(--font-display); font-weight:600; font-size: clamp(22px,3.4vw,32px); color: var(--foam); }
+.section-head p{ font-family: var(--font-mono); font-size:12px; color: var(--current-br); margin-top:6px; }
+
+/* =======================================================================
+   RANK PLAQUES (CompTIA certs)
+   ======================================================================= */
+.plaque-grid{ display:grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap:22px; margin-bottom:56px; }
+.plaque{
+  position:relative;
+  background: linear-gradient(160deg, #0d3550 0%, #082230 100%);
+  border: 1px solid rgba(201,162,75,.35);
+  border-radius: 12px;
+  padding: 26px 22px 22px;
+  text-decoration:none;
+  color: inherit;
+  display:flex; flex-direction:column; gap:12px;
+  box-shadow: 0 16px 34px var(--shadow);
+  transition: transform .3s cubic-bezier(.3,1.2,.4,1), border-color .3s ease, box-shadow .3s ease;
+}
+.plaque::before{
+  content:'';
+  position:absolute; inset:6px;
+  border: 1px solid rgba(240,205,118,.25);
+  border-radius: 8px;
+  pointer-events:none;
+}
+.plaque:hover{
+  transform: translateY(-6px);
+  border-color: var(--gold-br);
+  box-shadow: 0 22px 44px var(--shadow), 0 0 26px rgba(79,224,212,.25);
+}
+.plaque-seal{
+  width:40px; height:40px; border-radius:50%;
+  border: 2px solid var(--gold);
+  display:flex; align-items:center; justify-content:center;
+  font-size:18px; color: var(--gold-br);
+  box-shadow: inset 0 0 10px rgba(201,162,75,.25);
+}
+.plaque-name{ font-family: var(--font-display); font-weight:600; font-size:17px; color: var(--foam); line-height:1.35; }
+.plaque-tag{ font-family: var(--font-body); font-style:italic; font-size:14px; color: rgba(234,247,246,.7); line-height:1.55; flex-grow:1; }
+.plaque-cta{
+  font-family: var(--font-mono); font-size:11px; letter-spacing:.12em; text-transform:uppercase;
+  color: var(--current-br); display:flex; align-items:center; gap:6px;
+  padding-top:10px; border-top: 1px dashed rgba(79,224,212,.25);
+}
+.plaque:hover .plaque-cta{ color: var(--gold-br); }
+
+/* =======================================================================
+   OCEAN CURRENT LEARNING JOURNEY (Phase 2)
+   ======================================================================= */
+.journey-section{ position:relative; margin-bottom:56px; }
+.journey-section::before{
+  content:'';
+  position:absolute; inset:-20px -6vw;
+  background-image:
+    repeating-linear-gradient(120deg, rgba(79,224,212,.05) 0 2px, transparent 2px 46px),
+    repeating-linear-gradient(60deg, rgba(201,162,75,.04) 0 2px, transparent 2px 60px);
+  opacity:.6; pointer-events:none; z-index:-1; border-radius:20px;
+}
+.journey-grid{ display:grid; grid-template-columns: repeat(auto-fit, minmax(300px,1fr)); gap:20px; }
+.journey-card{
+  background: linear-gradient(160deg, #0d3550 0%, #082230 100%);
+  border: 1px solid rgba(79,224,212,.25);
+  border-radius: 12px;
+  padding: 22px 22px 20px;
+  display:flex; flex-direction:column; gap:12px;
+  box-shadow: 0 14px 30px var(--shadow);
+}
+.jc-head{ display:flex; align-items:flex-start; justify-content:space-between; gap:10px; }
+.jc-title{ font-family: var(--font-display); font-weight:600; font-size:16px; color: var(--foam); line-height:1.3; }
+.jc-tier{ font-family: var(--font-mono); font-size:9.5px; letter-spacing:.08em; text-transform:uppercase; padding:4px 9px; border-radius:20px; white-space:nowrap; }
+.jc-tier.tier-starting{ background: rgba(255,118,87,.18); color: var(--coral); border:1px solid rgba(255,118,87,.4); }
+.jc-tier.tier-comfortable{ background: rgba(79,224,212,.15); color: var(--current-br); border:1px solid rgba(79,224,212,.4); }
+.jc-tier.tier-fluent{ background: rgba(240,205,118,.16); color: var(--gold-br); border:1px solid rgba(240,205,118,.4); }
+
+.jc-gauge{ position:relative; height:26px; border-radius:14px; background: rgba(4,18,28,.7); border:1px solid rgba(79,224,212,.3); overflow:hidden; }
+.jc-fill{ position:absolute; inset:0 auto 0 0; width:0%; background: linear-gradient(90deg, var(--current) 0%, var(--current-br) 100%); transition: width 1.4s cubic-bezier(.2,.8,.2,1); overflow:hidden; }
+.jc-fill::before, .jc-fill::after{
+  content:''; position:absolute; top:-6px; width:200%; height:20px;
+  background: radial-gradient(ellipse at center, rgba(255,255,255,.35) 0%, transparent 70%);
+  background-size: 40px 20px; background-repeat: repeat-x;
+  animation: wave-scroll 3.2s linear infinite;
+  opacity:.5;
+}
+.jc-fill::after{ animation-duration:5s; opacity:.3; top:-3px; }
+@keyframes wave-scroll{ from{ transform: translateX(0); } to{ transform: translateX(-40px); } }
+.jc-brick{ position:absolute; right:10px; top:50%; transform:translateY(-50%); font-family: var(--font-mono); font-size:10.5px; color: var(--foam); text-shadow: 0 1px 2px rgba(0,0,0,.7); z-index:2; }
+
+.jc-desc{ font-family: var(--font-body); font-style:italic; font-size:13.5px; color: rgba(234,247,246,.72); line-height:1.6; }
+
+.nav-chart{ position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:520px; max-width:80vw; opacity:.09; pointer-events:none; z-index:-1; color: var(--current-br); animation: chart-spin 240s linear infinite; }
+@keyframes chart-spin{ from{ transform:translate(-50%,-50%) rotate(0deg);} to{ transform:translate(-50%,-50%) rotate(360deg);} }
+.nav-chart svg{ width:100%; height:100%; display:block; }
+
+/* =======================================================================
+   LOOKOUT'S LOG (Currently Watching)
+   ======================================================================= */
+.log-list{ display:flex; flex-direction:column; gap:14px; max-width:640px; margin:0 auto 56px; }
+.log-entry{ display:flex; align-items:center; gap:16px; background: rgba(7,42,61,.45); border:1px solid rgba(79,224,212,.22); border-radius:10px; padding:16px 20px; }
+.log-glyph{ flex:0 0 auto; width:36px; height:36px; border-radius:50%; border:1.5px solid var(--gold); display:flex; align-items:center; justify-content:center; font-size:16px; color:var(--gold-br); }
+.log-body{ flex-grow:1; }
+.log-type{ font-family:var(--font-mono); font-size:9.5px; letter-spacing:.14em; text-transform:uppercase; color:var(--current-br); }
+.log-title{ font-family:var(--font-display); font-weight:600; font-size:16px; color:var(--foam); margin-top:2px; }
+.log-note{ font-family:var(--font-body); font-style:italic; font-size:13px; color:rgba(234,247,246,.68); margin-top:4px; line-height:1.5; }
+.log-entry--empty{ border-style:dashed; opacity:.6; }
+.log-entry--empty .log-title{ color: rgba(234,247,246,.5); font-style:italic; font-weight:400; }
+.log-score{ flex:0 0 auto; text-align:center; padding-left:14px; border-left:1px dashed rgba(79,224,212,.3); }
+.log-score-num{ font-family: var(--font-mono); font-size:15px; color: var(--gold-br); font-weight:700; line-height:1; }
+.log-score-tier{ font-family: var(--font-mono); font-size:8.5px; letter-spacing:.08em; text-transform:uppercase; color: var(--current-br); margin-top:4px; white-space:nowrap; }
+
+/* =======================================================================
+   PHILOSOPHY / CREED
+   ======================================================================= */
+.creed{
+  text-align:center; max-width:680px; margin: 0 auto 56px;
+  padding: 30px 6vw;
+  border-top: 1px solid rgba(201,162,75,.3);
+  border-bottom: 1px solid rgba(201,162,75,.3);
+}
+.creed p{ font-family: var(--font-body); font-style:italic; font-size: clamp(17px,2.2vw,21px); line-height:1.8; color: var(--foam); }
+.creed span{ display:block; margin-top:14px; font-family: var(--font-mono); font-size:11px; letter-spacing:.2em; text-transform:uppercase; color: var(--gold-br); }
+
+/* =======================================================================
+   TEASER ("STILL CHARTING")
+   ======================================================================= */
+.teaser{
+  max-width: 640px; margin: 0 auto 40px;
+  background: rgba(7,42,61,.5);
+  border: 1px dashed rgba(79,224,212,.35);
+  border-radius: 12px;
+  padding: 26px 28px;
+}
+.teaser h3{ font-family: var(--font-display); font-size:16px; color: var(--current-br); margin-bottom:14px; text-align:center; letter-spacing:.03em; }
+.teaser ul{ list-style:none; display:flex; flex-direction:column; gap:10px; }
+.teaser li{ font-family: var(--font-mono); font-size:12.5px; color: rgba(234,247,246,.75); display:flex; gap:10px; align-items:baseline; }
+.teaser li::before{ content:'\301C'; color: var(--gold-br); }
+
+.finale{ text-align:center; min-height:30vh; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:14px; }
+.finale p{ font-family: var(--font-body); font-style:italic; color: rgba(234,247,246,.6); max-width:480px; }
+
+/* =======================================================================
+   CREW DRAWER TRIGGER
+   ======================================================================= */
+.dig-trigger{
+  position:fixed; top:20px; left:20px; z-index:60;
+  width:54px; height:54px; border-radius:50%;
+  background: var(--deep); border: 2px solid var(--current-br);
+  display:flex; align-items:center; justify-content:center;
+  font-size:22px; cursor:pointer;
+  box-shadow: 0 4px 0 var(--shadow);
+  transition: transform .25s ease;
+}
+.dig-trigger:hover{ transform: scale(1.08) rotate(-6deg); }
+
+.dig-trigger.is-shaking{ animation: nudge-shake .5s ease-in-out infinite; }
+@keyframes nudge-shake{
+  0%,100%{ transform:translate(0,0) rotate(0deg); }
+  20%{ transform:translate(-2px,0) rotate(-4deg); }
+  40%{ transform:translate(2px,0) rotate(4deg); }
+  60%{ transform:translate(-2px,0) rotate(-3deg); }
+  80%{ transform:translate(2px,0) rotate(3deg); }
+}
+
+.crew-drawer{ position:fixed; inset:0; z-index:70; background: rgba(2,10,16,.75); display:flex; align-items:center; justify-content:center; opacity:0; pointer-events:none; transition: opacity .35s ease; padding: 5vh 4vw; }
+.crew-drawer.is-open{ opacity:1; pointer-events:auto; }
+.crew-panel{
+  background: var(--deep); border: 3px solid var(--current-br); border-radius:12px;
+  padding: 28px 28px 22px; max-width:560px; width:100%; max-height:84vh; overflow-y:auto;
+  box-shadow: 0 20px 50px var(--shadow);
+  transform: scale(.92) translateY(10px); transition: transform .35s cubic-bezier(.3,1.4,.4,1);
+  scrollbar-color: var(--current-br) transparent; scrollbar-width: thin;
+}
+.crew-panel::-webkit-scrollbar{ width:6px; }
+.crew-panel::-webkit-scrollbar-track{ background: transparent; }
+.crew-panel::-webkit-scrollbar-thumb{ background: var(--current-br); border-radius:6px; }
+.crew-drawer.is-open .crew-panel{ transform: scale(1) translateY(0); }
+.crew-panel-head{ display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; }
+.crew-panel-head h3{ font-family: var(--font-display); font-size:14px; letter-spacing:.05em; color: var(--current-br); }
+.crew-close{ width:30px; height:30px; border-radius:50%; border:1px solid var(--current-br); background:transparent; color: var(--foam); font-size:16px; cursor:pointer; }
+.crew-grid{ display:grid; grid-template-columns: repeat(3, 1fr); gap:12px; }
+.crew-link{ display:block; border:2px solid var(--ink); border-radius:5px; overflow:hidden; text-decoration:none; transition: transform .25s cubic-bezier(.34,1.5,.4,1); }
+.crew-link:hover{ transform: scale(1.06) rotate(-1deg); }
+.crew-link img{ display:block; width:100%; height:auto; }
+.crew-link .cl-name{ display:block; text-align:center; font-family: var(--font-display); font-size:9px; letter-spacing:.05em; padding:5px 0; background: var(--current-br); color: var(--ink); }
+</style>
+</head>
+<body>
+
+<!-- ==================== PAGE TRANSITIONS & LOADING SCREENS ==================== -->
+<div class="page-transition" id="pageTransition">
+  <div class="pt-blot pt-blot1"></div>
+  <div class="pt-blot pt-blot2"></div>
+  <div class="pt-blot pt-blot3"></div>
+</div>
+<div class="sakura-wipe" id="sakuraWipe"></div>
+<div class="char-loading" id="charLoading">
+  <img class="nl-bg" id="charLoadingImg" src="" alt="">
+  <div class="rain-layer" id="rainLayer"></div>
+  <div class="nl-caption" id="charLoadingCaption"></div>
+</div>
+
+<div class="ocean-bg"><canvas id="bubbleCanvas"></canvas></div>
+<canvas id="rippleCanvas"></canvas>
+<div class="whale-layer" id="whaleLayer"></div>
+<div class="whale-toast" id="whaleToast"></div>
+<div class="sun-toggle" id="sunToggle" title="Switch to Warlord Mode">
+  <img src="Jinbei_Page/Sun_Pirates.png" alt="Sun Pirates emblem">
+</div>
+
+<!-- ==================== CREW TRIGGER ==================== -->
+<div class="dig-trigger" id="digTrigger">&#129517;</div>
+<div class="crew-drawer" id="crewDrawer">
+  <div class="crew-panel">
+    <div class="crew-panel-head">
+      <h3>REST OF THE CREW</h3>
+      <button class="crew-close" id="crewClose">&times;</button>
+    </div>
+    <div class="crew-grid">
+      <a class="crew-link" href="Luffy.html" data-loading="luffy"><img src="Wanted_Posters/luffy_wanted_poster.jpg" alt="Luffy"><span class="cl-name">Luffy</span></a>
+      <a class="crew-link" href="Zoro.html" data-loading="zoro"><img src="Wanted_Posters/zoro_wanted_poster.jpg" alt="Zoro"><span class="cl-name">Zoro</span></a>
+      <a class="crew-link" href="Nami.html" data-loading="nami"><img src="Wanted_Posters/nami_wanted_poster.jpg" alt="Nami"><span class="cl-name">Nami</span></a>
+      <a class="crew-link" href="Sanji.html" data-loading="sanji"><img src="Wanted_Posters/sanji_wanted_poster.jpg" alt="Sanji"><span class="cl-name">Sanji</span></a>
+      <a class="crew-link" href="Chopper.html" data-loading="chopper"><img src="Wanted_Posters/chopper_wanted_poster.jpg" alt="Chopper"><span class="cl-name">Chopper</span></a>
+      <a class="crew-link" href="Robin.html" data-loading="robin"><img src="Wanted_Posters/robin_wanted_poster.jpg" alt="Robin"><span class="cl-name">Robin</span></a>
+      <a class="crew-link" href="Franky.html" data-loading="franky"><img src="Wanted_Posters/franky_wanted_poster.jpg" alt="Franky"><span class="cl-name">Franky</span></a>
+      <a class="crew-link" href="Brook.html" data-loading="brook"><img src="Wanted_Posters/brook_wanted_poster.jpg" alt="Brook"><span class="cl-name">Brook</span></a>
+      <a class="crew-link" href="Usopp.html" data-loading="usopp"><img src="Wanted_Posters/usopp_wanted_poster.jpg" alt="Usopp"><span class="cl-name">Usopp</span></a>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <!-- ==================== INTRO ==================== -->
+  <section class="intro">
+    <span class="eyebrow">The Helmsman's Chart</span>
+    <h1 class="title">KNIGHT OF THE SEA</h1>
+    <p class="sub">Every course correction starts with knowing the currents. This is the chart of what's being learned, watched, and worked toward right now.</p>
+    <span class="scroll-hint">&#9662; scroll into open water &#9662;</span>
+  </section>
+
+  <!-- ==================== RANK PLAQUES ==================== -->
+  <div class="section-head">
+    <h2>Fish-Man Karate Rank Plaques</h2>
+    <p>verified certifications — click a plaque to view the credential</p>
+  </div>
+  <div class="plaque-grid">
+
+    <a class="plaque" href="https://www.credly.com/badges/f2f7931b-e787-4983-9435-38989cc7b559/public_url" target="_blank" rel="noopener">
+      <div class="plaque-seal">&#9875;</div>
+      <div class="plaque-name">CompTIA A+</div>
+      <div class="plaque-tag">Ground zero — the fundamentals every technician needs before stepping into open water.</div>
+      <div class="plaque-cta">View Credential &#8599;</div>
+    </a>
+
+    <a class="plaque" href="https://www.credly.com/badges/2a6f3a1e-efce-43dc-b2a6-b1e0536e80d4/public_url" target="_blank" rel="noopener">
+      <div class="plaque-seal">&#9875;</div>
+      <div class="plaque-name">CompTIA Network+</div>
+      <div class="plaque-tag">Reading the currents — how data moves, and how to keep it moving.</div>
+      <div class="plaque-cta">View Credential &#8599;</div>
+    </a>
+
+    <a class="plaque" href="https://www.credly.com/badges/188ed97d-701a-487d-a3e1-282be81c1259/public_url" target="_blank" rel="noopener">
+      <div class="plaque-seal">&#9875;</div>
+      <div class="plaque-name">CompTIA IT Operations Specialist</div>
+      <div class="plaque-tag">Keeping the ship running — day-to-day operations, hardware to helpdesk.</div>
+      <div class="plaque-cta">View Credential &#8599;</div>
+    </a>
+
+  </div>
+
+  <!-- ==================== OCEAN CURRENT LEARNING JOURNEY ==================== -->
+  <div class="section-head">
+    <h2>The Ocean Current Learning Journey</h2>
+    <p>vagabond drill techniques — currently in training</p>
+  </div>
+  <div class="journey-section">
+    <div class="nav-chart" aria-hidden="true">
+      <svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg" stroke="currentColor" fill="none">
+        <circle cx="200" cy="200" r="180" stroke-width="1.5"/>
+        <circle cx="200" cy="200" r="140" stroke-width="1"/>
+        <line x1="200" y1="10" x2="200" y2="390" stroke-width="1"/>
+        <line x1="10" y1="200" x2="390" y2="200" stroke-width="1"/>
+        <line x1="60" y1="60" x2="340" y2="340" stroke-width="0.75"/>
+        <line x1="340" y1="60" x2="60" y2="340" stroke-width="0.75"/>
+        <polygon points="200,30 210,200 200,370 190,200" fill="currentColor" stroke="none" opacity="0.6"/>
+        <polygon points="30,200 200,190 370,200 200,210" fill="currentColor" stroke="none" opacity="0.4"/>
+      </svg>
+    </div>
+    <div class="journey-grid">
+
+      <div class="journey-card" data-fill="90" data-brick="10000">
+        <div class="jc-head">
+          <div class="jc-title">Mastering the Flow: IT Support &amp; Technical Services</div>
+          <span class="jc-tier tier-fluent">Nearly Fluent</span>
+        </div>
+        <div class="jc-gauge"><div class="jc-fill"><span class="jc-brick">0 Brick Fist</span></div></div>
+        <div class="jc-desc">People bring their broken tech to the door and expect it fixed — this is the current running underneath everything else in the toolkit.</div>
+      </div>
+
+      <div class="journey-card" data-fill="55" data-brick="5000">
+        <div class="jc-head">
+          <div class="jc-title">Mastering the Flow: Networking &amp; Network Security</div>
+          <span class="jc-tier tier-comfortable">Getting Comfortable</span>
+        </div>
+        <div class="jc-gauge"><div class="jc-fill"><span class="jc-brick">0 Brick Fist</span></div></div>
+        <div class="jc-desc">Reading how traffic moves and where it can be intercepted — the discipline that keeps the whole fleet's data safe in open water.</div>
+      </div>
+
+      <div class="journey-card" data-fill="55" data-brick="5000">
+        <div class="jc-head">
+          <div class="jc-title">Mastering the Flow: Cybersecurity</div>
+          <span class="jc-tier tier-comfortable">Getting Comfortable</span>
+        </div>
+        <div class="jc-gauge"><div class="jc-fill"><span class="jc-brick">0 Brick Fist</span></div></div>
+        <div class="jc-desc">Wannabe hacker energy, channeled productively — learning how attackers think in order to build better defenses.</div>
+      </div>
+
+      <div class="journey-card" data-fill="90" data-brick="10000">
+        <div class="jc-head">
+          <div class="jc-title">Mastering the Flow: Systems, Infrastructure &amp; Cloud</div>
+          <span class="jc-tier tier-fluent">Nearly Fluent</span>
+        </div>
+        <div class="jc-gauge"><div class="jc-fill"><span class="jc-brick">0 Brick Fist</span></div></div>
+        <div class="jc-desc">The unglamorous plumbing that keeps everything else running — a genuine passion, not just a job requirement.</div>
+      </div>
+
+      <div class="journey-card" data-fill="90" data-brick="10000">
+        <div class="jc-head">
+          <div class="jc-title">Mastering the Flow: Hardware &amp; Device Management</div>
+          <span class="jc-tier tier-fluent">Nearly Fluent</span>
+        </div>
+        <div class="jc-gauge"><div class="jc-fill"><span class="jc-brick">0 Brick Fist</span></div></div>
+        <div class="jc-desc">Taking devices apart, putting them back together better — where the whole journey started, and still the most fun part.</div>
+      </div>
+
+      <div class="journey-card" data-fill="20" data-brick="1000">
+        <div class="jc-head">
+          <div class="jc-title">Mastering the Flow: AI, Data &amp; Computer Science</div>
+          <span class="jc-tier tier-starting">Just Starting</span>
+        </div>
+        <div class="jc-gauge"><div class="jc-fill"><span class="jc-brick">0 Brick Fist</span></div></div>
+        <div class="jc-desc">Newest waters, still finding footing — the next current worth learning to read.</div>
+      </div>
+
+      <div class="journey-card" data-fill="55" data-brick="5000">
+        <div class="jc-head">
+          <div class="jc-title">Mastering the Flow: Game Development &amp; Interactive Media</div>
+          <span class="jc-tier tier-comfortable">Getting Comfortable</span>
+        </div>
+        <div class="jc-gauge"><div class="jc-fill"><span class="jc-brick">0 Brick Fist</span></div></div>
+        <div class="jc-desc">Unreal Engine for life — building worlds is a different kind of problem-solving, and it sharpens the rest.</div>
+      </div>
+
+      <div class="journey-card" data-fill="55" data-brick="5000">
+        <div class="jc-head">
+          <div class="jc-title">Mastering the Flow: Professional &amp; Productivity Skills</div>
+          <span class="jc-tier tier-comfortable">Getting Comfortable</span>
+        </div>
+        <div class="jc-gauge"><div class="jc-fill"><span class="jc-brick">0 Brick Fist</span></div></div>
+        <div class="jc-desc">The soft skills that make the technical skills usable — communicating, documenting, and working with a team.</div>
+      </div>
+
+    </div>
+  </div>
+
+<!-- ==================== CURRENTLY WATCHING ==================== -->
+  <div class="watching-block">
+  <div class="section-head">
+    <h2>The Lookout's Log</h2>
+    <p>what's been on the horizon lately</p>
+  </div>
+  <div class="log-list">
+
+    <div class="log-entry">
+      <div class="log-glyph">&#9760;</div>
+      <div class="log-body">
+        <div class="log-type">Anime</div>
+        <div class="log-title">One Piece</div>
+        <div class="log-note">The obvious one — the current that started this whole voyage.</div>
+      </div>
+    </div>
+
+    <div class="log-entry">
+      <div class="log-glyph">&#127754;</div>
+      <div class="log-body">
+        <div class="log-type">Series</div>
+        <div class="log-title">The Brothers Sun</div>
+        <div class="log-note">A different kind of found-family story — still worth the watch.</div>
+      </div>
+    </div>
+
+    <div class="log-entry">
+      <div class="log-glyph">&#9875;</div>
+      <div class="log-body">
+        <div class="log-type">Channel</div>
+        <div class="log-title">Linus Tech Tips</div>
+        <div class="log-note">Where the hardware obsession started, and still docks every week.</div>
+      </div>
+    </div>
+    <div class="log-entry">
+      <div class="log-glyph">&#127760;</div>
+      <div class="log-body">
+        <div class="log-type">Language — Duolingo</div>
+        <div class="log-title">Nederlands (België)</div>
+        <div class="log-note">Just getting the first words wet.</div>
+      </div>
+      <div class="log-score">
+        <div class="log-score-num">14</div>
+        <div class="log-score-tier">A1 · Beginner</div>
+      </div>
+    </div>
+
+    <div class="log-entry">
+      <div class="log-glyph">&#127760;</div>
+      <div class="log-body">
+        <div class="log-type">Language — Duolingo</div>
+        <div class="log-title">English</div>
+        <div class="log-note">Capped what the app can measure — the written test is the next current to cross.</div>
+      </div>
+      <div class="log-score">
+        <div class="log-score-num">130</div>
+        <div class="log-score-tier">C1–C2 · App Max</div>
+      </div>
+    </div>
+    <div class="log-entry log-entry--empty">
+      <div class="log-glyph">&#10022;</div>
+      <div class="log-body">
+        <div class="log-type">Movie</div>
+        <div class="log-title">Awaiting entry…</div>
+      </div>
+    </div>
+
+  </div>
+  </div>
+
+<!-- ==================== WHALE SHARK CALL ==================== -->
+  <div class="whale-section">
+    <button class="whale-btn" id="whaleCallBtn"><span class="wb-icon">&#128011;</span>Summon the Whale Sharks</button>
+  </div>
+
+  <!-- ==================== CREED ==================== -->
+  <div class="creed">
+    <p>"A Knight of the Sea takes responsibility for the path he's chosen — and keeps his eyes fixed on what's ahead, not on what's behind."</p>
+    <span>— on steering forward <button class="all-blue-spark" id="allBlueSpark" aria-label="A secret sparkle"></button></span>
+  </div>
+
+  <!-- ==================== FINALE ==================== -->
+  <section class="finale">
+    <p>The chart is drawn. The rest is just sailing it.</p>
+  </section>
+
+</div>
+
+<!-- ==================== ALL BLUE MODAL ==================== -->
+<div class="modal-backdrop" id="allBlueModal">
+  <div class="ab-modal">
+    <button class="modal-close" id="modalCloseBtn" aria-label="Close">&times;</button>
+    <h3>The All Blue</h3>
+    <p>Some dreams are worth standing watch over. This is as close as a portfolio gets to it — everything built, gathered in one current.</p>
+    <a class="go" href="Zoro.html">Cross to the Projects Page →</a>
+  </div>
+</div>
+
+<script>
+(function(){
+"use strict";
+const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* ---- ambient rising bubbles ---- */
+const bubbleCv = document.getElementById('bubbleCanvas');
+const bctx = bubbleCv.getContext('2d');
+let bw, bh, bubbles=[];
+function resizeBubbles(){ bw=bubbleCv.width=window.innerWidth; bh=bubbleCv.height=window.innerHeight; }
+resizeBubbles(); window.addEventListener('resize', resizeBubbles);
+function spawnBubble(){
+  bubbles.push({
+    x:Math.random()*bw, y:bh+20, r:2+Math.random()*5,
+    vy:.35+Math.random()*.6, wob:Math.random()*Math.PI*2, wobSpeed:.01+Math.random()*.02,
+    life:0, maxLife:600+Math.random()*300
+  });
+}
+let bubbleRunning=true;
+function bubbleFrame(){
+  if(!bubbleRunning) return;
+  bctx.clearRect(0,0,bw,bh);
+  if (!reduceMotion && Math.random()<0.045 && bubbles.length<50) spawnBubble();
+  bubbles.forEach(b=>{
+    b.life++; b.y-=b.vy; b.wob+=b.wobSpeed; b.x+=Math.sin(b.wob)*.4;
+    const t=b.life/b.maxLife; const a=Math.max(0, .5*(1-t));
+    bctx.beginPath();
+    bctx.strokeStyle=`rgba(79,224,212,${a})`;
+    bctx.lineWidth=1;
+    bctx.arc(b.x,b.y,b.r,0,Math.PI*2);
+    bctx.stroke();
+  });
+  bubbles = bubbles.filter(b=> b.life<b.maxLife && b.y>-20);
+  requestAnimationFrame(bubbleFrame);
+}
+bubbleFrame();
+document.addEventListener('visibilitychange', ()=>{ bubbleRunning=!document.hidden; if(bubbleRunning) bubbleFrame(); });
+
+/* ---- Heart of Water: cursor ripple trail ---- */
+const rippleCv = document.getElementById('rippleCanvas');
+const rctx = rippleCv.getContext('2d');
+let rw, rh, ripples=[];
+function resizeRipple(){ rw=rippleCv.width=window.innerWidth; rh=rippleCv.height=window.innerHeight; }
+resizeRipple(); window.addEventListener('resize', resizeRipple);
+
+let lastRippleX=null, lastRippleY=null;
+function maybeSpawnRipple(x,y){
+  if (reduceMotion) return;
+  if (lastRippleX!==null){
+    const dx=x-lastRippleX, dy=y-lastRippleY;
+    if (Math.sqrt(dx*dx+dy*dy) < 22) return;
+  }
+  lastRippleX=x; lastRippleY=y;
+  ripples.push({ x, y, r:2, maxR:34+Math.random()*14, life:0, maxLife:46 });
+  if (ripples.length>40) ripples.shift();
+}
+window.addEventListener('mousemove', (e)=> maybeSpawnRipple(e.clientX, e.clientY));
+window.addEventListener('touchmove', (e)=>{
+  if (e.touches && e.touches[0]) maybeSpawnRipple(e.touches[0].clientX, e.touches[0].clientY);
+}, { passive:true });
+
+let rippleRunning=true;
+function rippleFrame(){
+  if(!rippleRunning) return;
+  rctx.clearRect(0,0,rw,rh);
+  ripples.forEach(r=>{
+    r.life++;
+    const t=r.life/r.maxLife;
+    r.r = 2 + (r.maxR-2)*t;
+    const alpha = Math.max(0, 0.35*(1-t));
+    rctx.beginPath();
+    rctx.strokeStyle = `rgba(79,224,212,${alpha})`;
+    rctx.lineWidth = 1.4;
+    rctx.arc(r.x, r.y, r.r, 0, Math.PI*2);
+    rctx.stroke();
+    rctx.beginPath();
+    rctx.strokeStyle = `rgba(234,247,246,${alpha*0.5})`;
+    rctx.lineWidth = 0.8;
+    rctx.arc(r.x, r.y, r.r*0.6, 0, Math.PI*2);
+    rctx.stroke();
+  });
+  ripples = ripples.filter(r=> r.life<r.maxLife);
+  requestAnimationFrame(rippleFrame);
+}
+rippleFrame();
+document.addEventListener('visibilitychange', ()=>{ rippleRunning=!document.hidden; if(rippleRunning) rippleFrame(); });
+
+/* ---- lightweight sound engine ---- */
+const SoundEngine = (function(){
+  let ctx=null, masterGain=null;
+  function ensureCtx(){
+    if (ctx) return;
+    ctx = new (window.AudioContext||window.webkitAudioContext)();
+    masterGain = ctx.createGain();
+    masterGain.gain.value = 0.35;
+    masterGain.connect(ctx.destination);
+  }
+  function playTick(){
+    ensureCtx();
+    if (ctx.state==='suspended') ctx.resume();
+    const o=ctx.createOscillator(), g=ctx.createGain();
+    o.type='triangle'; o.frequency.value=440;
+    g.gain.value=0.0001;
+    o.connect(g); g.connect(masterGain);
+    const t=ctx.currentTime;
+    g.gain.exponentialRampToValueAtTime(0.3,t+0.01);
+    g.gain.exponentialRampToValueAtTime(0.0001,t+0.2);
+    o.start(t); o.stop(t+0.22);
+  }
+  function playSparkle(){
+    ensureCtx();
+    if (ctx.state==='suspended') ctx.resume();
+    [880,1180,1560].forEach((f,i)=>{
+      const o=ctx.createOscillator(), g=ctx.createGain();
+      o.type='sine'; o.frequency.value=f;
+      g.gain.value=0.0001;
+      o.connect(g); g.connect(masterGain);
+      const t=ctx.currentTime+i*0.07;
+      g.gain.exponentialRampToValueAtTime(0.22,t+0.01);
+      g.gain.exponentialRampToValueAtTime(0.0001,t+0.3);
+      o.start(t); o.stop(t+0.32);
+    });
+  }
+  function playWhaleCall(){
+    ensureCtx();
+    if (ctx.state==='suspended') ctx.resume();
+    const o=ctx.createOscillator(), g=ctx.createGain();
+    o.type='sine';
+    const t=ctx.currentTime;
+    o.frequency.setValueAtTime(220, t);
+    o.frequency.exponentialRampToValueAtTime(90, t+1.1);
+    g.gain.value=0.0001;
+    o.connect(g); g.connect(masterGain);
+    g.gain.exponentialRampToValueAtTime(0.28, t+0.08);
+    g.gain.exponentialRampToValueAtTime(0.0001, t+1.2);
+    o.start(t); o.stop(t+1.25);
+  }
+  return { playTick, playSparkle, playWhaleCall };
+})();
+
+/* ---- sparkle burst at exact pixel coordinates ---- */
+function burstSparkleAt(x, y){
+  const glyphs = ['&#10022;','&#10023;','&#10039;'];
+  for (let i=0;i<10;i++){
+    const s = document.createElement('span');
+    s.className = 'sparkle';
+    s.innerHTML = glyphs[Math.floor(Math.random()*glyphs.length)];
+    const angle = Math.random()*Math.PI*2, dist = 40+Math.random()*60;
+    s.style.setProperty('--sx', Math.cos(angle)*dist+'px');
+    s.style.setProperty('--sy', Math.sin(angle)*dist+'px');
+    s.style.left = x+'px'; s.style.top = y+'px';
+    s.style.fontSize = (14+Math.random()*10)+'px';
+    document.body.appendChild(s);
+    setTimeout(()=> s.remove(), 950);
+  }
+  SoundEngine.playSparkle();
+}
+
+/* ---- entrance + generic exit transition ---- */
+function gsapFreeScale(elements, from, to, duration, done){
+  const start = performance.now();
+  elements.forEach(el=> el.style.transform = `translate(-50%,-50%) scale(${from})`);
+  function step(now){
+    const p = Math.min(1, (now-start)/duration);
+    const eased = 1 - Math.pow(1-p, 3);
+    const val = from + (to-from)*eased;
+    elements.forEach(el=> el.style.transform = `translate(-50%,-50%) scale(${val})`);
+    if (p<1) requestAnimationFrame(step); else if (done) done();
+  }
+  requestAnimationFrame(step);
+}
+function playEntranceTransition(){
+  const blots = document.querySelectorAll('.pt-blot');
+  gsapFreeScale(blots, 1, 0, reduceMotion ? 150 : 700, ()=>{ document.getElementById('pageTransition').style.pointerEvents='none'; });
+}
+playEntranceTransition();
+function playExitTransition(x, y, href){
+  const overlay = document.getElementById('pageTransition');
+  const blots = overlay.querySelectorAll('.pt-blot');
+  blots.forEach(b=>{ b.style.left = x+'px'; b.style.top = y+'px'; });
+  overlay.style.pointerEvents = 'auto';
+  gsapFreeScale(blots, 0, 1, reduceMotion ? 150 : 850, ()=>{ window.location.href = href; });
+}
+
+/* ---- petal screen-fill wipes (shared engine; sakura = Robin/Chopper, tangerine = Nami, cola = Franky, music = Brook, thunder = Zoro, lie = Usopp) ---- */
+function playPetalWipe(emoji, colorA, colorB, done){
+  const wipe = document.getElementById('sakuraWipe');
+  wipe.style.background = `radial-gradient(circle at 50% 50%, ${colorA}, ${colorB})`;
+  wipe.innerHTML = '';
+  wipe.classList.add('is-active');
+  const count = reduceMotion ? 0 : 46;
+  for (let i=0;i<count;i++){
+    const p = document.createElement('span');
+    p.className = 'wipe-petal';
+    p.textContent = emoji;
+    p.style.left = (Math.random()*100) + 'vw';
+    p.style.top  = (Math.random()*100) + 'vh';
+    p.style.fontSize = (22 + Math.random()*30) + 'px';
+    const rot = Math.random()*360;
+    wipe.appendChild(p);
+    setTimeout(()=>{
+      p.classList.add('is-in');
+      p.style.transform = `scale(1.15) rotate(${rot}deg)`;
+    }, Math.random() * (reduceMotion ? 0 : 260));
+  }
+  setTimeout(()=>{ if (done) done(); }, reduceMotion ? 80 : 650);
+}
+function playSakuraWipe(done){ playPetalWipe('\u{1F338}', '#ffd6ef', '#ff9ad5', done); }
+function playTangerineWipe(done){ playPetalWipe('\u{1F34A}', '#ffe0b0', '#ff9a3c', done); }
+function playColaWipe(done){ playPetalWipe('\u{1F964}', '#f5e6c8', '#5c3a1e', done); }
+function playMusicWipe(done){ playPetalWipe('\u{1F3B5}', '#2a1a3a', '#000000', done); }
+function playThunderWipe(done){ playPetalWipe('\u{26A1}', '#1a3a1a', '#000000', done); }
+function playLieWipe(done){ playPetalWipe('\u{1F925}', '#f3e3bd', '#b5502e', done); }
+
+/* ---- character loading screens ----
+   images: fullscreen art, one picked at random per visit
+   icons:  falling rain art
+   caption: shown while the loading screen is up
+   href:   final destination
+   transition: optional — 'sakura' | 'tangerine' | 'cola' | 'music' | 'thunder' | 'lie' | omit for a plain fade
+---- */
+const LOADING_SCREENS = {
+  luffy: {
+    images: ['Luffy_Page/loading1.jpg','Luffy_Page/loading2.png','Luffy_Page/loading3.jpg','Luffy_Page/loading4.png','Luffy_Page/loading5.png','Luffy_Page/loading6.jpeg','Luffy_Page/loading7.jpeg','Luffy_Page/loading8.jpg'],
+    icons:  ['Icons/meat.png','Icons/pizza.png'],
+    caption: "Setting course for the Captain\u2026",
+    href: 'Luffy.html',
+    audio: 'Luffy_Page/loading-sound.mp3'
+  },
+  zoro: {
+    images: ['Zoro_Page/loading1.jpg','Zoro_Page/loading2.jpg','Zoro_Page/loading3.jpeg'],
+    icons:  ['Icons/rum.png','Icons/sleep.png','Icons/enma.png','Icons/kitetsu.png','Icons/wado.png'],
+    caption: "One wrong turn from Wano\u2026",
+    href: 'Zoro.html',
+    transition: 'thunder',
+    audio: 'Zoro_Page/loading-sound.mp3'
+  },
+  nami: {
+    images: ['Nami_Page/loading1.png','Nami_Page/loading2.jpg','Nami_Page/loading3.jpeg'],
+    icons:  ['Icons/berry.png','Icons/tangerine.png'],
+    caption: "Charting a course to Nami's Route\u2026",
+    href: 'Nami.html',
+    transition: 'tangerine',
+    audio: 'Nami_Page/loading-sound.mp3'
+  },
+  sanji: {
+    images: ['Sanji_Page/loading1.jpg','Sanji_Page/loading2.jpg','Sanji_Page/loading3.jpg','Sanji_Page/loading4.jpg','Sanji_Page/loading5.jpg'],
+    icons:  ['Icons/meat.png','Icons/rum.png','Icons/pizza.png','Icons/mooncake.png'],
+    caption: "Heading to the galley\u2026",
+    href: 'Sanji.html',
+    audio: 'Sanji_Page/loading-sound.mp3'
+  },
+  chopper: {
+    images: ['Chopper_Page/loading1.jpg','Chopper_Page/loading2.jpg','Chopper_Page/loading3.jpg'],
+    icons:  ['Icons/sakura.png'],
+    caption: "Following the sakura trail\u2026",
+    href: 'Chopper.html',
+    transition: 'sakura',
+    audio: 'Chopper_Page/loading-sound.mp3'
+  },
+  robin: {
+    images: ['Robin_Page/loading1.jpg','Robin_Page/loading2.jpg','Robin_Page/loading3.jpg','Robin_Page/loading4.png','Robin_Page/loading5.jpg'],
+    icons:  ['Icons/sakura.png'],
+    caption: "Uncovering the record\u2026",
+    href: 'Robin.html',
+    transition: 'sakura',
+    audio: 'Robin_Page/loading-sound.mp3'
+  },
+  franky: {
+    images: ['Franky_Page/loading1.jpg','Franky_Page/loading2.jpg','Franky_Page/loading3.jpg','Franky_Page/loading4.jpg','Franky_Page/loading5.jpg'],
+    icons:  ['Icons/cola.png'],
+    caption: "Heading to the workshop\u2026",
+    href: 'Franky.html',
+    transition: 'cola',
+    audio: 'Franky_Page/loading-sound.mp3'
+  },
+  brook: {
+    images: ['Brook_Page/loading1.jpg','Brook_Page/loading2.jpg','Brook_Page/loading3.jpg','Brook_Page/loading4.jpg','Brook_Page/loading5.jpg'],
+    icons:  ['Icons/note1.png','Icons/note2.png','Icons/note3.png'],
+    caption: "Yohohoho\u2026 tuning in to the Soul King\u2026",
+    href: 'Brook.html',
+    transition: 'music',
+    audio: 'Brook_Page/loading-sound.mp3'
+  },
+  usopp: {
+    images: ['Usopp_Page/loading1.jpg','Usopp_Page/loading2.jpg','Usopp_Page/loading3.jpeg','Usopp_Page/loading4.jpg','Usopp_Page/loading5.jpg'],
+    icons:  ['Icons/impact.png','Icons/slingshot.png','Icons/hammer.png'],
+    caption: "Spinning up the next legend\u2026",
+    href: 'Usopp.html',
+    transition: 'lie',
+    audio: 'Usopp_Page/loading-sound.mp3'
+  }
+};
+
+function spawnRainIcon(container, icons){
+  const el=document.createElement('div');
+  el.className='rain-icon';
+  const size = 26+Math.random()*30;
+  el.style.width=size+'px'; el.style.height=size+'px';
+  el.style.left=(Math.random()*100)+'vw';
+  const duration = 2.4+Math.random()*1.8;
+  const rot = (Math.random()*80-40);
+  el.style.transition=`transform ${duration}s linear, opacity .3s ease`;
+  const img=document.createElement('img');
+  img.src = icons[Math.floor(Math.random()*icons.length)];
+  el.appendChild(img);
+  container.appendChild(el);
+  requestAnimationFrame(()=>{ el.style.transform = `translateY(115vh) rotate(${rot}deg)`; });
+  el.addEventListener('click', (e)=>{
+    e.stopPropagation();
+    burstSparkleAt(e.clientX, e.clientY);
+    el.style.opacity='0';
+    setTimeout(()=>el.remove(),300);
+  });
+  setTimeout(()=>{ if (el.parentNode) el.remove(); }, duration*1000+200);
+}
+
+function playCharLoadingScreen(key){
+  const config = LOADING_SCREENS[key];
+  if (!config) return;
+
+  let audioDone = false;
+  let fallbackTimer = null;
+  let rainInterval = null;
+
+  function finish(){
+    if (fallbackTimer) clearTimeout(fallbackTimer);
+    if (rainInterval) clearInterval(rainInterval);
+    window.location.href = config.href;
+  }
+
+  if (config.audio){
+    const sound = new Audio(config.audio);
+    fallbackTimer = setTimeout(()=>{ if(!audioDone){ audioDone=true; finish(); } }, 6000);
+    sound.addEventListener('ended', ()=>{ if(audioDone) return; audioDone=true; finish(); });
+    sound.addEventListener('error', ()=>{ if(audioDone) return; audioDone=true; finish(); });
+    sound.play().catch(()=>{ if(audioDone) return; audioDone=true; finish(); });
+  }
+
+  function reveal(){
+    const overlay   = document.getElementById('charLoading');
+    const img       = document.getElementById('charLoadingImg');
+    const rainLayer = document.getElementById('rainLayer');
+    const caption   = document.getElementById('charLoadingCaption');
+    img.src = config.images[Math.floor(Math.random()*config.images.length)];
+    img.classList.remove('is-shown');
+    caption.textContent = config.caption;
+    overlay.classList.add('is-active');
+    requestAnimationFrame(()=> img.classList.add('is-shown'));
+    rainInterval = setInterval(()=> spawnRainIcon(rainLayer, config.icons), 180);
+    setTimeout(()=>{
+      const wipe = document.getElementById('sakuraWipe');
+      if (wipe) wipe.classList.remove('is-active');
+    }, 400);
+    if (!config.audio){
+      setTimeout(finish, 2600);
+    }
+  }
+
+  if (config.transition === 'sakura'){
+    playSakuraWipe(reveal);
+  } else if (config.transition === 'tangerine'){
+    playTangerineWipe(reveal);
+  } else if (config.transition === 'cola'){
+    playColaWipe(reveal);
+  } else if (config.transition === 'music'){
+    playMusicWipe(reveal);
+  } else if (config.transition === 'thunder'){
+    playThunderWipe(reveal);
+  } else if (config.transition === 'lie'){
+    playLieWipe(reveal);
+  } else {
+    reveal();
+  }
+}
+
+/* ---- Ocean Current Learning Journey: scroll-triggered fill + Brick Fist count-up ---- */
+const journeyObserver = new IntersectionObserver((entries)=>{
+  entries.forEach(entry=>{
+    if (entry.isIntersecting){
+      const card = entry.target;
+      const fill = card.querySelector('.jc-fill');
+      const brickEl = card.querySelector('.jc-brick');
+      const targetFill = parseFloat(card.dataset.fill);
+      const targetBrick = parseInt(card.dataset.brick, 10);
+      fill.style.width = targetFill + '%';
+      if (!reduceMotion){
+        const start = performance.now();
+        const duration = 1400;
+        function tick(now){
+          const p = Math.min(1, (now-start)/duration);
+          brickEl.textContent = Math.round(targetBrick*p).toLocaleString() + ' Brick Fist';
+          if (p<1) requestAnimationFrame(tick);
+        }
+        requestAnimationFrame(tick);
+      } else {
+        brickEl.textContent = targetBrick.toLocaleString() + ' Brick Fist';
+      }
+      journeyObserver.unobserve(card);
+    }
+  });
+}, { threshold: 0.35 });
+document.querySelectorAll('.journey-card').forEach(c=> journeyObserver.observe(c));
+
+/* ---- Whale Shark Call ---- */
+const WHALE_CARGO = ['Claude', 'Unreal Engine', 'Blueprint & Verse', 'PowerShell', 'Bazzite / rpm-ostree', 'Qt', 'Network+', 'Cybersecurity', 'IT Support'];
+const whaleBtn = document.getElementById('whaleCallBtn');
+const whaleLayer = document.getElementById('whaleLayer');
+const whaleToast = document.getElementById('whaleToast');
+
+function whaleSharkSVG(){
+  return `<svg viewBox="0 0 140 60" xmlns="http://www.w3.org/2000/svg">
+    <ellipse cx="65" cy="30" rx="55" ry="20" fill="#1b7f96" opacity="0.92"/>
+    <path d="M8 30 L-14 14 L-14 46 Z" fill="#1b7f96" opacity="0.92"/>
+    <ellipse cx="65" cy="36" rx="50" ry="8" fill="#0d3f56" opacity="0.7"/>
+    <path d="M40 12 L52 -4 L60 12 Z" fill="#1b7f96" opacity="0.92"/>
+    <circle cx="24" cy="24" r="3" fill="#eaf7f6"/>
+    <circle cx="42" cy="20" r="2.4" fill="#eaf7f6"/>
+    <circle cx="58" cy="26" r="2.8" fill="#eaf7f6"/>
+    <circle cx="76" cy="18" r="2.2" fill="#eaf7f6"/>
+    <circle cx="90" cy="24" r="2.6" fill="#eaf7f6"/>
+    <circle cx="30" cy="36" r="2" fill="#eaf7f6"/>
+    <circle cx="66" cy="38" r="2.2" fill="#eaf7f6"/>
+    <circle cx="14" cy="30" r="4" fill="#04121c"/>
+  </svg>`;
+}
+
+function showWhaleToast(text){
+  whaleToast.textContent = text;
+  whaleToast.classList.add('is-shown');
+  clearTimeout(showWhaleToast._t);
+  showWhaleToast._t = setTimeout(()=> whaleToast.classList.remove('is-shown'), 3200);
+}
+
+function summonWhaleSharks(){
+  const count = 5;
+  const cargo = [...WHALE_CARGO].sort(()=>Math.random()-0.5).slice(0, count);
+
+  if (reduceMotion){
+    showWhaleToast('Spotted in the current: ' + cargo.join(' · '));
+    SoundEngine.playWhaleCall();
+    return;
+  }
+
+  whaleBtn.disabled = true;
+  cargo.forEach((label, i)=>{
+    const shark = document.createElement('div');
+    shark.className = 'whale-shark';
+    const top = 10 + Math.random()*70;
+    const duration = 7 + Math.random()*3;
+    const delay = i * 0.5;
+    shark.style.top = top + 'vh';
+    shark.style.animation = `whale-swim ${duration}s linear ${delay}s forwards`;
+    shark.innerHTML = whaleSharkSVG() + `<span class="whale-tag">${label}</span>`;
+    whaleLayer.appendChild(shark);
+    setTimeout(()=> shark.remove(), (duration+delay)*1000 + 200);
+  });
+
+  SoundEngine.playWhaleCall();
+  setTimeout(()=>{ whaleBtn.disabled = false; }, 2200);
+}
+
+whaleBtn.addEventListener('click', summonWhaleSharks);
+
+/* ---- Sun Pirates tattoo toggle: Warlord Mode ---- */
+const sunToggle = document.getElementById('sunToggle');
+const introEyebrow = document.querySelector('.intro .eyebrow');
+const introSub = document.querySelector('.intro .sub');
+
+function updateModeCopy(){
+  const isWarlord = document.body.classList.contains('warlord-mode');
+  if (isWarlord){
+    introEyebrow.textContent = 'Professional Overview';
+    introSub.textContent = 'A working record of current certifications and technical development — the parts of the chart that matter most at a glance.';
+    sunToggle.title = 'Switch to Community Mode';
+  } else {
+    introEyebrow.textContent = "The Helmsman's Chart";
+    introSub.textContent = "Every course correction starts with knowing the currents. This is the chart of what's being learned, watched, and worked toward right now.";
+    sunToggle.title = 'Switch to Warlord Mode';
+  }
+}
+
+function toggleWarlordMode(){
+  const blots = document.querySelectorAll('.pt-blot');
+  const overlay = document.getElementById('pageTransition');
+  blots.forEach(b=>{ b.style.left='50%'; b.style.top='50%'; });
+  overlay.style.pointerEvents = 'auto';
+  gsapFreeScale(blots, 0, 1, reduceMotion ? 120 : 500, ()=>{
+    document.body.classList.toggle('warlord-mode');
+    updateModeCopy();
+    setTimeout(()=>{
+      gsapFreeScale(blots, 1, 0, reduceMotion ? 120 : 500, ()=>{ overlay.style.pointerEvents='none'; });
+    }, 120);
+  });
+}
+sunToggle.addEventListener('click', toggleWarlordMode);
+
+/* ---- The All Blue (guarded by the Knight of the Sea) ---- */
+const allBlueModal = document.getElementById('allBlueModal');
+function openAllBlueModal(){ allBlueModal.classList.add('show'); }
+function closeAllBlueModal(){ allBlueModal.classList.remove('show'); }
+document.getElementById('allBlueSpark').addEventListener('click', openAllBlueModal);
+document.getElementById('modalCloseBtn').addEventListener('click', closeAllBlueModal);
+allBlueModal.addEventListener('click', function(e){ if(e.target === allBlueModal) closeAllBlueModal(); });
+document.addEventListener('keydown', function(e){
+  if (e.key === 'Escape'){
+    crewDrawer.classList.remove('is-open');
+    closeAllBlueModal();
+  }
+});
+
+/* ---- wire up the crew links ---- */
+document.querySelectorAll('.crew-link').forEach(a=>{
+  a.addEventListener('click', function(e){
+    e.preventDefault();
+    const href = this.getAttribute('href');
+    const rect = this.getBoundingClientRect();
+    const cx = rect.left + rect.width/2;
+    const cy = rect.top + rect.height/2;
+    SoundEngine.playTick();
+    if (this.dataset.loading){
+      playCharLoadingScreen(this.dataset.loading);
+    } else {
+      playExitTransition(cx, cy, href);
+    }
+  });
+});
+
+/* ---- crew drawer ---- */
+const digTrigger = document.getElementById('digTrigger');
+const crewDrawer = document.getElementById('crewDrawer');
+const crewClose  = document.getElementById('crewClose');
+digTrigger.addEventListener('click', ()=> crewDrawer.classList.add('is-open'));
+crewClose.addEventListener('click', ()=> crewDrawer.classList.remove('is-open'));
+crewDrawer.addEventListener('click', (e)=>{ if (e.target === crewDrawer) crewDrawer.classList.remove('is-open'); });
+
+/* ---- dig-trigger nudge near bottom of page ---- */
+if (!reduceMotion){
+  const navTrigger = document.getElementById('digTrigger');
+  window.addEventListener('scroll', ()=>{
+    const nearBottom = (window.innerHeight + window.scrollY) >= (document.documentElement.scrollHeight - 120);
+    navTrigger.classList.toggle('is-shaking', nearBottom);
+  }, { passive: true });
+}
+})();
+</script>
+
+</body>
 </html>

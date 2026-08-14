@@ -242,6 +242,15 @@ html{ scrollbar-color: var(--neon) var(--steel-dark); scrollbar-width: thin; }
 }
 .dig-trigger:hover{ transform: scale(1.08) rotate(-6deg); }
 
+.dig-trigger.is-shaking{ animation: nudge-shake .5s ease-in-out infinite; }
+@keyframes nudge-shake{
+  0%,100%{ transform:translate(0,0) rotate(0deg); }
+  20%{ transform:translate(-2px,0) rotate(-4deg); }
+  40%{ transform:translate(2px,0) rotate(4deg); }
+  60%{ transform:translate(-2px,0) rotate(-3deg); }
+  80%{ transform:translate(2px,0) rotate(3deg); }
+}
+
 .crew-drawer{ position:fixed; inset:0; z-index:70; background: rgba(10,14,18,.7); display:flex; align-items:center; justify-content:center; opacity:0; pointer-events:none; transition: opacity .35s ease; padding: 5vh 4vw; }
 .crew-drawer.is-open{ opacity:1; pointer-events:auto; }
 .crew-panel{
@@ -302,8 +311,8 @@ html{ scrollbar-color: var(--neon) var(--steel-dark); scrollbar-width: thin; }
       <a class="crew-link" href="Chopper.html" data-loading="chopper"><img src="Wanted_Posters/chopper_wanted_poster.jpg" alt="Chopper"><span class="cl-name">Chopper</span></a>
       <a class="crew-link" href="Robin.html" data-loading="robin"><img src="Wanted_Posters/robin_wanted_poster.jpg" alt="Robin"><span class="cl-name">Robin</span></a>
       <a class="crew-link" href="Brook.html" data-loading="brook"><img src="Wanted_Posters/brook_wanted_poster.jpg" alt="Brook"><span class="cl-name">Brook</span></a>
-      <a class="crew-link" href="Usopp.html"><img src="Wanted_Posters/usopp_wanted_poster.jpg" alt="Usopp"><span class="cl-name">Usopp</span></a>
-      <a class="crew-link" href="Jinbe.html"><img src="Wanted_Posters/jinbe_wanted_poster.jpg" alt="Jinbe"><span class="cl-name">Jinbe</span></a>
+      <a class="crew-link" href="Usopp.html" data-loading="usopp"><img src="Wanted_Posters/usopp_wanted_poster.jpg" alt="Usopp"><span class="cl-name">Usopp</span></a>
+      <a class="crew-link" href="Jinbei.html" data-loading="jinbei"><img src="Wanted_Posters/jinbei_wanted_poster.jpg" alt="Jinbei"><span class="cl-name">Jinbei</span></a>
     </div>
   </div>
 </div>
@@ -550,7 +559,7 @@ function playPetalWipe(emoji, colorA, colorB, done){
   for (let i=0;i<count;i++){
     const p = document.createElement('span');
     p.className = 'wipe-petal';
-    p.textContent = emoji;
+    p.textContent = Array.isArray(emoji) ? emoji[Math.floor(Math.random()*emoji.length)] : emoji;
     p.style.left = (Math.random()*100) + 'vw';
     p.style.top  = (Math.random()*100) + 'vh';
     p.style.fontSize = (22 + Math.random()*30) + 'px';
@@ -567,6 +576,8 @@ function playSakuraWipe(done){ playPetalWipe('\u{1F338}', '#ffd6ef', '#ff9ad5', 
 function playTangerineWipe(done){ playPetalWipe('\u{1F34A}', '#ffe0b0', '#ff9a3c', done); }
 function playMusicWipe(done){ playPetalWipe('\u{1F3B5}', '#2a1a3a', '#000000', done); }
 function playThunderWipe(done){ playPetalWipe('\u{26A1}', '#1a3a1a', '#000000', done); }
+function playLieWipe(done){ playPetalWipe('\u{1F925}', '#f3e3bd', '#b5502e', done); }
+function playJinbeiWipe(done){ playPetalWipe(['\u{1F40B}','\u{1F988}','\u{1F30A}','\u{1F44A}','\u{2600}\u{FE0F}','\u{1F458}'], '#bfe9ff', '#04121c', done); }
 
 /* ---- character loading screens ----
    images: fullscreen art, one picked at random per visit
@@ -629,6 +640,22 @@ const LOADING_SCREENS = {
     href: 'Zoro.html',
     transition: 'thunder',
     audio: 'Zoro_Page/loading-sound.mp3'
+  },
+  usopp: {
+    images: ['Usopp_Page/loading1.jpg','Usopp_Page/loading2.jpg','Usopp_Page/loading3.jpeg','Usopp_Page/loading4.jpg','Usopp_Page/loading5.jpg'],
+    icons:  ['Icons/impact.png','Icons/slingshot.png','Icons/hammer.png'],
+    caption: "Spinning up the next legend\u2026",
+    href: 'Usopp.html',
+    transition: 'lie',
+    audio: 'Usopp_Page/loading-sound.mp3'
+  },
+  jinbei: {
+    images: ['Jinbei_Page/loading1.jpg','Jinbei_Page/loading2.png','Jinbei_Page/loading3.jpg'],
+    icons:  ['Icons/wave.png','Icons/drop.png','Icons/punch.png','Icons/rum.png'],
+    caption: "Diving into open water with the Helmsman\u2026",
+    href: 'Jinbei.html',
+    transition: 'jinbei',
+    audio: 'Jinbei_Page/loading-sound.mp3'
   }
 };
 
@@ -707,6 +734,10 @@ function playCharLoadingScreen(key){
     playMusicWipe(reveal);
   } else if (config.transition === 'thunder'){
     playThunderWipe(reveal);
+  } else if (config.transition === 'lie'){
+    playLieWipe(reveal);
+  } else if (config.transition === 'jinbei'){
+    playJinbeiWipe(reveal);
   } else {
     reveal();
   }
@@ -783,6 +814,13 @@ window.addEventListener('scroll', ()=>{
   }
 });
 updateColaGauge();
+if (!reduceMotion){
+  const navTrigger = document.getElementById('digTrigger');
+  window.addEventListener('scroll', ()=>{
+    const nearBottom = (window.innerHeight + window.scrollY) >= (document.documentElement.scrollHeight - 120);
+    navTrigger.classList.toggle('is-shaking', nearBottom);
+  }, { passive: true });
+}
 })();
 </script>
 

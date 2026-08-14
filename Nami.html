@@ -128,6 +128,15 @@ a{ color: inherit; }
   transform: rotate(-3deg);
 }
 
+.nav-toggle-btn.is-shaking{ animation: nudge-shake .5s ease-in-out infinite; }
+@keyframes nudge-shake{
+  0%,100%{ transform:translate(0,0) rotate(0deg); }
+  20%{ transform:translate(-2px,0) rotate(-4deg); }
+  40%{ transform:translate(2px,0) rotate(4deg); }
+  60%{ transform:translate(-2px,0) rotate(-3deg); }
+  80%{ transform:translate(2px,0) rotate(3deg); }
+}
+
 .chart-nav{
   position: fixed;
   top: 84px; left: 24px;
@@ -679,8 +688,8 @@ a{ color: inherit; }
     <a class="mobile-poster" href="Robin.html"><img src="Wanted_Posters/robin_wanted_poster.jpg" alt="Robin"></a>
     <a class="mobile-poster" href="Franky.html" data-loading="franky"><img src="Wanted_Posters/franky_wanted_poster.jpg" alt="Franky"></a>
     <a class="mobile-poster" href="Brook.html" data-loading="brook"><img src="Wanted_Posters/brook_wanted_poster.jpg" alt="Brook"></a>
-    <a class="mobile-poster" href="Usopp.html"><img src="Wanted_Posters/usopp_wanted_poster.jpg" alt="Usopp"></a>
-    <a class="mobile-poster" href="Jinbe.html"><img src="Wanted_Posters/jinbe_wanted_poster.jpg" alt="Jinbe"></a>
+    <a class="mobile-poster" href="Usopp.html" data-loading="usopp"><img src="Wanted_Posters/usopp_wanted_poster.jpg" alt="Usopp"></a>
+    <a class="mobile-poster" href="Jinbei.html" data-loading="jinbei"><img src="Wanted_Posters/jinbei_wanted_poster.jpg" alt="Jinbei"></a>
   </div>
 </nav>
 
@@ -912,13 +921,13 @@ a{ color: inherit; }
 
   <!-- ================= AUTOMATION ================= -->
   <section class="island island--left" data-caption="Approaching Automation Island">
-   <a class="poster-trigger" href="Usopp.html" style="right:7vw; top:15%; --rot:5deg;">
+   <a class="poster-trigger" href="Usopp.html" data-loading="usopp" style="right:7vw; top:15%; --rot:5deg;">
      <img src="Wanted_Posters/usopp_wanted_poster.jpg" alt="Usopp Wanted Poster">
      <span class="poster-label">Usopp</span>
    </a>
-   <a class="poster-trigger" href="Jinbe.html" style="right:9vw; top:58%; --rot:-7deg;">
-     <img src="Wanted_Posters/jinbe_wanted_poster.jpg" alt="Jinbe Wanted Poster">
-     <span class="poster-label">Jinbe</span>
+   <a class="poster-trigger" href="Jinbei.html" data-loading="jinbei" style="right:9vw; top:58%; --rot:-7deg;">
+     <img src="Wanted_Posters/jinbei_wanted_poster.jpg" alt="Jinbei Wanted Poster">
+     <span class="poster-label">Jinbei</span>
    </a>
     <div class="ink-overlay">
       <div class="blot blot1"></div><div class="blot blot2"></div><div class="blot blot3"></div>
@@ -1023,7 +1032,7 @@ function playPetalWipe(emoji, colorA, colorB, done){
   for (let i=0;i<count;i++){
     const p = document.createElement('span');
     p.className = 'wipe-petal';
-    p.textContent = emoji;
+    p.textContent = Array.isArray(emoji) ? emoji[Math.floor(Math.random()*emoji.length)] : emoji;
     p.style.left = (Math.random()*100) + 'vw';
     p.style.top  = (Math.random()*100) + 'vh';
     p.style.fontSize = (22 + Math.random()*30) + 'px';
@@ -1041,6 +1050,8 @@ function playTangerineWipe(done){ playPetalWipe('\u{1F34A}', '#ffe0b0', '#ff9a3c
 function playColaWipe(done){ playPetalWipe('\u{1F964}', '#f5e6c8', '#5c3a1e', done); }
 function playMusicWipe(done){ playPetalWipe('\u{1F3B5}', '#2a1a3a', '#000000', done); }
 function playThunderWipe(done){ playPetalWipe('\u{26A1}', '#1a3a1a', '#000000', done); }
+function playLieWipe(done){ playPetalWipe('\u{1F925}', '#f3e3bd', '#b5502e', done); }
+function playJinbeiWipe(done){ playPetalWipe(['\u{1F40B}','\u{1F988}','\u{1F30A}','\u{1F44A}','\u{2600}\u{FE0F}','\u{1F458}'], '#bfe9ff', '#04121c', done); }
 
 /* =======================================================================
    3. CUSTOM CURSOR
@@ -1443,6 +1454,22 @@ const LOADING_SCREENS = {
     href: 'Zoro.html',
     transition: 'thunder',
     audio: 'Zoro_Page/loading-sound.mp3'
+  },
+  usopp: {
+    images: ['Usopp_Page/loading1.jpg','Usopp_Page/loading2.jpg','Usopp_Page/loading3.jpeg','Usopp_Page/loading4.jpg','Usopp_Page/loading5.jpg'],
+    icons:  ['Icons/impact.png','Icons/slingshot.png','Icons/hammer.png'],
+    caption: "Spinning up the next legend\u2026",
+    href: 'Usopp.html',
+    transition: 'lie',
+    audio: 'Usopp_Page/loading-sound.mp3'
+  },
+  jinbei: {
+    images: ['Jinbei_Page/loading1.jpg','Jinbei_Page/loading2.png','Jinbei_Page/loading3.jpg'],
+    icons:  ['Icons/wave.png','Icons/drop.png','Icons/punch.png','Icons/rum.png'],
+    caption: "Diving into open water with the Helmsman\u2026",
+    href: 'Jinbei.html',
+    transition: 'jinbei',
+    audio: 'Jinbei_Page/loading-sound.mp3'
   }
 };
 
@@ -1543,6 +1570,10 @@ function playCharLoadingScreen(key){
     playMusicWipe(reveal);
   } else if (config.transition === 'thunder'){
     playThunderWipe(reveal);
+  } else if (config.transition === 'lie'){
+    playLieWipe(reveal);
+  } else if (config.transition === 'jinbei'){
+    playJinbeiWipe(reveal);
   } else {
     reveal();
   }
@@ -1634,6 +1665,14 @@ document.querySelectorAll('.reveal-btn').forEach(btn=>{
 window.addEventListener('resize', ()=>{
   if (window.ScrollTrigger) ScrollTrigger.refresh();
 });
+
+if (!reduceMotion){
+  const navTrigger = document.querySelector('.nav-toggle-btn');
+  window.addEventListener('scroll', ()=>{
+    const nearBottom = (window.innerHeight + window.scrollY) >= (document.documentElement.scrollHeight - 120);
+    navTrigger.classList.toggle('is-shaking', nearBottom);
+  }, { passive: true });
+}
 
 })();
 </script>

@@ -230,8 +230,8 @@
     <a class="poster-trigger" href="Robin.html" data-loading="robin" style="--rot:-5deg;"><img src="Wanted_Posters/robin_wanted_poster.jpg" alt="Robin"><span class="poster-label">Robin</span></a>
     <a class="poster-trigger" href="Franky.html" data-loading="franky" style="--rot:6deg;"><img src="Wanted_Posters/franky_wanted_poster.jpg" alt="Franky"><span class="poster-label">Franky</span></a>
     <a class="poster-trigger" href="Brook.html" data-loading="brook" style="--rot:-7deg;"><img src="Wanted_Posters/brook_wanted_poster.jpg" alt="Brook"><span class="poster-label">Brook</span></a>
-    <a class="poster-trigger" href="Usopp.html" style="--rot:4deg;"><img src="Wanted_Posters/usopp_wanted_poster.jpg" alt="Usopp"><span class="poster-label">Usopp</span></a>
-    <a class="poster-trigger" href="Jinbe.html" style="--rot:-3deg;"><img src="Wanted_Posters/jinbe_wanted_poster.jpg" alt="Jinbe"><span class="poster-label">Jinbe</span></a>
+    <a class="poster-trigger" href="Usopp.html" data-loading="usopp" style="--rot:4deg;"><img src="Wanted_Posters/usopp_wanted_poster.jpg" alt="Usopp"><span class="poster-label">Usopp</span></a>
+    <a class="poster-trigger" href="Jinbei.html" data-loading="jinbei" style="--rot:-3deg;"><img src="Wanted_Posters/jinbei_wanted_poster.jpg" alt="Jinbei"><span class="poster-label">Jinbei</span></a>
   </div>
 </div>
 
@@ -370,7 +370,7 @@ function playPetalWipe(emoji, colorA, colorB, done){
   for (let i=0;i<count;i++){
     const p = document.createElement('span');
     p.className = 'wipe-petal';
-    p.textContent = emoji;
+    p.textContent = Array.isArray(emoji) ? emoji[Math.floor(Math.random()*emoji.length)] : emoji;
     p.style.left = (Math.random()*100) + 'vw';
     p.style.top  = (Math.random()*100) + 'vh';
     p.style.fontSize = (22 + Math.random()*30) + 'px';
@@ -388,6 +388,8 @@ function playTangerineWipe(done){ playPetalWipe('\u{1F34A}', '#ffe0b0', '#ff9a3c
 function playColaWipe(done){ playPetalWipe('\u{1F964}', '#f5e6c8', '#5c3a1e', done); }
 function playMusicWipe(done){ playPetalWipe('\u{1F3B5}', '#2a1a3a', '#000000', done); }
 function playThunderWipe(done){ playPetalWipe('\u{26A1}', '#1a3a1a', '#000000', done); }
+function playLieWipe(done){ playPetalWipe('\u{1F925}', '#f3e3bd', '#b5502e', done); }
+function playJinbeiWipe(done){ playPetalWipe(['\u{1F40B}','\u{1F988}','\u{1F30A}','\u{1F44A}','\u{2600}\u{FE0F}','\u{1F458}'], '#bfe9ff', '#04121c', done); }
 
 (function(){
   const overlay = document.getElementById('pageTransition');
@@ -539,6 +541,22 @@ const LOADING_SCREENS = {
     href: 'Zoro.html',
     transition: 'thunder',
     audio: 'Zoro_Page/loading-sound.mp3'
+  },
+  usopp: {
+    images: ['Usopp_Page/loading1.jpg','Usopp_Page/loading2.jpg','Usopp_Page/loading3.jpeg','Usopp_Page/loading4.jpg','Usopp_Page/loading5.jpg'],
+    icons:  ['Icons/impact.png','Icons/slingshot.png','Icons/hammer.png'],
+    caption: "Spinning up the next legend\u2026",
+    href: 'Usopp.html',
+    transition: 'lie',
+    audio: 'Usopp_Page/loading-sound.mp3'
+  },
+  jinbei: {
+    images: ['Jinbei_Page/loading1.jpg','Jinbei_Page/loading2.png','Jinbei_Page/loading3.jpg'],
+    icons:  ['Icons/wave.png','Icons/drop.png','Icons/punch.png','Icons/rum.png'],
+    caption: "Diving into open water with the Helmsman\u2026",
+    href: 'Jinbei.html',
+    transition: 'jinbei',
+    audio: 'Jinbei_Page/loading-sound.mp3'
   }
 };
 
@@ -625,6 +643,10 @@ function playCharLoadingScreen(key){
     playMusicWipe(reveal);
   } else if (config.transition === 'thunder'){
     playThunderWipe(reveal);
+  } else if (config.transition === 'lie'){
+    playLieWipe(reveal);
+  } else if (config.transition === 'jinbei'){
+    playJinbeiWipe(reveal);
   } else {
     reveal();
   }

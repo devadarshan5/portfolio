@@ -1,0 +1,896 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sanji — Reservation Desk | Devadarshan R K</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,500&family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Cutive+Mono&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+
+<style>
+/* =======================================================================
+   DESIGN TOKENS
+   ======================================================================= */
+:root{
+  --bg-deep:      #120d09;
+  --bg-panel:     #1c140d;
+  --panel-glass:  rgba(28,20,13,0.55);
+  --gold:         #cda45e;
+  --gold-bright:  #eccb85;
+  --gold-dim:     rgba(205,164,94,0.35);
+  --ember:        #ff5a36;
+  --ember-deep:   #8f1c1c;
+  --cream:        #f3e8d2;
+  --muted:        #ab9878;
+  --line:         rgba(205,164,94,0.22);
+  --ink:          #0b0704;
+  --shadow:       rgba(6,4,2,.6);
+
+  --font-display: 'Cormorant Garamond', 'Times New Roman', serif;
+  --font-body:    'EB Garamond', Georgia, serif;
+  --font-mono:    'Cutive Mono', monospace;
+}
+
+*{ margin:0; padding:0; box-sizing:border-box; }
+html{ scroll-behavior:smooth; }
+body{
+  font-family: var(--font-body);
+  background: var(--bg-deep);
+  color: var(--cream);
+  overflow-x:hidden;
+  position:relative;
+}
+
+@media (prefers-reduced-motion: reduce){
+  *{ animation-duration:.001ms !important; animation-iteration-count:1 !important; }
+}
+
+::-webkit-scrollbar{ width:11px; }
+::-webkit-scrollbar-track{ background: var(--bg-panel); }
+::-webkit-scrollbar-thumb{ background: var(--gold); border-radius:8px; border:2px solid var(--bg-panel); }
+html{ scrollbar-color: var(--gold) var(--bg-panel); scrollbar-width: thin; }
+a{ color:inherit; }
+::selection{ background:var(--gold); color:#1c140d; }
+
+/* =======================================================================
+   PAGE TRANSITIONS & LOADING SCREENS (shared engine — matches other pages)
+   ======================================================================= */
+.page-transition{ position:fixed; inset:0; z-index:9997; pointer-events:none; }
+.pt-blot{ position:absolute; left:50%; top:50%; width:160vmax; height:160vmax; background: var(--ink); border-radius:50%; transform:translate(-50%,-50%) scale(1); }
+.pt-blot2{ width:140vmax; height:140vmax; opacity:.92; }
+.pt-blot3{ width:120vmax; height:120vmax; opacity:.85; }
+
+.char-loading{ position:fixed; inset:0; z-index:9999; background:#000; opacity:0; pointer-events:none; transition:opacity .5s ease; overflow:hidden; }
+.char-loading.is-active{ opacity:1; pointer-events:auto; }
+.char-loading img.nl-bg{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; opacity:0; transition:opacity .6s ease, transform 6s ease; transform:scale(1.06); }
+.char-loading img.nl-bg.is-shown{ opacity:1; transform:scale(1); }
+.rain-layer{ position:absolute; inset:0; overflow:hidden; }
+.rain-icon{ position:absolute; top:-60px; cursor:pointer; will-change:transform; filter:drop-shadow(0 2px 4px rgba(0,0,0,.5)); }
+.rain-icon img{ display:block; width:100%; height:100%; object-fit:contain; }
+.nl-caption{ position:absolute; bottom:40px; left:50%; transform:translateX(-50%); font-family: var(--font-display); font-style:italic; letter-spacing:.03em; color: var(--gold-bright); font-size:17px; opacity:0; transition:opacity .5s ease .3s; text-shadow:0 0 10px rgba(0,0,0,.8); }
+.char-loading.is-active .nl-caption{ opacity:1; }
+
+/* generic petal screen-fill wipe (emoji + colors set at runtime) */
+.sakura-wipe{ position:fixed; inset:0; z-index:9996; pointer-events:none; opacity:0; overflow:hidden; background: radial-gradient(circle at 50% 50%, #ffd6ef, #ff9ad5); transition: opacity .35s ease; }
+.sakura-wipe.is-active{ opacity:1; }
+.wipe-petal{ position:absolute; opacity:0; transform: scale(.2) rotate(0deg); transition: opacity .5s ease, transform .5s cubic-bezier(.2,1.4,.4,1); }
+.wipe-petal.is-in{ opacity:.95; }
+
+/* sparkle burst (rain-icon clicks) */
+.sparkle{ position:fixed; font-family: var(--font-display); color: var(--gold-bright); pointer-events:none; z-index:10000; animation: sparkle-pop .9s ease-out forwards; }
+@keyframes sparkle-pop{ 0%{ opacity:1; transform: translate(0,0) scale(.6); } 100%{ opacity:0; transform: translate(var(--sx), var(--sy)) scale(1.3); } }
+
+/* =======================================================================
+   LAYOUT SHELL
+   ======================================================================= */
+.shell{
+  position:relative; z-index:2;
+  display:grid;
+  grid-template-columns: 42% 58%;
+  min-height:100vh;
+}
+@media (max-width: 900px){
+  .shell{ grid-template-columns: 1fr; }
+}
+
+/* ============ LEFT PANEL ============ */
+.left-panel{
+  position:relative;
+  background:
+    radial-gradient(ellipse at 50% 30%, rgba(255,90,54,0.10), transparent 55%),
+    linear-gradient(160deg, #1a130c 0%, #100b07 65%, #0b0704 100%);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  padding:64px 32px;
+  overflow:hidden;
+  min-height:420px;
+}
+
+.diable-glow{
+  position:absolute;
+  width:520px; height:520px;
+  left:50%; top:52%;
+  transform:translate(-50%,-50%);
+  background:radial-gradient(circle, rgba(255,90,54,0.35) 0%, rgba(200,30,30,0.18) 35%, transparent 70%);
+  filter:blur(6px);
+  animation:pulse-glow 5.5s ease-in-out infinite;
+  pointer-events:none;
+}
+@keyframes pulse-glow{
+  0%,100%{ opacity:0.55; transform:translate(-50%,-50%) scale(0.92); }
+  50%{ opacity:1; transform:translate(-50%,-50%) scale(1.06); }
+}
+
+.motto-vertical{
+  position:absolute;
+  top:48px; left:24px;
+  writing-mode:vertical-rl;
+  letter-spacing:0.35em;
+  font-family:var(--font-mono);
+  font-size:11px;
+  color:var(--gold-dim);
+  text-transform:uppercase;
+}
+@media (max-width:900px){ .motto-vertical{ display:none; } }
+
+.emblem-wrap{ position:relative; z-index:2; display:flex; flex-direction:column; align-items:center; gap:22px; }
+.swirl-emblem{ width:150px; height:150px; filter: drop-shadow(0 0 18px rgba(255,140,70,0.35)); }
+.swirl-emblem path{ stroke: var(--gold-bright); stroke-width:2.2; fill:none; stroke-linecap:round; }
+
+.smoke{ position:absolute; width:3px; height:3px; border-radius:50%; background:rgba(230,220,205,0.5); filter:blur(2px); top:8px; left:50%; animation: rise 6s linear infinite; opacity:0; }
+.smoke:nth-child(1){ animation-delay:0s; left:46%; }
+.smoke:nth-child(2){ animation-delay:2s; left:52%; }
+.smoke:nth-child(3){ animation-delay:4s; left:49%; }
+@keyframes rise{
+  0%{ opacity:0; transform:translate(0,0) scale(1); }
+  10%{ opacity:0.5; }
+  80%{ opacity:0.15; }
+  100%{ opacity:0; transform:translate(18px,-140px) scale(3.2); }
+}
+
+.brand-word{ font-family:var(--font-display); font-size:clamp(34px, 4vw, 46px); letter-spacing:0.14em; font-weight:500; color:var(--gold-bright); text-align:center; margin:0; }
+.brand-sub{ font-family:var(--font-mono); font-size:11px; letter-spacing:0.28em; text-transform:uppercase; color:var(--muted); text-align:center; margin-top:-8px; }
+.quote{ max-width:320px; text-align:center; font-style:italic; font-family:var(--font-display); font-size:18px; color:var(--cream); opacity:0.82; line-height:1.5; margin-top:8px; }
+.quote::before,.quote::after{ content:'"'; color:var(--gold); }
+
+/* ============ RIGHT PANEL ============ */
+.right-panel{ background: linear-gradient(180deg, #17110b 0%, #14100b 100%); padding: 64px 8vw 48px; display:flex; flex-direction:column; gap:36px; position:relative; }
+.desk-header{ text-align:left; }
+.eyebrow{ font-family:var(--font-mono); font-size:11px; letter-spacing:0.3em; text-transform:uppercase; color:var(--gold); margin:0 0 10px; }
+.desk-title{ font-family:var(--font-display); font-size:clamp(30px, 3.4vw, 44px); margin:0; color:var(--cream); font-weight:600; }
+.desk-motto{ margin:10px 0 0; color:var(--muted); font-style:italic; font-size:15px; }
+
+.card{ background:var(--panel-glass); backdrop-filter: blur(14px) saturate(120%); -webkit-backdrop-filter: blur(14px) saturate(120%); border:1px solid var(--line); border-radius:6px; padding:32px clamp(20px,3vw,40px); }
+
+.field{ margin-bottom:22px; display:flex; flex-direction:column; gap:8px; }
+.field label{ font-family:var(--font-mono); font-size:11px; letter-spacing:0.14em; text-transform:uppercase; color:var(--gold); }
+.field input[type="text"], .field input[type="email"], .field textarea{
+  background:rgba(0,0,0,0.25); border:1px solid var(--line); border-radius:3px; padding:12px 14px;
+  color:var(--cream); font-family:var(--font-body); font-size:16px; outline:none;
+  transition:border-color .25s ease, box-shadow .25s ease;
+}
+.field input:focus, .field textarea:focus{ border-color:var(--gold); box-shadow:0 0 0 3px rgba(205,164,94,0.15); }
+.field textarea{ min-height:96px; resize:vertical; font-family:var(--font-body); }
+
+.honorific-group{ display:flex; gap:10px; flex-wrap:wrap; }
+.honorific-opt{ position:relative; }
+.honorific-opt input{ position:absolute; opacity:0; width:0; height:0; }
+.honorific-opt label{
+  display:inline-block; padding:9px 18px; border:1px solid var(--line); border-radius:20px;
+  font-family:var(--font-display); font-style:italic; font-size:15px; color:var(--muted);
+  cursor:pointer; transition: all .2s ease;
+}
+.honorific-opt input:checked + label{ background:var(--gold); color:#1c140d; border-color:var(--gold); font-weight:600; }
+.honorific-opt input:focus-visible + label{ outline:2px solid var(--gold-bright); outline-offset:2px; }
+
+.submit-row{ display:flex; align-items:center; gap:16px; margin-top:8px; flex-wrap:wrap; }
+.lighter-btn{
+  position:relative; background:linear-gradient(180deg, #241a10, #14100b); color:var(--gold-bright);
+  border:1.5px solid var(--gold); padding:14px 30px; font-family:var(--font-mono); font-size:13px;
+  letter-spacing:0.18em; text-transform:uppercase; border-radius:3px; cursor:pointer; isolation:isolate;
+  overflow:visible; transition: color .2s ease, transform .15s ease;
+}
+.lighter-btn::before{
+  content:''; position:absolute; inset:-2px; border-radius:5px; padding:2px;
+  background:conic-gradient(from 0deg, transparent 0 92%, var(--ember) 96%, transparent 100%);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor; mask-composite: exclude;
+  opacity:0; transition:opacity .3s ease; animation: spin-flame 2.6s linear infinite paused; z-index:-1;
+}
+.lighter-btn:hover, .lighter-btn:focus-visible{ color:#fff; transform:translateY(-1px); }
+.lighter-btn:hover::before, .lighter-btn:focus-visible::before{ opacity:1; animation-play-state:running; }
+@keyframes spin-flame{ to{ transform:rotate(360deg); } }
+.lighter-btn .flame-tip{ position:absolute; right:-9px; top:50%; transform:translateY(-50%) scale(0); width:16px; height:22px; opacity:0; transition: opacity .25s ease, transform .25s ease; pointer-events:none; }
+.lighter-btn:hover .flame-tip, .lighter-btn:focus-visible .flame-tip{ opacity:1; transform:translateY(-50%) scale(1); }
+
+.submit-note{ font-family:var(--font-body); font-size:13px; color:var(--muted); font-style:italic; }
+
+.confirmation{ display:none; margin-top:20px; padding:18px 20px; border-radius:4px; border:1px solid var(--gold-dim); background:rgba(0,0,0,0.25); font-family:var(--font-display); font-size:16px; align-items:center; gap:12px; }
+.confirmation.show{ display:flex; animation:fade-up .4s ease; }
+@keyframes fade-up{ from{opacity:0; transform:translateY(8px);} to{opacity:1; transform:translateY(0);} }
+.confirmation .heart{ color:#ff5a7a; font-size:20px; animation:beat 1s ease-in-out infinite; }
+@keyframes beat{ 0%,100%{transform:scale(1);} 50%{transform:scale(1.25);} }
+.confirmation .stamp{ color:var(--gold); font-size:20px; }
+
+.menu-card{ background:transparent; border:none; padding:0; }
+.menu-title{ font-family:var(--font-display); font-size:22px; color:var(--gold-bright); margin:0 0 4px; text-align:center; letter-spacing:0.04em; }
+.menu-sub{ text-align:center; font-family:var(--font-mono); font-size:10px; letter-spacing:0.25em; color:var(--muted); text-transform:uppercase; margin-bottom:22px; }
+.menu-course{ margin-bottom:22px; }
+.menu-course:last-child{ margin-bottom:0; }
+.course-label{ font-family:var(--font-mono); font-size:11px; letter-spacing:0.2em; text-transform:uppercase; color:var(--gold); border-bottom:1px solid var(--line); padding-bottom:6px; margin-bottom:10px; }
+.course-item{ display:flex; justify-content:space-between; align-items:baseline; gap:10px; padding:6px 0; font-family:var(--font-display); font-size:17px; text-decoration:none; color:var(--cream); transition:color .2s ease; }
+.course-item .dots{ flex:1; border-bottom:1px dotted var(--line); margin:0 8px 4px; }
+.course-item:hover{ color:var(--gold-bright); }
+.course-item-static{ cursor:default; opacity:0.72; }
+.course-item-static:hover{ color:var(--cream); }
+.course-item span.tag{ font-family:var(--font-mono); font-size:11px; color:var(--muted); }
+
+.desk-footer{ text-align:center; padding-top:18px; border-top:1px solid var(--line); font-family:var(--font-display); font-style:italic; color:var(--muted); font-size:15px; position:relative; }
+.all-blue-spark{
+  display:inline-block; width:9px; height:9px; border-radius:50%;
+  background:radial-gradient(circle, #bfe9ff, #2f8fd1 70%); box-shadow:0 0 8px 2px rgba(90,180,255,0.6);
+  margin-left:8px; vertical-align:middle; cursor:pointer; animation: twinkle 2.4s ease-in-out infinite; border:none; padding:0;
+}
+@keyframes twinkle{ 0%,100%{ opacity:0.55; transform:scale(0.9); } 50%{ opacity:1; transform:scale(1.15); } }
+
+/* =======================================================================
+   CREW DRAWER (shared engine — matches other pages)
+   ======================================================================= */
+.dig-trigger{
+  position:fixed; top:20px; left:88px; z-index:60;
+  width:54px; height:54px; border-radius:50%;
+  background: var(--bg-panel); border: 2px solid var(--gold);
+  display:flex; align-items:center; justify-content:center;
+  font-size:22px; cursor:pointer;
+  box-shadow: 0 4px 0 var(--shadow);
+  transition: transform .25s ease;
+}
+.dig-trigger:hover{ transform: scale(1.08) rotate(-6deg); }
+@keyframes digShake{
+  0%, 100% { transform: rotate(0deg); }
+  20% { transform: rotate(-8deg); }
+  40% { transform: rotate(7deg); }
+  60% { transform: rotate(-5deg); }
+  80% { transform: rotate(4deg); }
+}
+.dig-trigger.is-shaking{
+  animation: digShake 0.5s ease-in-out infinite;
+}
+
+.crew-drawer{ position:fixed; inset:0; z-index:70; background: rgba(10,7,4,.75); display:flex; align-items:center; justify-content:center; opacity:0; pointer-events:none; transition: opacity .35s ease; padding: 5vh 4vw; }
+.crew-drawer.is-open{ opacity:1; pointer-events:auto; }
+.crew-panel{
+  background: var(--bg-panel); border: 3px solid var(--gold); border-radius:12px;
+  padding: 28px 28px 22px; max-width:560px; width:100%; max-height:84vh; overflow-y:auto;
+  box-shadow: 0 20px 50px var(--shadow);
+  transform: scale(.92) translateY(10px); transition: transform .35s cubic-bezier(.3,1.4,.4,1);
+  scrollbar-color: var(--gold) transparent; scrollbar-width: thin;
+}
+.crew-panel::-webkit-scrollbar{ width:6px; }
+.crew-panel::-webkit-scrollbar-thumb{ background: var(--gold); border-radius:6px; }
+.crew-drawer.is-open .crew-panel{ transform: scale(1) translateY(0); }
+.crew-panel-head{ display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; }
+.crew-panel-head h3{ font-family: var(--font-display); font-size:16px; letter-spacing:.08em; color: var(--gold-bright); font-style:italic; }
+.crew-close{ width:30px; height:30px; border-radius:50%; border:1px solid var(--gold); background:transparent; color: var(--cream); font-size:16px; cursor:pointer; }
+.crew-grid{ display:grid; grid-template-columns: repeat(3, 1fr); gap:12px; }
+.crew-link{ display:block; border:2px solid var(--ink); border-radius:5px; overflow:hidden; text-decoration:none; transition: transform .25s cubic-bezier(.34,1.5,.4,1); }
+.crew-link:hover{ transform: scale(1.06) rotate(-1deg); }
+.crew-link img{ display:block; width:100%; height:auto; }
+.crew-link .cl-name{ display:block; text-align:center; font-family: var(--font-mono); font-size:9px; letter-spacing:.05em; padding:5px 0; background: var(--gold); color: var(--ink); }
+
+/* ============ ALL BLUE MODAL ============ */
+.modal-backdrop{ position:fixed; inset:0; background:rgba(5,3,2,0.82); display:none; align-items:center; justify-content:center; z-index:200; padding:24px; }
+.modal-backdrop.show{ display:flex; }
+.modal{ background:linear-gradient(160deg, #1b1410, #100b07); border:1px solid var(--gold-dim); border-radius:6px; max-width:420px; padding:36px 30px; text-align:center; position:relative; }
+.modal h3{ font-family:var(--font-display); color:var(--gold-bright); font-size:24px; margin:0 0 10px; }
+.modal p{ color:var(--muted); font-size:15px; line-height:1.6; }
+.modal a.go{ display:inline-block; margin-top:14px; color:var(--gold); border-bottom:1px solid var(--gold-dim); text-decoration:none; padding-bottom:2px; font-family:var(--font-mono); font-size:12px; letter-spacing:0.12em; text-transform:uppercase; }
+.modal-close{ position:absolute; top:12px; right:14px; background:none; border:none; color:var(--muted); font-size:20px; cursor:pointer; }
+</style>
+</head>
+<body>
+
+<!-- ==================== PAGE TRANSITIONS & LOADING SCREENS ==================== -->
+<div class="page-transition" id="pageTransition">
+  <div class="pt-blot pt-blot1"></div>
+  <div class="pt-blot pt-blot2"></div>
+  <div class="pt-blot pt-blot3"></div>
+</div>
+<div class="sakura-wipe" id="sakuraWipe"></div>
+<div class="char-loading" id="charLoading">
+  <img class="nl-bg" id="charLoadingImg" src="" alt="">
+  <div class="rain-layer" id="rainLayer"></div>
+  <div class="nl-caption" id="charLoadingCaption"></div>
+</div>
+
+<!-- ==================== CREW TRIGGER ==================== -->
+<div class="dig-trigger" id="digTrigger" title="Ring for the crew">&#128276;</div>
+<div class="crew-drawer" id="crewDrawer">
+  <div class="crew-panel">
+    <div class="crew-panel-head">
+      <h3>Private Dining — The Rest of the Crew</h3>
+      <button class="crew-close" id="crewClose">&times;</button>
+    </div>
+    <div class="crew-grid">
+      <a class="crew-link" href="Luffy.html" data-loading="luffy"><img src="Wanted_Posters/luffy_wanted_poster.jpg" alt="Luffy"><span class="cl-name">Luffy</span></a>
+      <a class="crew-link" href="Zoro.html" data-loading="zoro"><img src="Wanted_Posters/zoro_wanted_poster.jpg" alt="Zoro"><span class="cl-name">Zoro</span></a>
+      <a class="crew-link" href="Nami.html" data-loading="nami"><img src="Wanted_Posters/nami_wanted_poster.jpg" alt="Nami"><span class="cl-name">Nami</span></a>
+      <a class="crew-link" href="Chopper.html" data-loading="chopper"><img src="Wanted_Posters/chopper_wanted_poster.jpg" alt="Chopper"><span class="cl-name">Chopper</span></a>
+      <a class="crew-link" href="Robin.html" data-loading="robin"><img src="Wanted_Posters/robin_wanted_poster.jpg" alt="Robin"><span class="cl-name">Robin</span></a>
+      <a class="crew-link" href="Franky.html" data-loading="franky"><img src="Wanted_Posters/franky_wanted_poster.jpg" alt="Franky"><span class="cl-name">Franky</span></a>
+      <a class="crew-link" href="Brook.html" data-loading="brook"><img src="Wanted_Posters/brook_wanted_poster.jpg" alt="Brook"><span class="cl-name">Brook</span></a>
+      <a class="crew-link" href="Usopp.html" data-loading="usopp"><img src="Wanted_Posters/usopp_wanted_poster.jpg" alt="Usopp"><span class="cl-name">Usopp</span></a>
+      <a class="crew-link" href="Jinbei.html" data-loading="jinbei"><img src="Wanted_Posters/jinbei_wanted_poster.jpg" alt="Jinbei"><span class="cl-name">Jinbei</span></a>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== LEFT: BARATIE ATMOSPHERE ==================== -->
+<div class="shell">
+  <div class="left-panel">
+    <div class="diable-glow" aria-hidden="true"></div>
+    <div class="motto-vertical" aria-hidden="true">SERVICE · SERVICE · STILL MORE SERVICE</div>
+
+    <div class="emblem-wrap">
+      <div style="position:relative;">
+        <span class="smoke" aria-hidden="true"></span>
+        <span class="smoke" aria-hidden="true"></span>
+        <span class="smoke" aria-hidden="true"></span>
+        <svg class="swirl-emblem" viewBox="0 0 150 150" aria-hidden="true">
+          <circle cx="75" cy="75" r="60" stroke="rgba(205,164,94,0.25)" stroke-width="1"/>
+          <path d="M75 40 C95 40 108 55 100 72 C94 84 78 84 78 72 C78 64 86 62 90 68"/>
+          <circle cx="90" cy="68" r="2.4" fill="var(--gold-bright)" stroke="none"/>
+        </svg>
+      </div>
+      <div>
+        <p class="brand-word">Baratie</p>
+        <p class="brand-sub">Ocean&nbsp;Restaurant &amp; Reservation Desk</p>
+      </div>
+      <p class="quote">All the world's oceans are connected. Somewhere out there is a table with your name on it.</p>
+    </div>
+  </div>
+
+  <!-- ==================== RIGHT: RESERVATION DESK ==================== -->
+  <div class="right-panel">
+
+    <div class="desk-header">
+      <p class="eyebrow">Reservation Desk</p>
+      <h1 class="desk-title">Reserve a Table with the Chef</h1>
+      <p class="desk-motto">Every guest is treated like royalty — that's the Baratie way.</p>
+    </div>
+
+    <form class="card" id="reservationForm">
+      <div class="field">
+        <label for="guestName">Guest Name</label>
+        <input type="text" id="guestName" name="guestName" required autocomplete="name" placeholder="Whom shall we set the table for?">
+      </div>
+
+      <div class="field">
+        <label for="guestEmail">Return Address for the Invitation</label>
+        <input type="email" id="guestEmail" name="guestEmail" required autocomplete="email" placeholder="you@example.com">
+      </div>
+
+      <div class="field">
+        <label id="honorificLabel">Honorific</label>
+        <div class="honorific-group" role="radiogroup" aria-labelledby="honorificLabel">
+          <div class="honorific-opt">
+            <input type="radio" id="hon-mr" name="honorific" value="Mr." checked>
+            <label for="hon-mr">Mr.</label>
+          </div>
+          <div class="honorific-opt">
+            <input type="radio" id="hon-ms" name="honorific" value="Ms.">
+            <label for="hon-ms">Ms.</label>
+          </div>
+          <div class="honorific-opt">
+            <input type="radio" id="hon-mx" name="honorific" value="Mx.">
+            <label for="hon-mx">Mx.</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="guestMessage">Special Requests or Dietary Preferences</label>
+        <textarea id="guestMessage" name="guestMessage" placeholder="Tell the chef what's on your mind — a project, an opportunity, or just a hello."></textarea>
+      </div>
+
+      <div class="submit-row">
+        <button type="submit" class="lighter-btn">
+          Place Your Order
+          <svg class="flame-tip" viewBox="0 0 16 22" aria-hidden="true">
+            <path d="M8 0 C4 6 2 9 2 13 C2 18 5 21 8 21 C11 21 14 18 14 13 C14 9 12 6 8 0 Z" fill="url(#flameGrad)"/>
+            <defs>
+              <linearGradient id="flameGrad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#ffe9a8"/>
+                <stop offset="45%" stop-color="#ff9a3d"/>
+                <stop offset="100%" stop-color="#ff4d1f"/>
+              </linearGradient>
+            </defs>
+          </svg>
+        </button>
+        <span class="submit-note">Sent straight to the kitchen — no mail app required.</span>
+      </div>
+
+      <div class="confirmation" id="confirmationBox">
+        <span class="icon"></span>
+        <span class="text"></span>
+      </div>
+    </form>
+
+    <div class="card menu-card">
+      <p class="menu-title">Prix Fixe — Ways to Reach Me</p>
+      <p class="menu-sub">Chef's Selection · Subject to Change</p>
+
+      <div class="menu-course">
+        <p class="course-label">Appetizers — Player Profiles</p>
+        <a class="course-item" href="https://steamcommunity.com/profiles/76561199134932687/" target="_blank" rel="noopener">Steam<span class="dots"></span><span class="tag">Add me</span></a>
+        <a class="course-item" href="https://dev.epicgames.com/community/profile/b0Wl4/PCE_05" target="_blank" rel="noopener">Epic Games<span class="dots"></span><span class="tag">PCE_05</span></a>
+        <p class="course-item course-item-static">Ubisoft Connect<span class="dots"></span><span class="tag">PC_ENTHUSIAST</span></p>
+        <p class="course-item course-item-static">PSN<span class="dots"></span><span class="tag">pce_05</span></p>
+        <a class="course-item" href="https://account.xbox.com/en-us/profile?gamertag=PCE05" target="_blank" rel="noopener">Xbox<span class="dots"></span><span class="tag">PCE05</span></a>
+        <a class="course-item" href="https://discord.gg/hPXx6Qku" target="_blank" rel="noopener">Discord<span class="dots"></span><span class="tag">pc_enthutiast_05</span></a>
+      </div>
+
+      <div class="menu-course">
+        <p class="course-label">Soup Course — Socials &amp; Media</p>
+        <a class="course-item" href="https://github.com/devadarshan5" target="_blank" rel="noopener">GitHub<span class="dots"></span><span class="tag">@devadarshan5</span></a>
+        <a class="course-item" href="https://www.linkedin.com/in/deva-darshan-r-k-07b3b8298" target="_blank" rel="noopener">LinkedIn<span class="dots"></span><span class="tag">Connect</span></a>
+        <a class="course-item" href="https://www.reddit.com/user/PC_ENTHUTIAST_05/" target="_blank" rel="noopener">Reddit<span class="dots"></span><span class="tag">Follow</span></a>
+        <a class="course-item" href="https://www.twitch.tv/pce_05" target="_blank" rel="noopener">Twitch<span class="dots"></span><span class="tag">Follow</span></a>
+        <a class="course-item" href="https://open.spotify.com/user/31tnelwxcmhjdgjsnc7hu3ww3u2i" target="_blank" rel="noopener">Spotify<span class="dots"></span><span class="tag">Follow</span></a>
+        <a class="course-item" href="https://bsky.app/profile/pc-enthutiast-05.bsky.social" target="_blank" rel="noopener">Bluesky<span class="dots"></span><span class="tag">Follow</span></a>
+        <a class="course-item" href="https://www.youtube.com/@pce_05" target="_blank" rel="noopener">YouTube<span class="dots"></span><span class="tag">Subscribe</span></a>
+        <a class="course-item" href="https://x.com/PC_ENTHUTIAST05" target="_blank" rel="noopener">X<span class="dots"></span><span class="tag">Follow</span></a>
+      </div>
+
+      <div class="menu-course">
+        <p class="course-label">Main Course — Direct Contact</p>
+        <a class="course-item" href="mailto:ericjones@outlook.com.ar">Email<span class="dots"></span><span class="tag">Direct Line</span></a>
+      </div>
+
+      <div class="menu-course">
+        <p class="course-label">Dessert — A Little Something Extra</p>
+        <a class="course-item" href="#" id="secretMenuLink">Chef's Secret Menu<span class="dots"></span><span class="tag">Psst.</span></a>
+      </div>
+    </div>
+
+    <div class="desk-footer">
+      Compliments to the Chef are always welcome.
+      <button class="all-blue-spark" id="allBlueSpark" aria-label="A secret sparkle"></button>
+    </div>
+
+  </div>
+</div>
+
+<!-- ==================== ALL BLUE MODAL ==================== -->
+<div class="modal-backdrop" id="allBlueModal">
+  <div class="modal">
+    <button class="modal-close" id="modalCloseBtn" aria-label="Close">&times;</button>
+    <h3>The All Blue</h3>
+    <p>A sea where every ocean's best comes together in one place. As close as this portfolio gets to it — everything I've built, gathered on one page.</p>
+    <a class="go" href="Zoro.html">See the Projects Page →</a>
+  </div>
+</div>
+
+<script>
+(function(){
+"use strict";
+const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* ---- lightweight sound engine (shared pattern) ---- */
+const SoundEngine = (function(){
+  let ctx=null, masterGain=null;
+  function ensureCtx(){
+    if (ctx) return;
+    ctx = new (window.AudioContext||window.webkitAudioContext)();
+    masterGain = ctx.createGain();
+    masterGain.gain.value = 0.35;
+    masterGain.connect(ctx.destination);
+  }
+  function playTick(){
+    ensureCtx();
+    if (ctx.state==='suspended') ctx.resume();
+    const o=ctx.createOscillator(), g=ctx.createGain();
+    o.type='triangle'; o.frequency.value=440;
+    g.gain.value=0.0001;
+    o.connect(g); g.connect(masterGain);
+    const t=ctx.currentTime;
+    g.gain.exponentialRampToValueAtTime(0.3,t+0.01);
+    g.gain.exponentialRampToValueAtTime(0.0001,t+0.2);
+    o.start(t); o.stop(t+0.22);
+  }
+  return { playTick };
+})();
+
+/* ---- sparkle burst at exact pixel coordinates ---- */
+function burstSparkleAt(x, y){
+  const glyphs = ['&#10022;','&#10023;','&#10039;'];
+  for (let i=0;i<10;i++){
+    const s = document.createElement('span');
+    s.className = 'sparkle';
+    s.innerHTML = glyphs[Math.floor(Math.random()*glyphs.length)];
+    const angle = Math.random()*Math.PI*2, dist = 40+Math.random()*60;
+    s.style.setProperty('--sx', Math.cos(angle)*dist+'px');
+    s.style.setProperty('--sy', Math.sin(angle)*dist+'px');
+    s.style.left = x+'px'; s.style.top = y+'px';
+    s.style.fontSize = (14+Math.random()*10)+'px';
+    document.body.appendChild(s);
+    setTimeout(()=> s.remove(), 950);
+  }
+}
+
+/* ---- entrance + generic exit transition (ink blot) ---- */
+function gsapFreeScale(elements, from, to, duration, done){
+  const start = performance.now();
+  elements.forEach(el=> el.style.transform = `translate(-50%,-50%) scale(${from})`);
+  function step(now){
+    const p = Math.min(1, (now-start)/duration);
+    const eased = 1 - Math.pow(1-p, 3);
+    const val = from + (to-from)*eased;
+    elements.forEach(el=> el.style.transform = `translate(-50%,-50%) scale(${val})`);
+    if (p<1) requestAnimationFrame(step); else if (done) done();
+  }
+  requestAnimationFrame(step);
+}
+function playEntranceTransition(){
+  const blots = document.querySelectorAll('.pt-blot');
+  gsapFreeScale(blots, 1, 0, reduceMotion ? 150 : 700, ()=>{ document.getElementById('pageTransition').style.pointerEvents='none'; });
+}
+playEntranceTransition();
+function playExitTransition(x, y, href){
+  const overlay = document.getElementById('pageTransition');
+  const blots = overlay.querySelectorAll('.pt-blot');
+  blots.forEach(b=>{ b.style.left = x+'px'; b.style.top = y+'px'; });
+  overlay.style.pointerEvents = 'auto';
+  gsapFreeScale(blots, 0, 1, reduceMotion ? 150 : 850, ()=>{ window.location.href = href; });
+}
+
+/* ---- petal screen-fill wipes (shared engine) ---- */
+function playPetalWipe(emoji, colorA, colorB, done){
+  const wipe = document.getElementById('sakuraWipe');
+  wipe.style.background = `radial-gradient(circle at 50% 50%, ${colorA}, ${colorB})`;
+  wipe.innerHTML = '';
+  wipe.classList.add('is-active');
+  const count = reduceMotion ? 0 : 46;
+  for (let i=0;i<count;i++){
+    const p = document.createElement('span');
+    p.className = 'wipe-petal';
+    p.textContent = Array.isArray(emoji) ? emoji[Math.floor(Math.random()*emoji.length)] : emoji;
+    p.style.left = (Math.random()*100) + 'vw';
+    p.style.top  = (Math.random()*100) + 'vh';
+    p.style.fontSize = (22 + Math.random()*30) + 'px';
+    const rot = Math.random()*360;
+    wipe.appendChild(p);
+    setTimeout(()=>{
+      p.classList.add('is-in');
+      p.style.transform = `scale(1.15) rotate(${rot}deg)`;
+    }, Math.random() * (reduceMotion ? 0 : 260));
+  }
+  setTimeout(()=>{ if (done) done(); }, reduceMotion ? 80 : 650);
+}
+function playSakuraWipe(done){ playPetalWipe('\u{1F338}', '#ffd6ef', '#ff9ad5', done); }
+function playTangerineWipe(done){ playPetalWipe('\u{1F34A}', '#ffe0b0', '#ff9a3c', done); }
+function playMusicWipe(done){ playPetalWipe('\u{1F3B5}', '#2a1a3a', '#000000', done); }
+function playThunderWipe(done){ playPetalWipe('\u{26A1}', '#1a3a1a', '#000000', done); }
+function playColaWipe(done){ playPetalWipe('\u{1F964}', '#d98a2b', '#c41e3a', done); }
+function playLieWipe(done){ playPetalWipe('\u{1F925}', '#f3e3bd', '#b5502e', done); }
+function playJinbeiWipe(done){ playPetalWipe(['\u{1F40B}','\u{1F988}','\u{1F30A}','\u{1F44A}','\u{2600}\u{FE0F}','\u{1F458}'], '#bfe9ff', '#04121c', done); }
+
+/* ---- character loading screens ----
+   NOTE: caption/icon filenames for "franky" are a best guess — Franky.html
+   itself never defines them (it excludes itself from its own list), so
+   double-check these against whatever you used in Brook/Chopper/Robin's
+   LOADING_SCREENS.franky entry and make them match exactly.
+---- */
+const LOADING_SCREENS = {
+  nami: {
+    images: ['Nami_Page/loading1.png','Nami_Page/loading2.jpg','Nami_Page/loading3.jpeg'],
+    icons:  ['Icons/berry.png','Icons/tangerine.png'],
+    caption: "Charting a course to Nami's Route\u2026",
+    href: 'Nami.html',
+    transition: 'tangerine',
+    audio: 'Nami_Page/loading-sound.mp3'
+  },
+  robin: {
+    images: ['Robin_Page/loading1.jpg','Robin_Page/loading2.jpg','Robin_Page/loading3.jpg','Robin_Page/loading4.jpg','Robin_Page/loading5.jpg'],
+    icons:  ['Icons/berry.png','Icons/tangerine.png'],
+    caption: "Uncovering the record\u2026",
+    href: 'Robin.html',
+    transition: 'sakura',
+    audio: 'Robin_Page/loading-sound.mp3'
+  },
+  chopper: {
+    images: ['Chopper_Page/loading1.jpg','Chopper_Page/loading2.jpg','Chopper_Page/loading3.jpg'],
+    icons:  ['Icons/berry.png','Icons/tangerine.png'],
+    caption: "Following the sakura trail\u2026",
+    href: 'Chopper.html',
+    transition: 'sakura',
+    audio: 'Chopper_Page/loading-sound.mp3'
+  },
+  luffy: {
+    images: ['Luffy_Page/loading1.jpg','Luffy_Page/loading2.png','Luffy_Page/loading3.jpg','Luffy_Page/loading4.png','Luffy_Page/loading5.png','Luffy_Page/loading6.jpeg','Luffy_Page/loading7.jpeg','Luffy_Page/loading8.jpg'],
+    icons:  ['Icons/meat.png','Icons/pizza.png'],
+    caption: "Setting course for the Captain\u2026",
+    href: 'Luffy.html',
+    audio: 'Luffy_Page/loading-sound.mp3'
+  },
+  brook: {
+    images: ['Brook_Page/loading1.jpg','Brook_Page/loading2.jpg','Brook_Page/loading3.jpg','Brook_Page/loading4.jpg','Brook_Page/loading5.jpg'],
+    icons:  ['Icons/note1.png','Icons/note2.png','Icons/note3.png'],
+    caption: "Yohohoho\u2026 tuning in to the Soul King\u2026",
+    href: 'Brook.html',
+    transition: 'music',
+    audio: 'Brook_Page/loading-sound.mp3'
+  },
+  zoro: {
+    images: ['Zoro_Page/loading1.jpg','Zoro_Page/loading2.jpg','Zoro_Page/loading3.jpeg'],
+    icons:  ['Icons/rum.png','Icons/sleep.png','Icons/enma.png','Icons/kitetsu.png','Icons/wado.png'],
+    caption: "One wrong turn from Wano\u2026",
+    href: 'Zoro.html',
+    transition: 'thunder',
+    audio: 'Zoro_Page/loading-sound.mp3'
+  },
+  franky: {
+    images: ['Franky_Page/loading1.jpg','Franky_Page/loading2.jpg','Franky_Page/loading3.jpg','Franky_Page/loading4.jpg','Franky_Page/loading5.jpg'],
+    icons:  ['Icons/cola.png'],
+    caption: "Heading to the workshop\u2026",
+    href: 'Franky.html',
+    transition: 'cola',
+    audio: 'Franky_Page/loading-sound.mp3'
+  },
+  usopp: {
+    images: ['Usopp_Page/loading1.jpg','Usopp_Page/loading2.jpg','Usopp_Page/loading3.jpeg','Usopp_Page/loading4.jpg','Usopp_Page/loading5.jpg'],
+    icons:  ['Icons/impact.png','Icons/slingshot.png','Icons/hammer.png'],
+    caption: "Spinning up the next legend\u2026",
+    href: 'Usopp.html',
+    transition: 'lie',
+    audio: 'Usopp_Page/loading-sound.mp3'
+  },
+  jinbei: {
+    images: ['Jinbei_Page/loading1.jpg','Jinbei_Page/loading2.png','Jinbei_Page/loading3.jpg'],
+    icons:  ['Icons/wave.png','Icons/drop.png','Icons/punch.png','Icons/rum.png'],
+    caption: "Diving into open water with the Helmsman\u2026",
+    href: 'Jinbei.html',
+    transition: 'jinbei',
+    audio: 'Jinbei_Page/loading-sound.mp3'
+  }
+};
+  
+
+function spawnRainIcon(container, icons){
+  const el=document.createElement('div');
+  el.className='rain-icon';
+  const size = 26+Math.random()*30;
+  el.style.width=size+'px'; el.style.height=size+'px';
+  el.style.left=(Math.random()*100)+'vw';
+  const duration = 2.4+Math.random()*1.8;
+  const rot = (Math.random()*80-40);
+  el.style.transition=`transform ${duration}s linear, opacity .3s ease`;
+  const img=document.createElement('img');
+  img.src = icons[Math.floor(Math.random()*icons.length)];
+  el.appendChild(img);
+  container.appendChild(el);
+  requestAnimationFrame(()=>{ el.style.transform = `translateY(115vh) rotate(${rot}deg)`; });
+  el.addEventListener('click', (e)=>{
+    e.stopPropagation();
+    burstSparkleAt(e.clientX, e.clientY);
+    el.style.opacity='0';
+    setTimeout(()=>el.remove(),300);
+  });
+  setTimeout(()=>{ if (el.parentNode) el.remove(); }, duration*1000+200);
+}
+
+function playCharLoadingScreen(key){
+  const config = LOADING_SCREENS[key];
+  if (!config) return;
+
+  let audioDone = false;
+  let fallbackTimer = null;
+  let rainInterval = null;
+
+  function finish(){
+    if (fallbackTimer) clearTimeout(fallbackTimer);
+    if (rainInterval) clearInterval(rainInterval);
+    window.location.href = config.href;
+  }
+
+  if (config.audio){
+    const sound = new Audio(config.audio);
+    fallbackTimer = setTimeout(()=>{ if(!audioDone){ audioDone=true; finish(); } }, 6000);
+    sound.addEventListener('ended', ()=>{ if(audioDone) return; audioDone=true; finish(); });
+    sound.addEventListener('error', ()=>{ if(audioDone) return; audioDone=true; finish(); });
+    sound.play().catch(()=>{ if(audioDone) return; audioDone=true; finish(); });
+  }
+
+  function reveal(){
+    const overlay   = document.getElementById('charLoading');
+    const img       = document.getElementById('charLoadingImg');
+    const rainLayer = document.getElementById('rainLayer');
+    const caption   = document.getElementById('charLoadingCaption');
+    img.src = config.images[Math.floor(Math.random()*config.images.length)];
+    img.classList.remove('is-shown');
+    caption.textContent = config.caption;
+    overlay.classList.add('is-active');
+    requestAnimationFrame(()=> img.classList.add('is-shown'));
+    rainInterval = setInterval(()=> spawnRainIcon(rainLayer, config.icons), 180);
+    setTimeout(()=>{
+      const wipe = document.getElementById('sakuraWipe');
+      if (wipe) wipe.classList.remove('is-active');
+    }, 400);
+    if (!config.audio){
+      setTimeout(finish, 2600);
+    }
+  }
+
+  if (config.transition === 'sakura'){
+    playSakuraWipe(reveal);
+  } else if (config.transition === 'tangerine'){
+    playTangerineWipe(reveal);
+  } else if (config.transition === 'cola'){
+    playColaWipe(reveal);
+  } else if (config.transition === 'music'){
+    playMusicWipe(reveal);
+  } else if (config.transition === 'thunder'){
+    playThunderWipe(reveal);
+  } else if (config.transition === 'lie'){
+    playLieWipe(reveal);
+  } else if (config.transition === 'jinbei'){
+    playJinbeiWipe(reveal);
+  } else {
+    reveal();
+  }
+}
+
+/* ---- wire up the crew links ---- */
+document.querySelectorAll('.crew-link').forEach(a=>{
+  a.addEventListener('click', function(e){
+    e.preventDefault();
+    const href = this.getAttribute('href');
+    const rect = this.getBoundingClientRect();
+    const cx = rect.left + rect.width/2;
+    const cy = rect.top + rect.height/2;
+    SoundEngine.playTick();
+    if (this.dataset.loading){
+      playCharLoadingScreen(this.dataset.loading);
+    } else {
+      playExitTransition(cx, cy, href);
+    }
+  });
+});
+
+/* ---- crew drawer ---- */
+const digTrigger = document.getElementById('digTrigger');
+const crewDrawer = document.getElementById('crewDrawer');
+const crewClose  = document.getElementById('crewClose');
+digTrigger.addEventListener('click', ()=> crewDrawer.classList.add('is-open'));
+crewClose.addEventListener('click', ()=> crewDrawer.classList.remove('is-open'));
+crewDrawer.addEventListener('click', (e)=>{ if (e.target === crewDrawer) crewDrawer.classList.remove('is-open'); });
+
+/* shake the bell once the page is scrolled near the bottom, nudging toward the crew nav */
+window.addEventListener('scroll', ()=>{
+  const nearBottom = (window.innerHeight + window.scrollY) >= (document.body.offsetHeight - 40);
+  digTrigger.classList.toggle('is-shaking', nearBottom && !reduceMotion);
+}, { passive: true });
+
+/* ================================================================
+   SANJI-SPECIFIC: reservation form, honorifics, All Blue easter egg
+   ================================================================ */
+/* ---- EmailJS config ----
+   Sign up free at emailjs.com, add an email service + template, then
+   fill in the three IDs below. Until they're filled in, the form
+   falls back to the old mailto behavior so it still works.
+---- */
+const EMAILJS_PUBLIC_KEY  = 'chLY_lp8es0D5R4g5';
+const EMAILJS_SERVICE_ID  = 'service_rb7avt4';
+const EMAILJS_TEMPLATE_ID = 'template_2g92gl9';
+const EMAILJS_CONFIGURED = ![EMAILJS_PUBLIC_KEY, EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID].some(v => v.startsWith('YOUR_'));
+if (EMAILJS_CONFIGURED && window.emailjs){
+  emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
+}
+
+const form = document.getElementById('reservationForm');
+const confirmationBox = document.getElementById('confirmationBox');
+const lighterBtn = form.querySelector('.lighter-btn');
+
+form.addEventListener('submit', function(e){
+  e.preventDefault();
+
+  const name = document.getElementById('guestName').value.trim();
+  const email = document.getElementById('guestEmail').value.trim();
+  const honorific = form.querySelector('input[name="honorific"]:checked').value;
+  const message = document.getElementById('guestMessage').value.trim();
+
+  function showResult(kind, name, honorific){
+    const iconEl = confirmationBox.querySelector('.icon');
+    const textEl = confirmationBox.querySelector('.text');
+    confirmationBox.classList.remove('show');
+    void confirmationBox.offsetWidth;
+
+    if (kind === 'missing'){
+      iconEl.textContent = '⚠';
+      iconEl.className = 'icon';
+      textEl.textContent = 'The chef needs at least your name and return address before the order can go out.';
+    } else if (kind === 'error'){
+      iconEl.textContent = '⚠';
+      iconEl.className = 'icon';
+      textEl.textContent = `Something spilled in the kitchen and the order didn't go through. Try again, or reach me directly at the email below.`;
+    } else if (honorific === 'Ms.'){
+      iconEl.textContent = '♥';
+      iconEl.className = 'icon heart';
+      textEl.textContent = `Your table is set, ${name}. The Love-Cook himself will be delighted to hear from you.`;
+    } else {
+      iconEl.textContent = '✓';
+      iconEl.className = 'icon stamp';
+      textEl.textContent = `Reservation confirmed, ${honorific} ${name}. Service, service, still more service.`;
+    }
+    confirmationBox.classList.add('show');
+  }
+
+  if(!name || !email){
+    showResult('missing');
+    return;
+  }
+
+  if (EMAILJS_CONFIGURED && window.emailjs){
+    lighterBtn.disabled = true;
+    const originalText = lighterBtn.firstChild.textContent;
+    lighterBtn.firstChild.textContent = 'Sending\u2026 ';
+
+    emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+      guest_name: name,
+      guest_honorific: honorific,
+      guest_email: email,
+      guest_message: message || '(none given)'
+    }).then(function(){
+      lighterBtn.disabled = false;
+      lighterBtn.firstChild.textContent = originalText;
+      form.reset();
+      showResult('success', name, honorific);
+    }).catch(function(err){
+      lighterBtn.disabled = false;
+      lighterBtn.firstChild.textContent = originalText;
+      showResult('error');
+      console.error('EmailJS send failed:', err);
+    });
+  } else {
+    // Fallback: EmailJS not configured yet, use mailto so the form still works.
+    const subject = encodeURIComponent(`Reservation Request — ${honorific} ${name}`);
+    const bodyLines = [
+      `Guest Name: ${honorific} ${name}`,
+      `Return Address: ${email}`,
+      '',
+      'Special Requests or Dietary Preferences:',
+      message || '(none given)'
+    ];
+    const body = encodeURIComponent(bodyLines.join('\n'));
+    window.location.href = `mailto:ericjones@outlook.com.ar?subject=${subject}&body=${body}`;
+    showResult('success', name, honorific);
+  }
+});
+
+document.getElementById('secretMenuLink').addEventListener('click', function(e){
+  e.preventDefault();
+  openAllBlueModal();
+});
+
+const allBlueModal = document.getElementById('allBlueModal');
+function openAllBlueModal(){ allBlueModal.classList.add('show'); }
+function closeAllBlueModal(){ allBlueModal.classList.remove('show'); }
+document.getElementById('allBlueSpark').addEventListener('click', openAllBlueModal);
+document.getElementById('modalCloseBtn').addEventListener('click', closeAllBlueModal);
+allBlueModal.addEventListener('click', function(e){ if(e.target === allBlueModal) closeAllBlueModal(); });
+
+document.addEventListener('keydown', function(e){
+  if(e.key === 'Escape'){
+    crewDrawer.classList.remove('is-open');
+    closeAllBlueModal();
+  }
+});
+
+})();
+</script>
+</body>
+</html>
