@@ -91,24 +91,30 @@
     transition:opacity .5s;
   }
   @media (max-width:680px){
-    html,body{ overflow-y:auto; }
-    .hero{ height:100svh; min-height:100vh; }
-    .logo{ top:18px; }
+    html,body{ height:auto; min-height:100%; overflow-y:auto; overflow-x:hidden; }
+    .hero{
+      height:auto; min-height:100vh; min-height:100svh;
+      overflow:visible; display:flex; flex-direction:column;
+      padding-top:100px; padding-bottom:24px;
+    }
+    .hero-canvas{ position:fixed; }
+    .content{ position:relative; inset:auto; flex:1; display:flex; flex-direction:column; }
+    .logo{ position:fixed; top:18px; }
     .logo .op{font-size:32px;} .logo .tag{font-size:10px; letter-spacing:0.25em;}
     .left{
-      left:16px; right:16px; bottom:auto; top:110px; width:auto;
-      gap:10px; max-width:none;
+      position:relative; left:auto; right:auto; bottom:auto; top:auto;
+      width:auto; margin:0 16px 28px; gap:10px; max-width:none;
     }
     .right{
-      left:16px; right:16px; top:auto; bottom:16px; transform:none;
-      width:auto; text-align:left; align-items:flex-start; gap:8px;
+      position:relative; left:auto; right:auto; top:auto; bottom:auto; transform:none;
+      width:auto; margin:0 16px; text-align:left; align-items:flex-start; gap:8px;
     }
     .title{font-size:34px;} .right .title{font-size:26px;} .desc{font-size:13px; line-height:1.45;}
     .btn{font-size:13px; padding:10px 16px;}
     .hint{ display:none; }
   }
   @media (max-width:680px) and (orientation:landscape){
-    .left{ top:78px; }
+    .hero{ padding-top:70px; }
     .logo{ top:8px; }
     .logo .op{font-size:24px;} .logo .tag{font-size:9px;}
     .title{font-size:24px;} .right .title{font-size:19px;}
@@ -158,6 +164,7 @@
 
 @media (max-width:680px){
   .crew-reveal{
+    position:fixed;
     width:92vw; max-width:92vw;
     height:80vh; max-height:80vh;
     display:grid;
