@@ -7,6 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Rye&family=Patrick+Hand&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
+<link rel="icon" type="image/png" href="Usopp_Page/favicon.png">
 
 <style>
 /* =======================================================================
@@ -337,10 +338,11 @@ body.is-sogeking .mask-toggle{ filter: drop-shadow(0 0 22px var(--gold-bright));
   width:54px; height:54px; border-radius:50%;
   background: var(--canvas); border: 2px solid var(--rust);
   display:flex; align-items:center; justify-content:center;
-  font-size:22px; cursor:pointer;
+  cursor:pointer; overflow:hidden;
   box-shadow: 0 4px 0 var(--shadow);
   transition: transform .25s ease;
 }
+.dig-trigger img{ width:60%; height:60%; object-fit:contain; }
 .dig-trigger:hover{ transform: scale(1.08) rotate(-6deg); }
 
 .dig-trigger.is-shaking{ animation: nudge-shake .5s ease-in-out infinite; }
@@ -421,7 +423,7 @@ body.is-sogeking .mask-toggle{ filter: drop-shadow(0 0 22px var(--gold-bright));
 <div class="transform-flash" id="transformFlash"></div>
 
 <!-- ==================== CREW TRIGGER ==================== -->
-<div class="dig-trigger" id="digTrigger" title="The rest of the crew">&#128067;</div>
+<div class="dig-trigger" id="digTrigger" title="The rest of the crew"><img src="Usopp_Page/nose.png" alt="Usopp's nose"></div>
 <div class="crew-drawer" id="crewDrawer">
   <div class="crew-panel">
     <div class="crew-panel-head">

@@ -7,6 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bungee&family=Share+Tech+Mono&family=Barlow:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<link rel="icon" type="image/png" href="Franky_Page/favicon.png">
 
 <style>
 /* =======================================================================
@@ -183,6 +184,155 @@ html{ scrollbar-color: var(--neon) var(--steel-dark); scrollbar-width: thin; }
 .belt-crate .bc-icon{ font-size:24px; }
 .belt-crate .bc-name{ font-family: var(--font-display); font-size:11px; color:#fff8ec; margin-top:8px; }
 @keyframes belt-scroll{ 0%{ transform:translateX(0); } 100%{ transform:translateX(-50%); } }
+
+/* =======================================================================
+   HEAVY TRANSPORT & MODIFICATION GARAGE
+   ======================================================================= */
+.garage-bay{
+  display:grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap:18px;
+  margin-bottom:50px;
+}
+.garage-ticket{
+  background: linear-gradient(160deg, #23282e 0%, #171b1f 100%);
+  border: 2px solid var(--steel-light); border-radius:8px;
+  padding:16px 18px; cursor:pointer;
+  box-shadow: 0 10px 20px var(--shadow);
+  transition: border-color .25s ease;
+}
+.garage-ticket:hover{ border-color: var(--neon); }
+.gt-head{ display:flex; align-items:center; gap:8px; margin-bottom:10px; }
+.gt-status{ width:9px; height:9px; border-radius:50%; flex-shrink:0; box-shadow:0 0 6px currentColor; }
+.gt-status--fixed{ background:#3ecf6a; color:#3ecf6a; }
+.gt-status--workaround{ background: var(--cola-amber); color: var(--cola-amber); }
+.gt-code{ font-family: var(--font-mono); font-size:10px; letter-spacing:.15em; color: var(--blueprint-ln); text-transform:uppercase; }
+.gt-arrow{ margin-left:auto; font-size:11px; color: var(--steel-light); transition: transform .3s ease; }
+.garage-ticket.is-open .gt-arrow{ transform: rotate(180deg); color: var(--neon); }
+.gt-vehicle{ font-family: var(--font-display); font-size:15px; color: var(--chrome); margin-bottom:4px; }
+.gt-fault{ font-family: var(--font-mono); font-size:11px; color: var(--neon); line-height:1.5; }
+.gt-detail{ max-height:0; overflow:hidden; transition: max-height .4s ease; }
+.garage-ticket.is-open .gt-detail{ max-height:420px; }
+.gt-row{ margin-top:10px; padding-top:10px; border-top:1px dashed rgba(126,200,227,.25); }
+.gt-label{ font-family: var(--font-mono); font-size:9px; letter-spacing:.15em; text-transform:uppercase; color: var(--blueprint-ln); }
+.gt-row p{ font-size:12.5px; color: rgba(223,232,238,.85); line-height:1.55; margin-top:4px; }
+.gt-row code, .ce-output code{
+  font-family: var(--font-mono); font-size:11px; color: var(--neon);
+  background: rgba(255,122,26,.1); padding:1px 5px; border-radius:3px; word-break:break-word;
+}
+
+/* =======================================================================
+   THE CONTROL CONSOLE (SYSTEM SCRIPTS)
+   ======================================================================= */
+.console-wrap{
+  background:#0c0f12; border: 3px solid var(--steel-dark); border-radius:10px;
+  overflow:hidden; margin-bottom:50px; box-shadow: 0 16px 34px var(--shadow);
+}
+.console-bar{ display:flex; align-items:center; gap:7px; padding:10px 14px; background: var(--steel-dark); }
+.console-dot{ width:10px; height:10px; border-radius:50%; }
+.cd-red{ background:#e0524a; } .cd-amber{ background: var(--cola-amber); } .cd-green{ background:#3ecf6a; }
+.console-title{ font-family: var(--font-mono); font-size:11px; color: var(--steel-light); margin-left:8px; }
+.console-body{ padding:6px 0; }
+.console-entry{ border-bottom:1px solid rgba(126,200,227,.08); cursor:pointer; }
+.console-entry:last-child{ border-bottom:none; }
+.ce-prompt{ display:flex; align-items:flex-start; gap:10px; padding:14px 18px; font-family: var(--font-mono); font-size:12.5px; color:#8fd9a8; }
+.ce-cmd-wrap{ flex:1; word-break:break-word; }
+.ce-cmd{ color: var(--chrome); }
+.ce-arrow{ flex-shrink:0; margin-top:2px; font-size:11px; color: var(--steel-light); transition: transform .3s ease; }
+.console-entry.is-open .ce-arrow{ transform: rotate(180deg); color: var(--neon); }
+.ce-output{ max-height:0; overflow:hidden; transition: max-height .4s ease; padding:0 18px; }
+.console-entry.is-open .ce-output{ max-height:320px; padding-bottom:16px; }
+.ce-output p{ font-family: var(--font-body); font-size:12.5px; color: rgba(223,232,238,.8); line-height:1.6; margin-top:6px; }
+.ce-output strong{ display:block; color: var(--blueprint-ln); font-family: var(--font-mono); font-size:10px; letter-spacing:.1em; text-transform:uppercase; }
+
+/* =======================================================================
+   THE BLUEPRINT BAY (RIG SCHEMATIC)
+   ======================================================================= */
+.blueprint-bay{
+  position:relative; background: linear-gradient(180deg, var(--blue-deep) 0%, #0a1a2c 100%);
+  border: 3px solid var(--blueprint-ln); border-radius:10px;
+  padding: 34px 20px; margin-bottom:50px; overflow:hidden;
+  box-shadow: 0 16px 34px var(--shadow), inset 0 0 50px rgba(126,200,227,.08);
+}
+.blueprint-bay::before{
+  content:''; position:absolute; inset:0;
+  background: repeating-linear-gradient(0deg, rgba(126,200,227,.08) 0 1px, transparent 1px 26px),
+              repeating-linear-gradient(90deg, rgba(126,200,227,.08) 0 1px, transparent 1px 26px);
+  pointer-events:none;
+}
+.schematic-frame{ position:relative; max-width:420px; margin:0 auto; aspect-ratio: 4/3; z-index:1; }
+.schematic-frame svg{ width:100%; height:100%; display:block; }
+.schematic-frame svg .rig-line{ fill:none; stroke: var(--blueprint-ln); stroke-width:2; opacity:.8; }
+.hotspot{
+  position:absolute; width:18px; height:18px; margin:-9px 0 0 -9px;
+  border-radius:50%; background: var(--neon); border:2px solid var(--chrome);
+  cursor:pointer; animation: hotspot-pulse 2.2s ease-out infinite;
+}
+.hotspot.is-active{ background: var(--cola-red); }
+@keyframes hotspot-pulse{
+  0%{ box-shadow: 0 0 0 0 rgba(255,122,26,.55); }
+  70%{ box-shadow: 0 0 0 12px rgba(255,122,26,0); }
+  100%{ box-shadow: 0 0 0 0 rgba(255,122,26,0); }
+}
+.bp-readout{
+  position:relative; z-index:1; max-width:420px; margin:22px auto 0;
+  background: var(--steel-dark); border: 2px solid var(--blueprint-ln); border-radius:8px;
+  padding:14px 18px; min-height:64px; text-align:center;
+}
+.bp-readout .bp-label{ font-family: var(--font-mono); font-size:10px; letter-spacing:.2em; text-transform:uppercase; color: var(--neon); }
+.bp-readout .bp-value{ font-family: var(--font-display); font-size:16px; color: var(--chrome); margin-top:4px; }
+.bp-hint{ position:relative; z-index:1; font-family: var(--font-mono); font-size:11px; color: var(--blueprint-ln); text-align:center; margin-top:10px; opacity:.75; }
+
+/* =======================================================================
+   THE TROPHY RACK (CERTIFICATIONS)
+   ======================================================================= */
+.trophy-rack{
+  display:grid; grid-template-columns: repeat(auto-fit, minmax(160px,1fr)); gap:18px;
+  margin-bottom:50px;
+}
+.trophy-card{ perspective:900px; height:150px; cursor:pointer; }
+.trophy-card-inner{ position:relative; width:100%; height:100%; transform-style:preserve-3d; transition: transform .6s cubic-bezier(.3,1.1,.3,1); }
+.trophy-card.is-flipped .trophy-card-inner{ transform: rotateY(180deg); }
+.trophy-face{ position:absolute; inset:0; backface-visibility:hidden; border-radius:8px; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:14px; }
+.trophy-front{
+  background: linear-gradient(160deg, var(--cola-amber) 0%, #8a5518 100%);
+  border: 2px solid #5c3a10; box-shadow: 0 8px 16px rgba(0,0,0,.4);
+}
+.trophy-icon{ font-size:32px; margin-bottom:8px; }
+.trophy-name{ font-family: var(--font-display); font-size:13px; color:#fff8ec; line-height:1.3; }
+.trophy-back{ background: var(--blueprint); border: 2px solid var(--blueprint-ln); transform: rotateY(180deg); }
+.trophy-tag{ font-family: var(--font-mono); font-size:9px; letter-spacing:.12em; color: var(--blueprint-ln); text-transform:uppercase; }
+.trophy-date{ font-family: var(--font-display); font-size:14px; color: var(--chrome); margin-top:6px; }
+.trophy-note{ font-family: var(--font-mono); font-size:10px; color: rgba(223,232,238,.75); margin-top:6px; line-height:1.5; }
+
+/* =======================================================================
+   DEN DEN MUSHI RELAY (SUBNET CALCULATOR)
+   ======================================================================= */
+.denden-wrap{
+  background: linear-gradient(160deg, #2a3038 0%, #171b1f 100%);
+  border: 3px solid var(--steel-light); border-radius: 50px 50px 12px 12px;
+  padding: 34px 26px 26px; margin-bottom:50px; position:relative;
+  box-shadow: 0 16px 34px var(--shadow);
+}
+.denden-wrap::before{
+  content:''; position:absolute; top:-16px; left:50%; transform:translateX(-50%);
+  width:10px; height:22px; background: var(--steel-light); border-radius:4px;
+}
+.denden-title{ text-align:center; font-family: var(--font-mono); font-size:11px; letter-spacing:.2em; text-transform:uppercase; color: var(--blueprint-ln); margin-bottom:16px; }
+.denden-row{ display:flex; gap:10px; flex-wrap:wrap; justify-content:center; margin-bottom:12px; }
+.denden-input{
+  font-family: var(--font-mono); font-size:14px; background: var(--ink); color: var(--chrome);
+  border: 2px solid var(--steel-light); border-radius:6px; padding:10px 14px; width:220px; outline:none;
+}
+.denden-input:focus{ border-color: var(--neon); }
+.denden-btn{
+  font-family: var(--font-display); font-size:12px; letter-spacing:.05em; color: var(--ink);
+  background: var(--neon); border:none; border-radius:6px; padding:0 20px; cursor:pointer;
+}
+.denden-btn:hover{ filter:brightness(1.1); }
+.denden-error{ text-align:center; font-family: var(--font-mono); font-size:12px; color: var(--cola-red); min-height:18px; margin-bottom:8px; }
+.denden-readout{ display:grid; grid-template-columns: repeat(auto-fit, minmax(160px,1fr)); gap:12px; }
+.dd-cell{ background: var(--steel-dark); border:1px solid rgba(126,200,227,.25); border-radius:6px; padding:10px 12px; }
+.dd-cell .dd-label{ font-family: var(--font-mono); font-size:9px; letter-spacing:.15em; text-transform:uppercase; color: var(--blueprint-ln); }
+.dd-cell .dd-value{ font-family: var(--font-mono); font-size:13px; color: var(--chrome); margin-top:4px; word-break:break-word; }
 
 /* =======================================================================
    COLA GAUGE + SUPER MOMENT
@@ -408,6 +558,213 @@ html{ scrollbar-color: var(--neon) var(--steel-dark); scrollbar-width: thin; }
     </div>
   </div>
 
+<!-- ==================== THE BLUEPRINT BAY ==================== -->
+<div class="section-head">
+  <h2>The Blueprint Bay</h2>
+  <p>the rig itself, schematic view &mdash; click a pin</p>
+</div>
+<div class="blueprint-bay">
+  <div class="schematic-frame">
+    <svg viewBox="0 0 200 150" xmlns="http://www.w3.org/2000/svg">
+      <rect class="rig-line" x="30" y="14" width="140" height="86" rx="4"/>
+      <rect class="rig-line" x="38" y="22" width="124" height="70" rx="2"/>
+      <path class="rig-line" d="M20 100 L180 100 L170 116 L30 116 Z"/>
+      <rect class="rig-line" x="10" y="116" width="180" height="8" rx="3"/>
+    </svg>
+    <div class="hotspot" style="top:34%; left:50%;" data-label="The Chassis" data-value="Dual-boot laptop, doing double duty as gaming rig and workshop"></div>
+    <div class="hotspot" style="top:72%; left:26%;" data-label="Graphics" data-value="4GB VRAM &mdash; punches above its weight, especially on the Bazzite side"></div>
+    <div class="hotspot" style="top:72%; left:74%;" data-label="Memory" data-value="16GB RAM &mdash; enough headroom for a browser, a terminal, and whatever's compiling"></div>
+    <div class="hotspot" style="top:78%; left:50%;" data-label="Operating Systems" data-value="Windows 11 Pro + Bazzite, dual-booted through rEFInd"></div>
+  </div>
+  <div class="bp-readout" id="bpReadout">
+    <div class="bp-label">Standby</div>
+    <div class="bp-value">Click a pin on the schematic</div>
+  </div>
+  <div class="bp-hint">peripherals: ROG Strix Impact II mouse &middot; 8BitDo Ultimate 2C controller</div>
+</div>
+
+<!-- ==================== THE TROPHY RACK ==================== -->
+<div class="section-head">
+  <h2>The Trophy Rack</h2>
+  <p>certifications mounted and dated &mdash; click to flip</p>
+</div>
+<div class="trophy-rack">
+  <div class="trophy-card" data-trophy><div class="trophy-card-inner">
+    <div class="trophy-face trophy-front"><div class="trophy-icon">&#127942;</div><div class="trophy-name">CompTIA A+ Core 1</div></div>
+    <div class="trophy-face trophy-back"><span class="trophy-tag">220-1101</span><div class="trophy-date">Jun 12, 2025</div><p class="trophy-note">First exam sat, after an earlier agreement with Insightz Technology ended.</p></div>
+  </div></div>
+  <div class="trophy-card" data-trophy><div class="trophy-card-inner">
+    <div class="trophy-face trophy-front"><div class="trophy-icon">&#127942;</div><div class="trophy-name">CompTIA A+ Core 2</div></div>
+    <div class="trophy-face trophy-back"><span class="trophy-tag">220-1102</span><div class="trophy-date">Sep 17, 2025</div><p class="trophy-note">Second core, completing the A+ pair.</p></div>
+  </div></div>
+  <div class="trophy-card" data-trophy><div class="trophy-card-inner">
+    <div class="trophy-face trophy-front"><div class="trophy-icon">&#127942;</div><div class="trophy-name">CompTIA Network+</div></div>
+    <div class="trophy-face trophy-back"><span class="trophy-tag">N10-009</span><div class="trophy-date">Mar 8, 2026</div><p class="trophy-note">Completed after being rehired as a Security Analyst at Insightz Technology.</p></div>
+  </div></div>
+</div>
+
+<!-- ==================== DEN DEN MUSHI RELAY ==================== -->
+<div class="section-head">
+  <h2>Den Den Mushi Relay</h2>
+  <p>subnet calculator &mdash; punch in an address</p>
+</div>
+<div class="denden-wrap">
+  <div class="denden-title">&#128044; transponder snail &mdash; subnetting console</div>
+  <div class="denden-row">
+    <input type="text" class="denden-input" id="ddInput" placeholder="e.g. 192.168.1.10/24">
+    <button class="denden-btn" id="ddCalc">Calculate</button>
+  </div>
+  <div class="denden-error" id="ddError"></div>
+  <div class="denden-readout" id="ddReadout">
+    <div class="dd-cell"><div class="dd-label">Network Address</div><div class="dd-value" id="ddNetwork">&mdash;</div></div>
+    <div class="dd-cell"><div class="dd-label">Broadcast Address</div><div class="dd-value" id="ddBroadcast">&mdash;</div></div>
+    <div class="dd-cell"><div class="dd-label">Subnet Mask</div><div class="dd-value" id="ddMask">&mdash;</div></div>
+    <div class="dd-cell"><div class="dd-label">Usable Host Range</div><div class="dd-value" id="ddRange">&mdash;</div></div>
+    <div class="dd-cell"><div class="dd-label">Usable Hosts</div><div class="dd-value" id="ddHosts">&mdash;</div></div>
+  </div>
+</div>
+
+  <!-- ==================== HEAVY TRANSPORT & MODIFICATION GARAGE ==================== -->
+  <div class="section-head">
+    <h2>Heavy Transport &amp; Modification Garage</h2>
+    <p>vehicle bay diagnostic tickets &mdash; click one to pop the hood</p>
+  </div>
+  <div class="garage-bay">
+    <div class="garage-ticket" data-ticket>
+      <div class="gt-head">
+        <span class="gt-status gt-status--fixed"></span>
+        <span class="gt-code">Ticket #FH4-014</span>
+        <span class="gt-arrow">&#9662;</span>
+      </div>
+      <div class="gt-vehicle">Forza Horizon 4</div>
+      <div class="gt-fault">Fault: system-wide freeze, every 5&ndash;10s, only during a drive</div>
+      <div class="gt-detail">
+        <div class="gt-row"><span class="gt-label">Diagnosis</span><p>A faulty ASUS VBIOS update was dropping CPU and GPU power to ~20W in short bursts &mdash; not a game bug, a power-delivery bug wearing one.</p></div>
+        <div class="gt-row"><span class="gt-label">Fix</span><p>Clean Windows reinstall with that VBIOS update skipped entirely. Kept a backup VBIOS (GA107.rom) on hand in case a rollback's ever needed.</p></div>
+        <div class="gt-row"><span class="gt-label">Tools</span><p>Fresh Windows install, VBIOS backup/flash</p></div>
+      </div>
+    </div>
+
+    <div class="garage-ticket" data-ticket>
+      <div class="gt-head">
+        <span class="gt-status gt-status--fixed"></span>
+        <span class="gt-code">Ticket #FH4-021</span>
+        <span class="gt-arrow">&#9662;</span>
+      </div>
+      <div class="gt-vehicle">Forza Horizon 4</div>
+      <div class="gt-fault">Fault: "Unable to connect to Live configuration servers"</div>
+      <div class="gt-detail">
+        <div class="gt-row"><span class="gt-label">Diagnosis</span><p>Stale, corrupted Xbox Live auth tokens sitting in Windows Credential Manager &mdash; the network path was fine, the handshake wasn't.</p></div>
+        <div class="gt-row"><span class="gt-label">Fix</span><p>Closed FH4, Steam, Xbox App and Microsoft Store, then cleared every Xbox-related credential so it re-authenticated clean.</p></div>
+        <div class="gt-row"><span class="gt-label">Tools</span><p>Windows Credential Manager</p></div>
+      </div>
+    </div>
+
+    <div class="garage-ticket" data-ticket>
+      <div class="gt-head">
+        <span class="gt-status gt-status--fixed"></span>
+        <span class="gt-code">Ticket #FH6-006</span>
+        <span class="gt-arrow">&#9662;</span>
+      </div>
+      <div class="gt-vehicle">Forza Horizon 6</div>
+      <div class="gt-fault">Fault: instant crash the moment "Drive" is selected</div>
+      <div class="gt-detail">
+        <div class="gt-row"><span class="gt-label">Diagnosis</span><p>The active Proton build couldn't keep up with this title's descriptor-heap handling under VKD3D.</p></div>
+        <div class="gt-row"><span class="gt-label">Fix</span><p>Switched to proton-cachyos-11.0-20260520-slr-x86_64 and added launch options: <code>PROTON_VKD3D_HEAP=1 VKD3D_CONFIG=enable_experimental_features,descriptor_heap %command%</code></p></div>
+        <div class="gt-row"><span class="gt-label">Tools</span><p>Steam compatibility settings</p></div>
+      </div>
+    </div>
+
+    <div class="garage-ticket" data-ticket>
+      <div class="gt-head">
+        <span class="gt-status gt-status--fixed"></span>
+        <span class="gt-code">Ticket #AC-011</span>
+        <span class="gt-arrow">&#9662;</span>
+      </div>
+      <div class="gt-vehicle">Assetto Corsa</div>
+      <div class="gt-fault">Fault: won't launch, or launches into graphical corruption</div>
+      <div class="gt-detail">
+        <div class="gt-row"><span class="gt-label">Diagnosis</span><p>Vulkan-to-DX11 translation choking under Proton on this particular setup.</p></div>
+        <div class="gt-row"><span class="gt-label">Fix</span><p>Switched to GE-Proton; when it still crashed, added <code>PROTON_USE_WINED3D=1 %command%</code> to the launch options.</p></div>
+        <div class="gt-row"><span class="gt-label">Tools</span><p>Steam compatibility settings, trial launches</p></div>
+      </div>
+    </div>
+
+    <div class="garage-ticket" data-ticket>
+      <div class="gt-head">
+        <span class="gt-status gt-status--workaround"></span>
+        <span class="gt-code">Ticket #ACC-004</span>
+        <span class="gt-arrow">&#9662;</span>
+      </div>
+      <div class="gt-vehicle">Assetto Corsa Competizione</div>
+      <div class="gt-fault">Fault: same launch instability, different remedy needed</div>
+      <div class="gt-detail">
+        <div class="gt-row"><span class="gt-label">Diagnosis</span><p>Vulkan/DX11 translation again &mdash; this time it's the sync model tripping things up.</p></div>
+        <div class="gt-row"><span class="gt-label">Fix</span><p>GE-Proton plus <code>PROTON_NO_ESYNC=1 PROTON_NO_FSYNC=1 %command%</code> to stabilize the sync model.</p></div>
+        <div class="gt-row"><span class="gt-label">Tools</span><p>Steam compatibility settings</p></div>
+      </div>
+    </div>
+
+    <div class="garage-ticket" data-ticket>
+      <div class="gt-head">
+        <span class="gt-status gt-status--fixed"></span>
+        <span class="gt-code">Ticket #WD-002</span>
+        <span class="gt-arrow">&#9662;</span>
+      </div>
+      <div class="gt-vehicle">Watch Dogs</div>
+      <div class="gt-fault">Fault: doesn't open at all when Play is clicked</div>
+      <div class="gt-detail">
+        <div class="gt-row"><span class="gt-label">Diagnosis</span><p>Ubisoft Connect never got installed inside the Proton prefix in the first place.</p></div>
+        <div class="gt-row"><span class="gt-label">Fix</span><p>Forced it through with the Proton Hotfix runtime.</p></div>
+        <div class="gt-row"><span class="gt-label">Tools</span><p>Steam compatibility settings</p></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== THE CONTROL CONSOLE ==================== -->
+  <div class="section-head">
+    <h2>The Control Console</h2>
+    <p>system scripts &amp; automation &mdash; click a line to run it back</p>
+  </div>
+  <div class="console-wrap">
+    <div class="console-bar">
+      <span class="console-dot cd-red"></span><span class="console-dot cd-amber"></span><span class="console-dot cd-green"></span>
+      <span class="console-title">admin@workshop &mdash; PowerShell</span>
+    </div>
+    <div class="console-body">
+      <div class="console-entry" data-entry>
+        <div class="ce-prompt">
+          <span class="ce-cmd-wrap">PS C:\&gt; <span class="ce-cmd">.\DG_Readiness_Tool_v3.6.ps1</span></span>
+          <span class="ce-arrow">&#9662;</span>
+        </div>
+        <div class="ce-output">
+          <p><strong>Issue</strong>VMware couldn't get hold of VT-x &mdash; Windows had it locked up running Device Guard and Virtualization-Based Security in the background, and VT-x only serves one master at a time.</p>
+          <p><strong>Fix</strong>Ran the DG Readiness script elevated, confirmed disabling Device Guard/VBS, restarted &mdash; VT-x freed up for VMware.</p>
+        </div>
+      </div>
+      <div class="console-entry" data-entry>
+        <div class="ce-prompt">
+          <span class="ce-cmd-wrap">PS C:\&gt; <span class="ce-cmd">net stop wuauserv; net stop bits; net stop cryptsvc; net stop trustedinstaller</span></span>
+          <span class="ce-arrow">&#9662;</span>
+        </div>
+        <div class="ce-output">
+          <p><strong>Issue</strong>Update KB5065426 kept failing mid-install because the services it depends on weren't in a clean state.</p>
+          <p><strong>Fix</strong>Stopped wuauserv, bits, cryptsvc and trustedinstaller; renamed the SoftwareDistribution and catroot2 folders so Windows would rebuild them fresh; restarted the same services. Update installed clean after.</p>
+        </div>
+      </div>
+      <div class="console-entry" data-entry>
+        <div class="ce-prompt">
+          <span class="ce-cmd-wrap">PS C:\&gt; <span class="ce-cmd">reg add "HKLM\System\CurrentControlSet\Control\TimeZoneInformation" /v RealTimeIsUniversal /d 1 /t REG_DWORD /f</span></span>
+          <span class="ce-arrow">&#9662;</span>
+        </div>
+        <div class="ce-output">
+          <p><strong>Issue</strong>Every swap between Windows and Bazzite threw the system clock off &mdash; the Linux side wrote the hardware clock in UTC, Windows expected local time, and each boot re-fought the other for it.</p>
+          <p><strong>Fix</strong>Told Windows to treat the hardware clock as UTC too, ending the tug-of-war (the Bazzite side got a matching flag via <code>timedatectl</code>).</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- ==================== ASSEMBLY CONVEYOR ==================== -->
   <div class="section-head">
     <h2>The Assembly Line</h2>
@@ -423,14 +780,15 @@ html{ scrollbar-color: var(--neon) var(--steel-dark); scrollbar-width: thin; }
       <div class="belt-crate"><div class="bc-icon">&#128444;&#65039;</div><div class="bc-name">Canvas API</div></div>
       <div class="belt-crate"><div class="bc-icon">&#128333;</div><div class="bc-name">Google Fonts</div></div>
       <div class="belt-crate"><div class="bc-icon">&#9971;&#65039;</div><div class="bc-name">SVG</div></div>
+      <div class="belt-crate"><div class="bc-icon">&#128230;</div><div class="bc-name">Three.js</div></div>
     </div>
   </div>
 
   <!-- ==================== FINALE ==================== -->
   <section class="finale">
     <span class="eyebrow">That's The Whole Shop</span>
-    <h1 class="title" style="font-size:clamp(26px,4.4vw,42px);">MORE UPGRADES LATER</h1>
-    <p class="sub">The rest of the site is still under construction.</p>
+  <h1 class="title" style="font-size:clamp(26px,4.4vw,42px);">EVERYTHING HERE WORKS</h1>
+  <p class="sub">Tools, rig, certs, garage, console, the whole assembly line — all bolted on and running. More gets welded in whenever there's more to show.</p>
   </section>
 
 </div>
@@ -781,6 +1139,74 @@ pegCards.forEach(card=>{
       colaFromClicks = Math.min(40, colaFromClicks + CLICK_STEP);
       updateColaGauge();
     }
+  });
+});
+
+/* ---- blueprint bay hotspots ---- */
+const bpReadout = document.getElementById('bpReadout');
+document.querySelectorAll('.hotspot').forEach(h=>{
+  h.addEventListener('click', function(){
+    document.querySelectorAll('.hotspot').forEach(o=>o.classList.remove('is-active'));
+    this.classList.add('is-active');
+    bpReadout.querySelector('.bp-label').textContent = this.dataset.label;
+    bpReadout.querySelector('.bp-value').innerHTML = this.dataset.value;
+    SoundEngine.playTick();
+  });
+});
+
+/* ---- trophy rack flip cards ---- */
+document.querySelectorAll('[data-trophy]').forEach(card=>{
+  card.addEventListener('click', function(){
+    this.classList.toggle('is-flipped');
+    SoundEngine.playTick();
+  });
+});
+
+/* ---- den den mushi relay: subnet calculator ---- */
+function ipToInt(ip){
+  const parts = ip.split('.').map(Number);
+  if (parts.length !== 4 || parts.some(p=>isNaN(p) || p<0 || p>255)) return null;
+  return ((parts[0]<<24) | (parts[1]<<16) | (parts[2]<<8) | parts[3]) >>> 0;
+}
+function intToIp(int){
+  return [(int>>>24)&255, (int>>>16)&255, (int>>>8)&255, int&255].join('.');
+}
+function calcSubnet(){
+  const ddError = document.getElementById('ddError');
+  const raw = document.getElementById('ddInput').value.trim();
+  ddError.textContent = '';
+  const match = raw.match(/^(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})\/(\d{1,2})$/);
+  if (!match){ ddError.textContent = 'Format: 192.168.1.10/24'; return; }
+  const ip = ipToInt(match[1]);
+  const cidr = parseInt(match[2], 10);
+  if (ip === null || cidr < 0 || cidr > 32){ ddError.textContent = 'Invalid address or prefix.'; return; }
+  const maskInt = cidr === 0 ? 0 : (0xFFFFFFFF << (32 - cidr)) >>> 0;
+  const network = (ip & maskInt) >>> 0;
+  const broadcast = (network | (~maskInt >>> 0)) >>> 0;
+  const totalHosts = cidr >= 31 ? 0 : Math.pow(2, 32 - cidr) - 2;
+  document.getElementById('ddNetwork').textContent = intToIp(network);
+  document.getElementById('ddBroadcast').textContent = intToIp(broadcast);
+  document.getElementById('ddMask').textContent = intToIp(maskInt);
+  document.getElementById('ddRange').textContent = totalHosts > 0 ? `${intToIp(network+1)} - ${intToIp(broadcast-1)}` : 'n/a';
+  document.getElementById('ddHosts').textContent = totalHosts > 0 ? totalHosts.toLocaleString() : (cidr===32 ? '1 (host route)' : '0');
+  SoundEngine.playTick();
+}
+document.getElementById('ddCalc').addEventListener('click', calcSubnet);
+document.getElementById('ddInput').addEventListener('keydown', (e)=>{ if(e.key==='Enter') calcSubnet(); });
+
+/* ---- garage tickets (heavy transport & modification garage) ---- */
+document.querySelectorAll('.garage-ticket').forEach(t=>{
+  t.addEventListener('click', function(){
+    this.classList.toggle('is-open');
+    SoundEngine.playTick();
+  });
+});
+
+/* ---- control console entries ---- */
+document.querySelectorAll('.console-entry').forEach(e=>{
+  e.addEventListener('click', function(){
+    this.classList.toggle('is-open');
+    SoundEngine.playTick();
   });
 });
 

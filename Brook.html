@@ -7,6 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,wght@0,600;1,500&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Special+Elite&display=swap" rel="stylesheet">
+<link rel="icon" type="image/png" href="Brook_Page/favicon.png">
 
 <style>
 /* =======================================================================
@@ -137,23 +138,22 @@ body.is-rave .title{ color: var(--rave-pink); text-shadow: 0 0 30px var(--rave-p
   position:relative; height:150px; display:flex; align-items:flex-end; justify-content:center;
   margin-top:6px; cursor:pointer;
 }
-.skeleton-figure{ font-size:64px; position:relative; z-index:2; }
+.skeleton-figure{ width:90px; height:auto; position:relative; z-index:2; transition: opacity .5s ease; }
 .soul-double{
-  position:absolute; bottom:0; font-size:64px;
-  color: #8fd9ff; opacity:0; filter: blur(1px);
+  position:absolute; bottom:0; width:90px; height:auto; z-index:3;
+  opacity:0; filter: blur(1px) drop-shadow(0 0 12px #8fd9ff) drop-shadow(0 0 24px #8fd9ff);
   transition: opacity .5s ease, transform 1.4s ease;
   pointer-events:none;
 }
-.ghost-stage:hover .soul-double{ opacity:.55; transform: translateY(-38px) scale(1.08); }
+.ghost-stage:hover .skeleton-figure{ opacity:.45; }
+.ghost-stage:hover .soul-double{ opacity:1; transform: translateY(-38px) scale(1.08); }
 
 /* ---- mirror gag ---- */
 .mirror-frame{
   width:90px; height:120px; margin:6px auto 0;
-  background: linear-gradient(160deg, #d8d8e0, #9098a8);
-  border: 4px solid var(--gold); border-radius: 50% 50% 8px 8px;
-  cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:28px;
-  box-shadow: 0 8px 16px rgba(0,0,0,.5);
+  cursor:pointer; display:flex; align-items:center; justify-content:center;
 }
+.mirror-frame img{ width:100%; height:100%; object-fit:cover; }
 .slap-note{
   margin-top:10px; min-height:24px; text-align:center;
   font-family: var(--font-body); font-style:italic; font-size:14px; color: var(--gold-bright);
@@ -458,8 +458,8 @@ body.is-rave .title{ color: var(--rave-pink); text-shadow: 0 0 30px var(--rave-p
       <h3>The Soul Steps Out</h3>
       <p class="desc">Hover over him. It's what happens when you've already died once — the soul gets a little restless.</p>
       <div class="ghost-stage">
-        <span class="soul-double">&#128123;</span>
-        <span class="skeleton-figure">&#128128;</span>
+        <img class="soul-double" src="Brook_Page/ghost.png" alt="">
+        <img class="skeleton-figure" src="Brook_Page/brook.png" alt="Brook">
       </div>
     </div>
 
@@ -467,7 +467,7 @@ body.is-rave .title{ color: var(--rave-pink); text-shadow: 0 0 30px var(--rave-p
     <div class="card">
       <h3>The Mirror</h3>
       <p class="desc">Every stage has a dressing-room mirror. This one has consequences.</p>
-      <div class="mirror-frame" id="mirrorBtn">&#128069;</div>
+      <div class="mirror-frame" id="mirrorBtn"><img src="Brook_Page/mirror.png" alt="Mirror"></div>
       <div class="slap-note" id="slapNote"></div>
     </div>
 
@@ -618,9 +618,9 @@ body.is-rave .title{ color: var(--rave-pink); text-shadow: 0 0 30px var(--rave-p
 
   <!-- ==================== FINALE ==================== -->
   <section class="finale">
-    <span class="eyebrow">End of Phase One</span>
-    <h1 class="title" style="font-size:clamp(24px,4vw,38px);">More Encores Later</h1>
-    <p class="sub">The skull instrument, the rhythm game, and the rest of the set are still being rehearsed.</p>
+    <span class="eyebrow">Final Bow</span>
+    <h1 class="title" style="font-size:clamp(24px,4vw,38px);">THE WHOLE SET'S LIVE</h1>
+    <p class="sub">Bone jokes, ghost tricks, the skull instrument, Tone-Deaf Simon Says, Bink's Sake, and a fight with the Soul King himself &mdash; every number's been played. Yohohoho!</p>
   </section>
 
 </div>
@@ -1382,6 +1382,13 @@ jokeBtn.addEventListener('click', ()=>{
   SoundEngine.playTick();
 });
 
+/* ---- ghost projection audio ---- */
+const ghostStage = document.querySelector('.ghost-stage');
+ghostStage.addEventListener('mouseenter', ()=>{
+  const ghostSound = new Audio('Brook_Page/ghost.mp3');
+  ghostSound.play().catch(()=>{});
+});
+
 /* ---- mirror gag ---- */
 const mirrorBtn = document.getElementById('mirrorBtn');
 const slapNote = document.getElementById('slapNote');
@@ -1390,12 +1397,17 @@ mirrorBtn.addEventListener('click', ()=>{
   if (mirrorBusy) return;
   mirrorBusy = true;
   slapNote.textContent = 'Can I see your\u2026';
-  setTimeout(()=>{
+  const mirrorSound = new Audio('Brook_Page/mirror.mp3');
+  const triggerSlap = ()=>{
     slapNote.innerHTML = '<span class="slap-flash">&#128077; SLAP! &mdash; worth it. Yohohoho!</span>';
     burstSparkleAt(mirrorBtn.getBoundingClientRect().left+45, mirrorBtn.getBoundingClientRect().top+60);
     SoundEngine.playTick();
     mirrorBusy = false;
-  }, 650);
+  };
+  mirrorSound.addEventListener('ended', triggerSlap);
+  mirrorSound.play().catch(()=>{
+    setTimeout(triggerSlap, 650);
+  });
 });
 
 /* ---- concert ticket generator ---- */
