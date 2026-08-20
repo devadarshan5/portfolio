@@ -1,53 +1,265 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta http-equiv="refresh" content="5; url=Luffy.html">
-  <title>Redirecting...</title>
-  <script>
-    setTimeout(() => {
-      window.location.replace("Luffy.html");
-    }, 5000);
-  </script>
- <style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Straw Hat Log | Devadarshan R K</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bangers&family=Bebas+Neue&family=Luckiest+Guy&family=Cormorant+Garamond:ital@1&display=swap" rel="stylesheet">
+<link rel="icon" type="image/png" href="Luffy_Page/favicon.png">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html,body { background:#04060c; height:100%; }
   body {
-    font-family: system-ui, sans-serif;
-    background: #000;
-    color: #fff;
-    max-width: 600px;
-    margin: 5rem auto;
-    padding: 0 1.5rem;
-    line-height: 1.6;
-    text-align: center;
+    font-family:'Cormorant Garamond',Georgia,serif; overflow-x:hidden;
+    min-height:100svh; display:flex; align-items:center; justify-content:center;
+    position:relative; padding:32px 20px;
+  }
+  img { max-width:100%; display:block; }
+
+  /* ambient grain, matches the rest of the site */
+  .grain{position:fixed;inset:-50%;width:200%;height:200%;z-index:0;pointer-events:none;opacity:.05;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)'/%3E%3C/svg%3E");
+    animation:grain 8s steps(10) infinite;}
+  @keyframes grain{0%,100%{transform:translate(0,0)}20%{transform:translate(-5%,-6%)}40%{transform:translate(4%,-4%)}60%{transform:translate(-4%,6%)}80%{transform:translate(6%,3%)}}
+
+  .glow{
+    position:fixed; inset:0; z-index:0; pointer-events:none;
+    background:radial-gradient(ellipse at 50% 38%, rgba(244,196,48,.14), transparent 55%),
+               radial-gradient(ellipse at 50% 90%, rgba(192,0,26,.12), transparent 60%);
   }
 
-  h1 {
-    margin-bottom: 0.5rem;
+  .wrap{ position:relative; z-index:2; display:flex; flex-direction:column; align-items:center; gap:28px; text-align:center; opacity:0; transform:translateY(18px); }
+
+  .logo .op{
+    font-family:'Luckiest Guy', cursive; font-size:64px; line-height:0.9;
+    letter-spacing:0.02em; text-transform:uppercase; color:#F7D446;
+    -webkit-text-stroke:3px #0a1a3a;
+    text-shadow:0 4px 0 #b3001a, 0 6px 0 #0a1a3a, 0 0 28px rgba(244,196,48,0.45);
+  }
+  .logo .tag{
+    margin-top:6px; font-family:'Bebas Neue',sans-serif; font-size:13px;
+    letter-spacing:0.5em; color:#fff; text-shadow:0 0 8px rgba(0,0,0,0.8); padding-left:0.5em;
   }
 
-  p {
-    color: #ccc;
+  .poster-frame{
+    width:200px; filter:drop-shadow(0 18px 40px rgba(0,0,0,.6));
+    animation:float 4.5s ease-in-out infinite;
+  }
+  @keyframes float{ 0%,100%{ transform:translateY(0) rotate(-2deg); } 50%{ transform:translateY(-10px) rotate(2deg); } }
+
+  .headline{
+    font-family:'Bangers', cursive; font-size:44px; color:#fff; text-transform:uppercase;
+    letter-spacing:0.02em; text-shadow:3px 3px 0 #b3001a, 0 0 20px rgba(192,0,26,0.4);
+  }
+  .sub{
+    font-style:italic; font-size:18px; line-height:1.6; color:rgba(255,255,255,0.75);
+    max-width:420px;
   }
 
-  a {
-    color: #4da3ff;
+  .enter-btn{
+    display:inline-flex; align-items:center; gap:10px;
+    font-family:'Bebas Neue',sans-serif; font-size:17px; letter-spacing:0.3em; text-transform:uppercase;
+    color:#04060c; background:#F4C430; border:none; border-radius:2px;
+    padding:16px 34px; cursor:pointer; text-decoration:none;
+    box-shadow:0 10px 26px rgba(244,196,48,.35);
+    transition:transform .2s ease, box-shadow .2s ease, background .2s ease;
   }
+  .enter-btn:hover{ transform:translateY(-3px); background:#ffd75c; box-shadow:0 16px 34px rgba(244,196,48,.5); }
+  .enter-btn:active{ transform:translateY(0); }
+  .enter-btn svg{ width:16px; height:16px; transition:transform .2s ease; }
+  .enter-btn:hover svg{ transform:translateX(4px); }
 
-  a:hover {
-    color: #80bfff;
+  .crew-row{ display:flex; gap:10px; flex-wrap:wrap; justify-content:center; max-width:520px; margin-top:6px; }
+  .crew-row a{ width:44px; height:44px; border-radius:50%; overflow:hidden; border:2px solid rgba(244,196,48,.4); transition:transform .2s ease, border-color .2s ease; }
+  .crew-row a img{ width:100%; height:100%; object-fit:cover; }
+  .crew-row a:hover{ transform:translateY(-4px) scale(1.08); border-color:#F4C430; }
+
+  .guide-btn{
+    display:inline-flex; align-items:center; gap:8px;
+    font-family:'Bebas Neue',sans-serif; font-size:13px; letter-spacing:0.25em; text-transform:uppercase;
+    color:rgba(255,255,255,.7); background:transparent; border:1.5px solid rgba(255,255,255,.25);
+    border-radius:999px; padding:10px 20px; cursor:pointer;
+    transition:border-color .2s ease, color .2s ease, background .2s ease;
+  }
+  .guide-btn:hover{ border-color:#F4C430; color:#F4C430; background:rgba(244,196,48,.08); }
+  .guide-btn svg{ width:14px; height:14px; }
+
+  .guide-overlay{
+    position:fixed; inset:0; z-index:50; display:flex; align-items:center; justify-content:center;
+    background:rgba(2,3,6,.78); backdrop-filter:blur(4px);
+    opacity:0; pointer-events:none; transition:opacity .25s ease; padding:24px;
+  }
+  .guide-overlay.is-open{ opacity:1; pointer-events:auto; }
+  .guide-panel{
+    width:100%; max-width:560px; max-height:80vh; overflow-y:auto;
+    background:#0b0e18; border:1px solid rgba(244,196,48,.3); border-radius:8px;
+    box-shadow:0 30px 80px rgba(0,0,0,.6); padding:28px 24px;
+    transform:translateY(16px); transition:transform .25s ease;
+  }
+  .guide-overlay.is-open .guide-panel{ transform:translateY(0); }
+  .guide-head{ display:flex; align-items:flex-start; justify-content:space-between; gap:16px; margin-bottom:6px; }
+  .guide-head h2{
+    font-family:'Bangers',cursive; font-size:26px; color:#F4C430; text-transform:uppercase; letter-spacing:0.02em;
+  }
+  .guide-close{
+    background:none; border:none; color:rgba(255,255,255,.5); font-size:22px; line-height:1; cursor:pointer;
+    padding:4px; transition:color .2s ease;
+  }
+  .guide-close:hover{ color:#fff; }
+  .guide-intro{ font-style:italic; color:rgba(255,255,255,.65); font-size:15px; margin-bottom:20px; }
+  .guide-list{ display:flex; flex-direction:column; gap:10px; }
+  .guide-row{
+    display:flex; align-items:center; gap:14px; padding:10px; border-radius:6px;
+    background:rgba(255,255,255,.03); border:1px solid rgba(255,255,255,.06);
+    text-decoration:none; transition:background .2s ease, border-color .2s ease;
+  }
+  .guide-row:hover{ background:rgba(244,196,48,.08); border-color:rgba(244,196,48,.3); }
+  .guide-row img{ width:40px; height:40px; border-radius:50%; object-fit:cover; border:1.5px solid rgba(244,196,48,.4); flex-shrink:0; }
+  .guide-row .g-text{ flex:1; min-width:0; }
+  .guide-row .g-role{
+    font-family:'Bebas Neue',sans-serif; font-size:11px; letter-spacing:0.15em; text-transform:uppercase; color:#F4C430;
+  }
+  .guide-row .g-name{ font-size:16px; color:#fff; line-height:1.3; }
+  .guide-row .g-desc{ font-size:13px; font-style:italic; color:rgba(255,255,255,.6); margin-top:2px; }
+  .guide-row .g-arrow{ color:rgba(255,255,255,.35); font-size:18px; flex-shrink:0; }
+  .guide-row:hover .g-arrow{ color:#F4C430; }
+
+  .signature{ margin-top:8px; font-family:'Bebas Neue',sans-serif; font-size:11px; letter-spacing:0.3em; color:rgba(255,255,255,0.35); text-transform:uppercase; }
+
+  @media (max-width:520px){
+    .logo .op{ font-size:44px; }
+    .headline{ font-size:32px; }
+    .poster-frame{ width:160px; }
   }
 </style>
 </head>
 <body>
-  <h1>Project in Progress</h1>
-  <p>
-    This page is a temporary placeholder while the project is being completed.
-    You'll be redirected to the current version in a few seconds.
-  </p>
+  <div class="grain"></div>
+  <div class="glow"></div>
 
-  <p>
-    If the redirect doesn't happen automatically,
-    <a href="Luffy.html">click here</a>.
-  </p>
+  <main class="wrap" id="wrap">
+    <div class="logo">
+      <div class="op">Straw Hat Log</div>
+      <div class="tag">A One Piece Fan Portfolio</div>
+    </div>
+
+    <img class="poster-frame" src="Wanted_Posters/luffy_wanted_poster.jpg" alt="Monkey D. Luffy wanted poster">
+
+    <h1 class="headline">The Log Is Open</h1>
+    <p class="sub">Follow the Straw Hat crew's journey, one bounty and one gear at a time. Set sail whenever you're ready.</p>
+
+    <a class="enter-btn" href="Luffy.html">
+      Set Sail
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+    </a>
+
+    <button type="button" class="guide-btn" id="guideOpenBtn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 2-3 4"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+      New Here? Start This Way
+    </button>
+
+    <div class="signature">Devadarshan R K</div>
+  </main>
+
+  <div class="guide-overlay" id="guideOverlay">
+    <div class="guide-panel" role="dialog" aria-modal="true" aria-labelledby="guideTitle">
+      <div class="guide-head">
+        <h2 id="guideTitle">Not A One Piece Fan?</h2>
+        <button type="button" class="guide-close" id="guideCloseBtn" aria-label="Close">&times;</button>
+      </div>
+      <p class="guide-intro">Every page here is themed after a Straw Hat, but each one is really a normal part of a portfolio. Here's what's actually behind each poster.</p>
+      <div class="guide-list">
+        <a class="guide-row" href="Luffy.html">
+          <img src="Luffy_Page/favicon.png" alt="Luffy">
+          <div class="g-text"><div class="g-role">Home</div><div class="g-name">Luffy</div><div class="g-desc">The landing page &mdash; starts here, always.</div></div>
+          <span class="g-arrow">&rarr;</span>
+        </a>
+        <a class="guide-row" href="Zoro.html">
+          <img src="Zoro_Page/favicon.png" alt="Zoro">
+          <div class="g-text"><div class="g-role">Projects</div><div class="g-name">Zoro</div><div class="g-desc">A grid of built projects and case studies.</div></div>
+          <span class="g-arrow">&rarr;</span>
+        </a>
+        <a class="guide-row" href="Nami.html">
+          <img src="Nami_Page/favicon.png" alt="Nami">
+          <div class="g-text"><div class="g-role">Skills</div><div class="g-name">Nami</div><div class="g-desc">A roadmap of skills, laid out like a voyage route.</div></div>
+          <span class="g-arrow">&rarr;</span>
+        </a>
+        <a class="guide-row" href="Sanji.html">
+          <img src="Sanji_Page/favicon.png" alt="Sanji">
+          <div class="g-text"><div class="g-role">Contact</div><div class="g-name">Sanji</div><div class="g-desc">A real contact form &mdash; get in touch here.</div></div>
+          <span class="g-arrow">&rarr;</span>
+        </a>
+        <a class="guide-row" href="Chopper.html">
+          <img src="Chopper_Page/favicon.png" alt="Chopper">
+          <div class="g-text"><div class="g-role">Now / Blog</div><div class="g-name">Chopper</div><div class="g-desc">A running log of what's being worked on lately.</div></div>
+          <span class="g-arrow">&rarr;</span>
+        </a>
+        <a class="guide-row" href="Robin.html">
+          <img src="Robin_Page/favicon.png" alt="Robin">
+          <div class="g-text"><div class="g-role">History</div><div class="g-name">Robin</div><div class="g-desc">Education and background, dug up like ruins.</div></div>
+          <span class="g-arrow">&rarr;</span>
+        </a>
+        <a class="guide-row" href="Franky.html">
+          <img src="Franky_Page/favicon.png" alt="Franky">
+          <div class="g-text"><div class="g-role">Tools</div><div class="g-name">Franky</div><div class="g-desc">The tools, hardware, and builds used day to day.</div></div>
+          <span class="g-arrow">&rarr;</span>
+        </a>
+        <a class="guide-row" href="Brook.html">
+          <img src="Brook_Page/favicon.png" alt="Brook">
+          <div class="g-text"><div class="g-role">Hobbies</div><div class="g-name">Brook</div><div class="g-desc">Music and hobbies outside of work.</div></div>
+          <span class="g-arrow">&rarr;</span>
+        </a>
+        <a class="guide-row" href="Usopp.html">
+          <img src="Usopp_Page/favicon.png" alt="Usopp">
+          <div class="g-text"><div class="g-role">Fun Facts</div><div class="g-name">Usopp</div><div class="g-desc">Odds, ends, and storytelling &mdash; the fun stuff.</div></div>
+          <span class="g-arrow">&rarr;</span>
+        </a>
+        <a class="guide-row" href="Jinbei.html">
+          <img src="Jinbei_Page/favicon.png" alt="Jinbei">
+          <div class="g-text"><div class="g-role">Currently Learning</div><div class="g-name">Jinbei</div><div class="g-desc">Whatever's being picked up and studied right now.</div></div>
+          <span class="g-arrow">&rarr;</span>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // gentle entrance, no forced redirect — the project's finished, this is a title screen now
+    requestAnimationFrame(()=>{
+      const wrap = document.getElementById('wrap');
+      wrap.style.transition = 'opacity .8s ease, transform .8s ease';
+      requestAnimationFrame(()=>{
+        wrap.style.opacity = '1';
+        wrap.style.transform = 'translateY(0)';
+      });
+    });
+
+    // "New here?" guide modal
+    (function(){
+      const overlay  = document.getElementById('guideOverlay');
+      const openBtn  = document.getElementById('guideOpenBtn');
+      const closeBtn = document.getElementById('guideCloseBtn');
+
+      function openGuide(){
+        overlay.classList.add('is-open');
+        document.body.style.overflow = 'hidden';
+      }
+      function closeGuide(){
+        overlay.classList.remove('is-open');
+        document.body.style.overflow = '';
+      }
+
+      openBtn.addEventListener('click', openGuide);
+      closeBtn.addEventListener('click', closeGuide);
+      overlay.addEventListener('click', function(e){
+        if (e.target === overlay) closeGuide();
+      });
+      document.addEventListener('keydown', function(e){
+        if (e.key === 'Escape' && overlay.classList.contains('is-open')) closeGuide();
+      });
+    })();
+  </script>
 </body>
 </html>
