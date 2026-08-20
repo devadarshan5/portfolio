@@ -18,6 +18,32 @@
   }
   img { max-width:100%; display:block; }
 
+  /* =====================================================================
+     PAGE TRANSITIONS & LOADING SCREENS (shared with every crew page)
+     ===================================================================== */
+  .page-transition{ position:fixed; inset:0; z-index:9997; pointer-events:none; }
+  .pt-blot{ position:absolute; left:50%; top:50%; width:160vmax; height:160vmax; background:#04060c; border-radius:50%; transform:translate(-50%,-50%) scale(1); }
+  .pt-blot2{ width:140vmax; height:140vmax; opacity:.92; }
+  .pt-blot3{ width:120vmax; height:120vmax; opacity:.85; }
+
+  .char-loading{ position:fixed; inset:0; z-index:9999; background:#000; opacity:0; pointer-events:none; transition:opacity .5s ease; overflow:hidden; }
+  .char-loading.is-active{ opacity:1; pointer-events:auto; }
+  .char-loading img.nl-bg{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; opacity:0; transition:opacity .6s ease, transform 6s ease; transform:scale(1.06); }
+  .char-loading img.nl-bg.is-shown{ opacity:1; transform:scale(1); }
+  .rain-layer{ position:absolute; inset:0; overflow:hidden; }
+  .rain-icon{ position:absolute; top:-60px; cursor:pointer; will-change:transform; filter:drop-shadow(0 2px 4px rgba(0,0,0,.5)); }
+  .rain-icon img{ display:block; width:100%; height:100%; object-fit:contain; }
+  .nl-caption{ position:absolute; bottom:40px; left:50%; transform:translateX(-50%); font-family:'Bebas Neue',sans-serif; letter-spacing:.05em; color:#F4C430; font-size:13px; opacity:0; transition:opacity .5s ease .3s; text-shadow:0 0 10px rgba(0,0,0,.8); }
+  .char-loading.is-active .nl-caption{ opacity:1; }
+
+  .sakura-wipe{ position:fixed; inset:0; z-index:9996; pointer-events:none; opacity:0; overflow:hidden; background:radial-gradient(circle at 50% 50%, #ffd6ef, #ff9ad5); transition:opacity .35s ease; }
+  .sakura-wipe.is-active{ opacity:1; }
+  .wipe-petal{ position:absolute; opacity:0; transform:scale(.2) rotate(0deg); transition:opacity .5s ease, transform .5s cubic-bezier(.2,1.4,.4,1); }
+  .wipe-petal.is-in{ opacity:.95; }
+
+  .sparkle{ position:fixed; font-family:'Bangers',cursive; color:#F4C430; pointer-events:none; z-index:10000; animation:sparkle-pop .9s ease-out forwards; }
+  @keyframes sparkle-pop{ 0%{ opacity:1; transform:translate(0,0) scale(.6); } 100%{ opacity:0; transform:translate(var(--sx), var(--sy)) scale(1.3); } }
+
   /* ambient grain, matches the rest of the site */
   .grain{position:fixed;inset:-50%;width:200%;height:200%;z-index:0;pointer-events:none;opacity:.05;
     background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)'/%3E%3C/svg%3E");
@@ -86,6 +112,8 @@
   .guide-btn:hover{ border-color:#F4C430; color:#F4C430; background:rgba(244,196,48,.08); }
   .guide-btn svg{ width:14px; height:14px; }
 
+  .sound-hint{ font-size:12px; color:rgba(255,255,255,.35); letter-spacing:.05em; }
+
   .guide-overlay{
     position:fixed; inset:0; z-index:50; display:flex; align-items:center; justify-content:center;
     background:rgba(2,3,6,.78); backdrop-filter:blur(4px);
@@ -108,7 +136,8 @@
     padding:4px; transition:color .2s ease;
   }
   .guide-close:hover{ color:#fff; }
-  .guide-intro{ font-style:italic; color:rgba(255,255,255,.65); font-size:15px; margin-bottom:20px; }
+  .guide-intro{ font-style:italic; color:rgba(255,255,255,.65); font-size:15px; margin-bottom:12px; }
+  .guide-sound-note{ font-size:13px; color:#F4C430; background:rgba(244,196,48,.08); border:1px solid rgba(244,196,48,.25); border-radius:6px; padding:8px 12px; margin-bottom:20px; }
   .guide-list{ display:flex; flex-direction:column; gap:10px; }
   .guide-row{
     display:flex; align-items:center; gap:14px; padding:10px; border-radius:6px;
@@ -136,6 +165,19 @@
 </style>
 </head>
 <body>
+  <!-- ==================== PAGE TRANSITIONS & LOADING SCREENS ==================== -->
+  <div class="page-transition" id="pageTransition">
+    <div class="pt-blot pt-blot1"></div>
+    <div class="pt-blot pt-blot2"></div>
+    <div class="pt-blot pt-blot3"></div>
+  </div>
+  <div class="sakura-wipe" id="sakuraWipe"></div>
+  <div class="char-loading" id="charLoading">
+    <img class="nl-bg" id="charLoadingImg" src="" alt="">
+    <div class="rain-layer" id="rainLayer"></div>
+    <div class="nl-caption" id="charLoadingCaption"></div>
+  </div>
+
   <div class="grain"></div>
   <div class="glow"></div>
 
@@ -150,7 +192,7 @@
     <h1 class="headline">The Log Is Open</h1>
     <p class="sub">Follow the Straw Hat crew's journey, one bounty and one gear at a time. Set sail whenever you're ready.</p>
 
-    <a class="enter-btn" href="Luffy.html">
+    <a class="enter-btn" href="Luffy.html" data-loading="luffy">
       Set Sail
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
     </a>
@@ -160,7 +202,7 @@
       New Here? Start This Way
     </button>
 
-    <div class="signature">Devadarshan R K</div>
+        <div class="signature">Devadarshan R K</div>
   </main>
 
   <div class="guide-overlay" id="guideOverlay">
@@ -170,53 +212,54 @@
         <button type="button" class="guide-close" id="guideCloseBtn" aria-label="Close">&times;</button>
       </div>
       <p class="guide-intro">Every page here is themed after a Straw Hat, but each one is really a normal part of a portfolio. Here's what's actually behind each poster.</p>
+      <p class="guide-sound-note">&#128266; Heads up: clicking any poster (including "Set Sail") plays a short sound effect and loading animation before the page opens. You may want to check your volume first.</p>
       <div class="guide-list">
-        <a class="guide-row" href="Luffy.html">
+        <a class="guide-row" href="Luffy.html" data-loading="luffy">
           <img src="Luffy_Page/favicon.png" alt="Luffy">
           <div class="g-text"><div class="g-role">Home</div><div class="g-name">Luffy</div><div class="g-desc">The landing page &mdash; starts here, always.</div></div>
           <span class="g-arrow">&rarr;</span>
         </a>
-        <a class="guide-row" href="Zoro.html">
+        <a class="guide-row" href="Zoro.html" data-loading="zoro">
           <img src="Zoro_Page/favicon.png" alt="Zoro">
           <div class="g-text"><div class="g-role">Projects</div><div class="g-name">Zoro</div><div class="g-desc">A grid of built projects and case studies.</div></div>
           <span class="g-arrow">&rarr;</span>
         </a>
-        <a class="guide-row" href="Nami.html">
+        <a class="guide-row" href="Nami.html" data-loading="nami">
           <img src="Nami_Page/favicon.png" alt="Nami">
           <div class="g-text"><div class="g-role">Skills</div><div class="g-name">Nami</div><div class="g-desc">A roadmap of skills, laid out like a voyage route.</div></div>
           <span class="g-arrow">&rarr;</span>
         </a>
-        <a class="guide-row" href="Sanji.html">
+        <a class="guide-row" href="Sanji.html" data-loading="sanji">
           <img src="Sanji_Page/favicon.png" alt="Sanji">
           <div class="g-text"><div class="g-role">Contact</div><div class="g-name">Sanji</div><div class="g-desc">A real contact form &mdash; get in touch here.</div></div>
           <span class="g-arrow">&rarr;</span>
         </a>
-        <a class="guide-row" href="Chopper.html">
+        <a class="guide-row" href="Chopper.html" data-loading="chopper">
           <img src="Chopper_Page/favicon.png" alt="Chopper">
           <div class="g-text"><div class="g-role">Now / Blog</div><div class="g-name">Chopper</div><div class="g-desc">A running log of what's being worked on lately.</div></div>
           <span class="g-arrow">&rarr;</span>
         </a>
-        <a class="guide-row" href="Robin.html">
+        <a class="guide-row" href="Robin.html" data-loading="robin">
           <img src="Robin_Page/favicon.png" alt="Robin">
           <div class="g-text"><div class="g-role">History</div><div class="g-name">Robin</div><div class="g-desc">Education and background, dug up like ruins.</div></div>
           <span class="g-arrow">&rarr;</span>
         </a>
-        <a class="guide-row" href="Franky.html">
+        <a class="guide-row" href="Franky.html" data-loading="franky">
           <img src="Franky_Page/favicon.png" alt="Franky">
           <div class="g-text"><div class="g-role">Tools</div><div class="g-name">Franky</div><div class="g-desc">The tools, hardware, and builds used day to day.</div></div>
           <span class="g-arrow">&rarr;</span>
         </a>
-        <a class="guide-row" href="Brook.html">
+        <a class="guide-row" href="Brook.html" data-loading="brook">
           <img src="Brook_Page/favicon.png" alt="Brook">
           <div class="g-text"><div class="g-role">Hobbies</div><div class="g-name">Brook</div><div class="g-desc">Music and hobbies outside of work.</div></div>
           <span class="g-arrow">&rarr;</span>
         </a>
-        <a class="guide-row" href="Usopp.html">
+        <a class="guide-row" href="Usopp.html" data-loading="usopp">
           <img src="Usopp_Page/favicon.png" alt="Usopp">
           <div class="g-text"><div class="g-role">Fun Facts</div><div class="g-name">Usopp</div><div class="g-desc">Odds, ends, and storytelling &mdash; the fun stuff.</div></div>
           <span class="g-arrow">&rarr;</span>
         </a>
-        <a class="guide-row" href="Jinbei.html">
+        <a class="guide-row" href="Jinbei.html" data-loading="jinbei">
           <img src="Jinbei_Page/favicon.png" alt="Jinbei">
           <div class="g-text"><div class="g-role">Currently Learning</div><div class="g-name">Jinbei</div><div class="g-desc">Whatever's being picked up and studied right now.</div></div>
           <span class="g-arrow">&rarr;</span>
@@ -260,6 +303,306 @@
         if (e.key === 'Escape' && overlay.classList.contains('is-open')) closeGuide();
       });
     })();
+
+    /* =====================================================================
+       PAGE TRANSITIONS, LOADING SCREENS, RAIN & SOUND
+       (ported straight from the crew pages so index.html matches)
+       ===================================================================== */
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    /* ---- lightweight sound engine ---- */
+    const SoundEngine = (function(){
+      let ctx=null, masterGain=null;
+      function ensureCtx(){
+        if (ctx) return;
+        ctx = new (window.AudioContext||window.webkitAudioContext)();
+        masterGain = ctx.createGain();
+        masterGain.gain.value = 0.35;
+        masterGain.connect(ctx.destination);
+      }
+      function playTick(){
+        ensureCtx();
+        if (ctx.state==='suspended') ctx.resume();
+        const o=ctx.createOscillator(), g=ctx.createGain();
+        o.type='triangle'; o.frequency.value=440;
+        g.gain.value=0.0001;
+        o.connect(g); g.connect(masterGain);
+        const t=ctx.currentTime;
+        g.gain.exponentialRampToValueAtTime(0.3,t+0.01);
+        g.gain.exponentialRampToValueAtTime(0.0001,t+0.2);
+        o.start(t); o.stop(t+0.22);
+      }
+      function playSparkle(){
+        ensureCtx();
+        if (ctx.state==='suspended') ctx.resume();
+        [880,1180,1560].forEach((f,i)=>{
+          const o=ctx.createOscillator(), g=ctx.createGain();
+          o.type='sine'; o.frequency.value=f;
+          g.gain.value=0.0001;
+          o.connect(g); g.connect(masterGain);
+          const t=ctx.currentTime+i*0.07;
+          g.gain.exponentialRampToValueAtTime(0.22,t+0.01);
+          g.gain.exponentialRampToValueAtTime(0.0001,t+0.3);
+          o.start(t); o.stop(t+0.32);
+        });
+      }
+      return { playTick, playSparkle };
+    })();
+
+    function burstSparkleAt(x, y){
+      const glyphs = ['&#10022;','&#10023;','&#10039;'];
+      for (let i=0;i<10;i++){
+        const s = document.createElement('span');
+        s.className = 'sparkle';
+        s.innerHTML = glyphs[Math.floor(Math.random()*glyphs.length)];
+        const angle = Math.random()*Math.PI*2, dist = 40+Math.random()*60;
+        s.style.setProperty('--sx', Math.cos(angle)*dist+'px');
+        s.style.setProperty('--sy', Math.sin(angle)*dist+'px');
+        s.style.left = x+'px'; s.style.top = y+'px';
+        s.style.fontSize = (14+Math.random()*10)+'px';
+        document.body.appendChild(s);
+        setTimeout(()=> s.remove(), 950);
+      }
+      SoundEngine.playSparkle();
+    }
+
+    /* ---- entrance + generic exit transition (ink blot) ---- */
+    function gsapFreeScale(elements, from, to, duration, done){
+      const start = performance.now();
+      elements.forEach(el=> el.style.transform = `translate(-50%,-50%) scale(${from})`);
+      function step(now){
+        const p = Math.min(1, (now-start)/duration);
+        const eased = 1 - Math.pow(1-p, 3);
+        const val = from + (to-from)*eased;
+        elements.forEach(el=> el.style.transform = `translate(-50%,-50%) scale(${val})`);
+        if (p<1) requestAnimationFrame(step); else if (done) done();
+      }
+      requestAnimationFrame(step);
+    }
+    function playEntranceTransition(){
+      const blots = document.querySelectorAll('.pt-blot');
+      gsapFreeScale(blots, 1, 0, reduceMotion ? 150 : 700, ()=>{ document.getElementById('pageTransition').style.pointerEvents='none'; });
+    }
+    playEntranceTransition();
+    function playExitTransition(x, y, href){
+      const overlay = document.getElementById('pageTransition');
+      const blots = overlay.querySelectorAll('.pt-blot');
+      blots.forEach(b=>{ b.style.left = x+'px'; b.style.top = y+'px'; });
+      overlay.style.pointerEvents = 'auto';
+      gsapFreeScale(blots, 0, 1, reduceMotion ? 150 : 850, ()=>{ window.location.href = href; });
+    }
+
+    /* ---- petal screen-fill wipes ---- */
+    function playPetalWipe(emoji, colorA, colorB, done){
+      const wipe = document.getElementById('sakuraWipe');
+      wipe.style.background = `radial-gradient(circle at 50% 50%, ${colorA}, ${colorB})`;
+      wipe.innerHTML = '';
+      wipe.classList.add('is-active');
+      const count = reduceMotion ? 0 : 46;
+      for (let i=0;i<count;i++){
+        const p = document.createElement('span');
+        p.className = 'wipe-petal';
+        p.textContent = Array.isArray(emoji) ? emoji[Math.floor(Math.random()*emoji.length)] : emoji;
+        p.style.left = (Math.random()*100) + 'vw';
+        p.style.top  = (Math.random()*100) + 'vh';
+        p.style.fontSize = (22 + Math.random()*30) + 'px';
+        const rot = Math.random()*360;
+        wipe.appendChild(p);
+        setTimeout(()=>{
+          p.classList.add('is-in');
+          p.style.transform = `scale(1.15) rotate(${rot}deg)`;
+        }, Math.random() * (reduceMotion ? 0 : 260));
+      }
+      setTimeout(()=>{ if (done) done(); }, reduceMotion ? 80 : 650);
+    }
+    function playSakuraWipe(done){ playPetalWipe('\u{1F338}', '#ffd6ef', '#ff9ad5', done); }
+    function playTangerineWipe(done){ playPetalWipe('\u{1F34A}', '#ffe0b0', '#ff9a3c', done); }
+    function playColaWipe(done){ playPetalWipe('\u{1F964}', '#f5e6c8', '#5c3a1e', done); }
+    function playMusicWipe(done){ playPetalWipe('\u{1F3B5}', '#2a1a3a', '#000000', done); }
+    function playThunderWipe(done){ playPetalWipe('\u{26A1}', '#1a3a1a', '#000000', done); }
+    function playLieWipe(done){ playPetalWipe('\u{1F925}', '#f3e3bd', '#b5502e', done); }
+    function playJinbeiWipe(done){ playPetalWipe(['\u{1F40B}','\u{1F988}','\u{1F30A}','\u{1F44A}','\u{2600}\u{FE0F}','\u{1F458}'], '#bfe9ff', '#04121c', done); }
+
+    /* ---- character loading screens: all 10, since index.html can route to any of them ---- */
+    const LOADING_SCREENS = {
+      luffy: {
+        images: ['Luffy_Page/loading1.jpg','Luffy_Page/loading2.png','Luffy_Page/loading3.jpg','Luffy_Page/loading4.png','Luffy_Page/loading5.png','Luffy_Page/loading6.jpeg','Luffy_Page/loading7.jpeg','Luffy_Page/loading8.jpg'],
+        icons:  ['Icons/meat.png','Icons/pizza.png'],
+        caption: "Setting course for the Captain\u2026",
+        href: 'Luffy.html',
+        audio: 'Luffy_Page/loading-sound.mp3'
+      },
+      zoro: {
+        images: ['Zoro_Page/loading1.jpg','Zoro_Page/loading2.jpg','Zoro_Page/loading3.jpeg'],
+        icons:  ['Icons/rum.png','Icons/sleep.png','Icons/enma.png','Icons/kitetsu.png','Icons/wado.png'],
+        caption: "One wrong turn from Wano\u2026",
+        href: 'Zoro.html',
+        transition: 'thunder',
+        audio: 'Zoro_Page/loading-sound.mp3'
+      },
+      nami: {
+        images: ['Nami_Page/loading1.png','Nami_Page/loading2.jpg','Nami_Page/loading3.jpeg'],
+        icons:  ['Icons/berry.png','Icons/tangerine.png'],
+        caption: "Charting a course to Nami's Route\u2026",
+        href: 'Nami.html',
+        transition: 'tangerine',
+        audio: 'Nami_Page/loading-sound.mp3'
+      },
+      sanji: {
+        images: ['Sanji_Page/loading1.jpg','Sanji_Page/loading2.jpg','Sanji_Page/loading3.jpg','Sanji_Page/loading4.jpg','Sanji_Page/loading5.jpg'],
+        icons:  ['Icons/meat.png','Icons/rum.png','Icons/pizza.png','Icons/mooncake.png'],
+        caption: "Heading to the galley\u2026",
+        href: 'Sanji.html',
+        audio: 'Sanji_Page/loading-sound.mp3'
+      },
+      chopper: {
+        images: ['Chopper_Page/loading1.jpg','Chopper_Page/loading2.jpg','Chopper_Page/loading3.jpg'],
+        icons:  ['Icons/sakura.png'],
+        caption: "Following the sakura trail\u2026",
+        href: 'Chopper.html',
+        transition: 'sakura',
+        audio: 'Chopper_Page/loading-sound.mp3'
+      },
+      robin: {
+        images: ['Robin_Page/loading1.jpg','Robin_Page/loading2.jpg','Robin_Page/loading3.jpg','Robin_Page/loading4.png','Robin_Page/loading5.jpg'],
+        icons:  ['Icons/sakura.png'],
+        caption: "Uncovering the record\u2026",
+        href: 'Robin.html',
+        transition: 'sakura',
+        audio: 'Robin_Page/loading-sound.mp3'
+      },
+      franky: {
+        images: ['Franky_Page/loading1.jpg','Franky_Page/loading2.jpg','Franky_Page/loading3.jpg','Franky_Page/loading4.jpg','Franky_Page/loading5.jpg'],
+        icons:  ['Icons/cola.png'],
+        caption: "Heading to the workshop\u2026",
+        href: 'Franky.html',
+        transition: 'cola',
+        audio: 'Franky_Page/loading-sound.mp3'
+      },
+      brook: {
+        images: ['Brook_Page/loading1.jpg','Brook_Page/loading2.jpg','Brook_Page/loading3.jpg','Brook_Page/loading4.jpg','Brook_Page/loading5.jpg'],
+        icons:  ['Icons/note1.png','Icons/note2.png','Icons/note3.png'],
+        caption: "Yohohoho\u2026 tuning in to the Soul King\u2026",
+        href: 'Brook.html',
+        transition: 'music',
+        audio: 'Brook_Page/loading-sound.mp3'
+      },
+      usopp: {
+        images: ['Usopp_Page/loading1.jpg','Usopp_Page/loading2.jpg','Usopp_Page/loading3.jpeg','Usopp_Page/loading4.jpg','Usopp_Page/loading5.jpg'],
+        icons:  ['Icons/impact.png','Icons/slingshot.png','Icons/hammer.png'],
+        caption: "Spinning up the next legend\u2026",
+        href: 'Usopp.html',
+        transition: 'lie',
+        audio: 'Usopp_Page/loading-sound.mp3'
+      },
+      jinbei: {
+        images: ['Jinbei_Page/loading1.jpg','Jinbei_Page/loading2.png','Jinbei_Page/loading3.jpg'],
+        icons:  ['Icons/wave.png','Icons/drop.png','Icons/punch.png','Icons/rum.png'],
+        caption: "Diving into open water with the Helmsman\u2026",
+        href: 'Jinbei.html',
+        transition: 'jinbei',
+        audio: 'Jinbei_Page/loading-sound.mp3'
+      }
+    };
+
+    function spawnRainIcon(container, icons){
+      const el=document.createElement('div');
+      el.className='rain-icon';
+      const size = 26+Math.random()*30;
+      el.style.width=size+'px'; el.style.height=size+'px';
+      el.style.left=(Math.random()*100)+'vw';
+      const duration = 2.4+Math.random()*1.8;
+      const rot = (Math.random()*80-40);
+      el.style.transition=`transform ${duration}s linear, opacity .3s ease`;
+      const img=document.createElement('img');
+      img.src = icons[Math.floor(Math.random()*icons.length)];
+      el.appendChild(img);
+      container.appendChild(el);
+      requestAnimationFrame(()=>{ el.style.transform = `translateY(115vh) rotate(${rot}deg)`; });
+      el.addEventListener('click', (e)=>{
+        e.stopPropagation();
+        burstSparkleAt(e.clientX, e.clientY);
+        el.style.opacity='0';
+        setTimeout(()=>el.remove(),300);
+      });
+      setTimeout(()=>{ if (el.parentNode) el.remove(); }, duration*1000+200);
+    }
+
+    function playCharLoadingScreen(key){
+      const config = LOADING_SCREENS[key];
+      if (!config) return;
+
+      let audioDone = false;
+      let fallbackTimer = null;
+      let rainInterval = null;
+
+      function finish(){
+        if (fallbackTimer) clearTimeout(fallbackTimer);
+        if (rainInterval) clearInterval(rainInterval);
+        window.location.href = config.href;
+      }
+
+      if (config.audio){
+        const sound = new Audio(config.audio);
+        fallbackTimer = setTimeout(()=>{ if(!audioDone){ audioDone=true; finish(); } }, 6000);
+        sound.addEventListener('ended', ()=>{ if(audioDone) return; audioDone=true; finish(); });
+        sound.addEventListener('error', ()=>{ if(audioDone) return; audioDone=true; finish(); });
+        sound.play().catch(()=>{ if(audioDone) return; audioDone=true; finish(); });
+      }
+
+      function reveal(){
+        const overlay   = document.getElementById('charLoading');
+        const img       = document.getElementById('charLoadingImg');
+        const rainLayer = document.getElementById('rainLayer');
+        const caption   = document.getElementById('charLoadingCaption');
+        img.src = config.images[Math.floor(Math.random()*config.images.length)];
+        img.classList.remove('is-shown');
+        caption.textContent = config.caption;
+        overlay.classList.add('is-active');
+        requestAnimationFrame(()=> img.classList.add('is-shown'));
+        rainInterval = setInterval(()=> spawnRainIcon(rainLayer, config.icons), 180);
+        setTimeout(()=>{
+          const wipe = document.getElementById('sakuraWipe');
+          if (wipe) wipe.classList.remove('is-active');
+        }, 400);
+        if (!config.audio){
+          setTimeout(finish, 2600);
+        }
+      }
+
+      if (config.transition === 'sakura'){
+        playSakuraWipe(reveal);
+      } else if (config.transition === 'tangerine'){
+        playTangerineWipe(reveal);
+      } else if (config.transition === 'cola'){
+        playColaWipe(reveal);
+      } else if (config.transition === 'music'){
+        playMusicWipe(reveal);
+      } else if (config.transition === 'thunder'){
+        playThunderWipe(reveal);
+      } else if (config.transition === 'lie'){
+        playLieWipe(reveal);
+      } else if (config.transition === 'jinbei'){
+        playJinbeiWipe(reveal);
+      } else {
+        reveal();
+      }
+    }
+
+    /* ---- wire up every [data-loading] link on this page (Set Sail + all 10 guide rows) ---- */
+    document.querySelectorAll('[data-loading]').forEach(a=>{
+      a.addEventListener('click', function(e){
+        e.preventDefault();
+        const href = this.getAttribute('href');
+        SoundEngine.playTick();
+        if (this.dataset.loading && LOADING_SCREENS[this.dataset.loading]){
+          playCharLoadingScreen(this.dataset.loading);
+        } else {
+          const rect = this.getBoundingClientRect();
+          playExitTransition(rect.left+rect.width/2, rect.top+rect.height/2, href);
+        }
+      });
+    });
   </script>
 </body>
 </html>
