@@ -1,0 +1,12 @@
+{
+  "name": "portfolio-checks",
+  "private": true,
+  "description": "Test tooling only - the site itself is plain static HTML.",
+  "scripts": {
+    "check:assets": "python3 scripts/check_assets.py",
+    "test": "node tests/smoke.js"
+  },
+  "devDependencies": {
+    "playwright": "1.65.1"
+  }
+}
