@@ -1,0 +1,38 @@
+name: Validate site
+
+# Whole-site safety net for manual pushes and pull requests.
+on:
+  push:
+    branches: [main]
+    paths: ["**.html", "scripts/**", "tests/**"]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Asset check (every referenced image/audio/page exists)
+        run: python3 scripts/check_assets.py
+
+      - uses: actions/setup-node@v4
+        if: always()
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install test browser
+        if: always()
+        run: |
+          npm ci
+          npx playwright install --with-deps chromium
+
+      - name: Browser smoke test (all pages)
+        if: always()
+        run: npm test

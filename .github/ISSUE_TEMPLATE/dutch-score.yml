@@ -1,0 +1,33 @@
+name: "🌊 Update Dutch score"
+description: Change the Nederlands (België) Duolingo score on the Jinbei page
+title: "Update Dutch score"
+labels: ["site-update"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Fill this in and press **Submit new issue**. A robot edits `Jinbei.html`, tests the page, publishes it and replies here with the result (about a minute).
+  - type: input
+    id: score
+    attributes:
+      label: Duolingo score
+      description: Whole number only.
+      placeholder: "24"
+    validations:
+      required: true
+  - type: input
+    id: level
+    attributes:
+      label: Level
+      description: The tier text shown under the number.
+      value: "A1 · Beginner"
+    validations:
+      required: true
+  - type: input
+    id: note
+    attributes:
+      label: Note (optional)
+      description: Leave empty to keep the current note.
+      placeholder: "Past the greetings — verbs are next."
+    validations:
+      required: false
