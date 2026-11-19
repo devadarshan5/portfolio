@@ -1,0 +1,117 @@
+name: Update site from form
+
+# Triggered by submitting one of the issue forms (Issues -> New issue).
+#   form -> edit HTML -> test the changed page -> commit to main -> wait for
+#   GitHub Pages -> confirm it is live -> reply on the issue and close it.
+on:
+  issues:
+    types: [opened]
+
+# Run updates one at a time so two quick submissions never collide.
+concurrency:
+  group: site-update
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+  issues: write
+
+jobs:
+  update:
+    # Public repos let anyone open issues. Only act on the owner's.
+    if: github.event.issue.user.login == github.repository_owner
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      GH_TOKEN: ${{ github.token }}
+      ISSUE: ${{ github.event.issue.number }}
+      RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Apply the update
+        id: apply
+        env:
+          # Passed as env vars (never pasted into the script) so issue text can't inject commands.
+          ISSUE_BODY: ${{ github.event.issue.body }}
+          ISSUE_CREATED_AT: ${{ github.event.issue.created_at }}
+          SITE_TZ: ${{ vars.SITE_TZ }}
+        run: python3 scripts/update_content.py
+
+      - uses: actions/setup-node@v4
+        if: steps.apply.outputs.changed == 'true'
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install test browser
+        if: steps.apply.outputs.changed == 'true'
+        run: |
+          npm ci
+          npx playwright install --with-deps chromium
+
+      - name: Test the changed page
+        if: steps.apply.outputs.changed == 'true'
+        env:
+          VERIFY_FILE: ${{ steps.apply.outputs.verify_file }}
+        run: |
+          python3 scripts/check_assets.py "$VERIFY_FILE"
+          PAGES="$VERIFY_FILE" npm test
+
+      - name: Publish (commit to main)
+        id: publish
+        if: steps.apply.outputs.changed == 'true'
+        env:
+          COMMIT_MSG: ${{ steps.apply.outputs.commit_msg }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A -- '*.html'
+          git commit -m "$COMMIT_MSG"
+          git pull --rebase origin "${GITHUB_REF_NAME}"
+          git push origin "HEAD:${GITHUB_REF_NAME}"
+
+      - name: Wait for GitHub Pages
+        id: live
+        if: steps.publish.outcome == 'success'
+        env:
+          VERIFY_FILE: ${{ steps.apply.outputs.verify_file }}
+          VERIFY_TEXT: ${{ steps.apply.outputs.verify_text }}
+          SITE_URL_VAR: ${{ vars.SITE_URL }}
+        run: |
+          repo="${GITHUB_REPOSITORY#*/}"
+          if [ -n "$SITE_URL_VAR" ]; then base="${SITE_URL_VAR%/}"
+          elif [ "$repo" = "${GITHUB_REPOSITORY_OWNER}.github.io" ]; then base="https://${repo}"
+          else base="https://${GITHUB_REPOSITORY_OWNER}.github.io/${repo}"; fi
+          url="${base}/${VERIFY_FILE}"
+          echo "url=${url}" >> "$GITHUB_OUTPUT"
+          for i in $(seq 1 30); do            # up to ~5 minutes
+            if curl -fsSL "${url}?cb=$(date +%s)" | grep -qF -- "$VERIFY_TEXT"; then
+              echo "live=true" >> "$GITHUB_OUTPUT"; echo "Live after ~$((i*10))s"; exit 0
+            fi
+            sleep 10
+          done
+          echo "live=false" >> "$GITHUB_OUTPUT"   # not fatal: the commit is in, Pages may just be slow
+
+      - name: Reply on the issue (success)
+        if: steps.apply.outputs.changed == 'true' && steps.publish.outcome == 'success'
+        env:
+          SUMMARY: ${{ steps.apply.outputs.summary }}
+          LIVE: ${{ steps.live.outputs.live }}
+          URL: ${{ steps.live.outputs.url }}
+        run: |
+          if [ "$LIVE" = "true" ]; then status="✅ **Live now:** ${URL}"
+          else status="⏳ Committed and tested, but I couldn't see it on the live site yet. GitHub Pages can take a few minutes: check ${URL} shortly."; fi
+          gh issue comment "$ISSUE" --body "${SUMMARY}"$'\n\n'"${status}"$'\n\n'"Run log: ${RUN_URL}"
+          gh issue close "$ISSUE" --reason completed
+
+      - name: Reply on the issue (failure)
+        if: failure()
+        env:
+          ERROR: ${{ steps.apply.outputs.error }}
+        run: |
+          msg="❌ Nothing was published."
+          [ -n "$ERROR" ] && msg="${msg}"$'\n\n'"**Why:** ${ERROR}"
+          msg="${msg}"$'\n\n'"Details: ${RUN_URL}"$'\n\n'"Fix the problem and submit a new form."
+          gh issue comment "$ISSUE" --body "$msg"
+          gh issue close "$ISSUE" --reason "not planned"

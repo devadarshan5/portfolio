@@ -1,0 +1,49 @@
+name: "🩺 New Chopper log entry"
+description: Add a card to the top of Tony Tony's Lab Log (Chopper.html)
+title: "New Chopper entry"
+labels: ["site-update"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Fill this in and press **Submit new issue**. A robot adds the card (with the NEW! sticker), tests the page, publishes it and replies here (about a minute).
+        You can write links as `[text](https://example.com)`. A blank line starts a new paragraph.
+  - type: input
+    id: title
+    attributes:
+      label: Entry title
+      placeholder: "Fresh Bazzite Install — Trial's Over"
+    validations:
+      required: true
+  - type: dropdown
+    id: form
+    attributes:
+      label: Form
+      description: Which Rumble Ball filter tab it belongs to.
+      options:
+        - Brain Point (Lore/Tech)
+        - Walk Point (Journal)
+        - Kung Fu Point (Action)
+    validations:
+      required: true
+  - type: textarea
+    id: body
+    attributes:
+      label: What happened
+    validations:
+      required: true
+  - type: textarea
+    id: orders
+    attributes:
+      label: Dr. Chopper's Orders (optional)
+      description: The dashed "ticket" note under the entry. Leave empty for none.
+    validations:
+      required: false
+  - type: input
+    id: date
+    attributes:
+      label: Date (optional)
+      description: "Format 2026-11-18. Leave empty to use today."
+      placeholder: "2026-11-18"
+    validations:
+      required: false
