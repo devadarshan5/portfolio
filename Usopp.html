@@ -1227,6 +1227,9 @@ function flashTransform(){
   transformFlash.classList.add('is-flashing');
 }
 
+const sogekingTheme = new Audio('Usopp_Page/sogeking-theme.mp3');
+sogekingTheme.loop = true;
+
 function toggleSogekingMode(){
   const isOn = document.body.classList.toggle('is-sogeking');
   const copy = isOn ? SOGEKING_COPY : USOPP_COPY;
@@ -1238,12 +1241,13 @@ function toggleSogekingMode(){
   SoundEngine.playBeat();
   if (isOn){
     maskHint.textContent = 'tap to become Usopp again';
-    themeStatus.textContent = '\u266A no track loaded yet';
-    const theme = new Audio('Usopp_Page/sogeking-theme.mp3');
-    theme.play().catch(()=>{ /* placeholder — no real track yet */ });
+    themeStatus.textContent = '\u266A Now playing: Sogeking\u2019s theme';
+    sogekingTheme.currentTime = 0;
+    sogekingTheme.play().catch(()=>{ themeStatus.textContent = ''; });
   } else {
     maskHint.textContent = 'tap the mask';
     themeStatus.textContent = '';
+    sogekingTheme.pause();
   }
 }
 
